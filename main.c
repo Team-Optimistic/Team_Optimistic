@@ -1,5 +1,6 @@
 #pragma config(UART_Usage, UART1, uartUserControl, baudRate9600, IOPins, None, None)
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
+#pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  leftQuad,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  rightQuad,      sensorQuadEncoder)
 #pragma config(Motor,  port1,            ,             tmotorVex393_HBridge, openLoop, reversed, driveLeft)
@@ -20,7 +21,10 @@ task main()
 		//Send msg header
 		sendChar(UART1, msgCount++);
 
-		//Send quad data
+		//Send analog data
+		sendChar(UART1, (short)SensorValue[intakePot]);
+
+		//Send digital data
 		sendChar(UART1, (short)SensorValue[leftQuad]);
 		sendChar(UART1, (short)SensorValue[rightQuad]);
 

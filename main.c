@@ -73,34 +73,56 @@ task readBuffer()
 	}
 }
 
-void setLeftMotors(int powerValue){
+void setLeftMotors(int powerValue)
+{
 	motor[leftMotor] = powerValue;
 }
 
-void setRightMotors(int powerValue){
+void setRightMotors(int powerValue)
+{
 	motor[rightMotor] = powerValue;
 }
 
-bool driveStraight(int distance){
+bool driveStraight(int distance)
+{
+	//Save left and right quad values instead of setting them to zero
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
-	pos_PID distancePID , anglePID;
-	float distanceElapsed = 0;
-	pos_PID_InitController(&distancePID, &distanceElapsed, 0, 0, 0);
-	float angleChange = 0;
-	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
+
+	//Total distance elapsed since start and total angle change since start
+	float distanceElapsed = 0, angleChange = 0;
+
+	//Target distance for the distance PID controller
+	//Angle PID controller's target is 0
 	int targetDistance = distance;
+
+	pos_PID distancePID , anglePID;
+
+	pos_PID_InitController(&distancePID, &distanceElapsed, 0, 0, 0);
+	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
+
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
 	pos_PID_SetTargetPosition(&anglePID, 0);
+
+	//If distance PID controller is at target
 	bool atTarget = false;
+
+	//Current left and right quad displacements
 	long currentLeft, currentRight;
+
+	//Distance and angle PID output
 	int distOutput, angleOutput;
-	while (!atTarget){
-		currentLeft = (SensorValue[leftQuad] - encoderLeft);
-		currentRight = (SensorValue[rightQuad] - encoderRight);
+
+	while (!atTarget)
+	{
+		currentLeft = SensorValue[leftQuad] - encoderLeft;
+		currentRight = SensorValue[rightQuad] - encoderRight;
+
 		distanceElapsed = (currentLeft + currentRight) / 2.0;
-		angleChange = currentRight - currentLeft
+		angleChange = currentRight - currentLeft;
+
 		distOutput = pos_PID_StepController(&distancePID);
 		angleOutput = pos_PID_StepController(&anglePID);
+
 		setLeftMotors(distOutput + angleOutput);
 		setRightMotors(distOutput - angleOutput);
 	}

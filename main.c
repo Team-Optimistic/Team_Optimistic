@@ -69,3 +69,42 @@ void setLeftMotors(int powerValue){
 void setRightMotors(int powerValue){
 	motor[rightMotor] = powerValue;
 }
+
+bool driveStraight(int distance){
+	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	pos_PID distancePID , anglePID;
+	float distanceElapsed = 0;
+	pos_PID_InitController(&distancePID, &distanceElapsed, 0, 0, 0);
+	float angleChange = 0;
+	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
+	int targetDistance = distance;
+	pos_PID_SetTargetPosition(&distancePID, targetDistance);
+	pos_PID_SetTargetPosition(&anglePID, 0);
+	bool atTarget = false;
+	long currentLeft, currentRight;
+	int distOutput, angleOutput;
+	while (!atTarget){
+		currentLeft = (SensorValue[leftQuad] - encoderLeft);
+		currentRight = (SensorValue[rightQuad] - encoderRight);
+		distanceElapsed = (currentLeft + currentRight) / 2.0;
+		angleChange = currentRight - currentLeft
+		distOutput = pos_PID_StepController(&distancePID);
+		angleOutput = pos_PID_StepController(&anglePID);
+		setLeftMotors(distOutput + angleOutput);
+		setRightMotors(distOutput - angleOutput);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -23,6 +23,7 @@ task main()
 		//Send data to pi
 		sendCurrentData();
 
+		//Read current message and write to debug stream
 		semaphoreLock(msgSem);
 		if (bDoesTaskOwnSemaphore(msgSem))
 		{

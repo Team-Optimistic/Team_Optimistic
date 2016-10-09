@@ -1,23 +1,23 @@
 #ifndef MOTORCONTROL_H_INCLUDED
 #define MOTORCONTROL_H_INCLUDED
 
-void setLeftMotors(int powerValue)
+void setLeftMotors(const int powerValue)
 {
 	motor[leftMotor] = powerValue;
 }
 
-void setRightMotors(int powerValue)
+void setRightMotors(const int powerValue)
 {
 	motor[rightMotor] = powerValue;
 }
 
-void setAllMotors(int power)
+void setAllMotors(const int power)
 {
 	setLeftMotors(power);
 	setRightMotors(power);
 }
 
-bool driveStraight(int distance)
+bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -94,7 +94,7 @@ bool driveStraight(int distance)
 	return true;
 }
 
-bool turn(int angle)
+bool turn(const int angle)
 {
 	//Save left and right quad values instead of setting them to zero
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -164,4 +164,11 @@ bool turn(int angle)
 	return true;
 }
 
-#endif //MOTORCONTROL_H_INCLUDED\
+bool moveToPoint(const int x, const int y)
+{
+
+
+	return true;
+}
+
+#endif //MOTORCONTROL_H_INCLUDED

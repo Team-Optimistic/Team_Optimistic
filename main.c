@@ -15,10 +15,24 @@
 
 task main()
 {
+	//Start reading from pi
+	startTask(readBuffer);
+
 	while (true)
 	{
 		//Send data to pi
 		sendCurrentData();
+
+		semaphoreLock(msgSem);
+		if (bDoesTaskOwnSemaphore(msgSem))
+		{
+			writeDebugStreamLine("%d,%d,%d", msg[0], msg[1], msg[2]);
+
+			if (bDoesTaskOwnSemaphore(msgSem))
+			{
+				semaphoreUnlock(msgSem);
+			}
+		}
 
 		//Task wait
 		wait1Msec(15);

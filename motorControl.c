@@ -77,7 +77,77 @@ bool driveStraight(int distance)
 		setRightMotors(distOutput - angleOutput);
 
 		//Place mark if we're close enough to the target distance
-		if (fabs(distance - distanceElapsed) <= atTargetDistance)
+		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
+		{
+			timer_PlaceMarker(&atTargetTimer);
+		}
+
+		//If we've been close enough for long enough, we're there
+		if (timer_GetDTFromMarker(&atTargetTimer) > timeoutPeriod)
+		{
+			atTarget = true;
+		}
+	}
+
+	setAllMotors(0);
+
+	return true;
+}
+
+bool turn(int angle)
+{
+	//Save left and right quad values instead of setting them to zero
+	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+
+	//Total angle change since start
+	float angleChange = 0;
+
+	//Target angle
+	int targetAngle = angle;
+
+	pos_PID anglePID;
+
+	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
+
+	pos_PID_SetTargetPosition(&anglePID, 0);
+
+	//If angle PID controller is at target
+	bool atTarget = false;
+
+	//Angle that is "close enough" to target
+	const int atTargetAngle = 10;
+
+	//Timer for being at target
+	timer atTargetTimer;
+	timer_Initialize(&atTargetTimer);
+
+	//Timeout period (ms)
+	const int timeoutPeriod = 250;
+
+	//Current left and right quad displacements
+	long currentLeft, currentRight;
+
+	//Distance and angle PID output
+	int angleOutput;
+
+	while (!atTarget)
+	{
+		//Calculate distance displacement
+		currentLeft = SensorValue[leftQuad] - encoderLeft;
+		currentRight = SensorValue[rightQuad] - encoderRight;
+
+		//Angle change doesn't need to be a real angle, just the difference in displacements
+		angleChange = currentRight - currentLeft;
+
+		//Get output from PID
+		angleOutput = pos_PID_StepController(&anglePID);
+
+		//Set motors to angle PID output
+		setLeftMotors(angleOutput);
+		setRightMotors(-1 * angleOutput);
+
+		//Place mark if we're close enough to the target angle
+		if (fabs(targetAngle - angleChange) <= atTargetAngle)
 		{
 			timer_PlaceMarker(&atTargetTimer);
 		}

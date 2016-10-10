@@ -81,11 +81,15 @@ bool driveStraight(const int distance)
 		//Place mark if we're close enough to the target distance
 		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
 		{
-			timer_PlaceMarker(&atTargetTimer);
+			timer_PlaceHardMarker(&atTargetTimer);
+		}
+		else
+		{
+			timer_ClearHardMarker(&atTargetTimer);
 		}
 
 		//If we've been close enough for long enough, we're there
-		if (timer_GetDTFromMarker(&atTargetTimer) > timeoutPeriod)
+		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)
 		{
 			atTarget = true;
 		}
@@ -151,11 +155,15 @@ bool turn(const int angle)
 		//Place mark if we're close enough to the target angle
 		if (fabs(targetAngle - angleChange) <= atTargetAngle)
 		{
-			timer_PlaceMarker(&atTargetTimer);
+			timer_PlaceHardMarker(&atTargetTimer);
+		}
+		else
+		{
+			timer_ClearHardMarker(&atTargetTimer);
 		}
 
 		//If we've been close enough for long enough, we're there
-		if (timer_GetDTFromMarker(&atTargetTimer) > timeoutPeriod)
+		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)
 		{
 			atTarget = true;
 		}

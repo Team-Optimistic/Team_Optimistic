@@ -12,12 +12,15 @@
 	Message recieve structure is
 	<start byte 0xFA>
 	<short message count>
-	<short x coordinate>
-	<short y coordinate>
+	<short estimated x>
+	<short estimated y>
+	<short estimated theta>
+	<short x coordinate demand>
+	<short y coordinate demand>
 */
 
 //Message length (excluding start byte)
-#define MSG_LENGTH 3
+#define MSG_LENGTH 6
 short msg[MSG_LENGTH];
 short msgFlagHolder;
 TSemaphore msgSem;

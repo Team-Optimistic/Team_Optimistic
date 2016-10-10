@@ -1,6 +1,8 @@
 #ifndef MOTORCONTROL_H_INCLUDED
 #define MOTORCONTROL_H_INCLUDED
 
+#include "uartHandler.c"
+
 void setLeftMotors(const int powerValue)
 {
 	motor[leftMotor] = powerValue;
@@ -166,7 +168,25 @@ bool turn(const int angle)
 
 bool moveToPoint(const int x, const int y)
 {
+	semaphoreLock(msgSem);
 
+	if (bDoesTaskOwnSemaphore(msgSem))
+	{
+		//Compute difference in distance and drive
+		float xDiff = x - msg[1], yDiff = y - msg[2];
+		float distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+
+		//Compute difference in angle and turn
+		float thetaDiff = (atan2(yDiff, xDiff) * (180 / PI)) - msg[3];
+
+		if (bDoesTaskOwnSemaphore(msgSem))
+		{
+			semaphoreUnlock(msgSem);
+		}
+
+		turn(thetaDiff);
+		driveStraight(distance);
+	}
 
 	return true;
 }

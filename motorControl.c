@@ -108,6 +108,10 @@ bool turn(const int angle)
 	//Total angle change since start
 	float angleChange = 0;
 
+	//Radius of robot
+	const float robotRadius = 11.5;
+	const float angleScale = 0.017453 * robotRadius; //2pi*radius*(theta/360)=encoder
+
 	//Target angle
 	int targetAngle = angle;
 
@@ -143,7 +147,7 @@ bool turn(const int angle)
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
 		//Angle change doesn't need to be a real angle, just the difference in displacements
-		angleChange = currentRight - currentLeft;
+		angleChange = currentRight / angleScale;
 
 		//Get output from PID
 		angleOutput = pos_PID_StepController(&anglePID);

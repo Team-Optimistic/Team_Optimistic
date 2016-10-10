@@ -14,6 +14,8 @@
 
 task main()
 {
+	initUART();
+
 	//Start reading from pi
 	startTask(readBuffer);
 

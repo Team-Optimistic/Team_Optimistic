@@ -21,14 +21,15 @@
 
 //Message length (excluding start byte)
 #define MSG_LENGTH 6
+
+//Current message
 short msg[MSG_LENGTH];
-short msgFlagHolder;
+
+//Message write semaphore, always get lock before reading or writing
 TSemaphore msgSem;
 
 //Total message count
 static short msgCount;
-
-//Current message
 
 void initUART()
 {
@@ -58,6 +59,7 @@ void sendCurrentData()
 task readBuffer()
 {
 	unsigned int index = 0;
+	short msgFlagHolder;
 
 	while (true)
 	{

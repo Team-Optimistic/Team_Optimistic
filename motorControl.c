@@ -13,10 +13,14 @@ void setRightMotors(const int powerValue)
 	motor[rightMotor] = powerValue;
 }
 
-void setAllMotors(const int power)
+void setAllDriveMotors(const int power)
 {
 	setLeftMotors(power);
 	setRightMotors(power);
+}
+
+void setIntakeMotors(const int power)
+{
 }
 
 bool driveStraight(const int distance)
@@ -95,7 +99,7 @@ bool driveStraight(const int distance)
 		}
 	}
 
-	setAllMotors(0);
+	setAllDriveMotors(0);
 
 	return true;
 }
@@ -173,7 +177,7 @@ bool turn(const int angle)
 		}
 	}
 
-	setAllMotors(0);
+	setAllDriveMotors(0);
 
 	return true;
 }
@@ -185,11 +189,11 @@ bool moveToPoint(const int x, const int y)
 	if (bDoesTaskOwnSemaphore(msgSem))
 	{
 		//Compute difference in distance and drive
-		float xDiff = x - msg[1], yDiff = y - msg[2];
+		float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
 		float distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
 		//Compute difference in angle and turn
-		float thetaDiff = (atan2(yDiff, xDiff) * (180 / PI)) - msg[3];
+		float thetaDiff = (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
 
 		if (bDoesTaskOwnSemaphore(msgSem))
 		{

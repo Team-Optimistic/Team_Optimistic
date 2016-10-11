@@ -17,13 +17,21 @@
 	<short estimated theta>
 	<short x coordinate demand>
 	<short y coordinate demand>
+	<short pick up object>
 */
 
 //Message length (excluding start byte)
-#define MSG_LENGTH 6
+#define MSG_LENGTH 7
 
 //Current message
 short msg[MSG_LENGTH];
+#define MSG_COUNT     0
+#define MSG_EST_X     1
+#define MSG_EST_Y     2
+#define MSG_EST_THETA 3
+#define MSG_X_COORD   4
+#define MSG_Y_COORD   5
+#define MSG_PICKUP    6
 
 //Message write semaphore, always get lock before reading or writing
 TSemaphore msgSem;

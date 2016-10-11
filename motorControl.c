@@ -26,14 +26,14 @@ void setIntakeMotors(const int power)
 bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
-	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
 
 	//Total distance elapsed since start and total angle change since start
 	float distanceElapsed = 0, angleChange = 0;
 
 	//Target distance for the distance PID controller
 	//Angle PID controller's target is 0
-	int targetDistance = distance;
+	const int targetDistance = distance;
 
 	pos_PID distancePID , anglePID;
 

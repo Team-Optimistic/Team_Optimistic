@@ -3,6 +3,12 @@
 
 #include "uartHandler.c"
 
+typedef struct distanceAndAngle_t
+{
+	float length;
+	float theta;
+} distanceAndAngle;
+
 void setLeftMotors(const int powerValue)
 {
 	motor[leftMotor] = powerValue;
@@ -182,29 +188,103 @@ bool turn(const int angle)
 	return true;
 }
 
-bool moveToPoint(const int x, const int y)
+float computeDistanceToPoint(const int x, const int y)
 {
 	semaphoreLock(msgSem);
 
 	if (bDoesTaskOwnSemaphore(msgSem))
 	{
-		//Compute difference in distance and drive
-		float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
-		float distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+		//Compute difference in distance
+		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+		return sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
-		//Compute difference in angle and turn
-		float thetaDiff = (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
+		if (bDoesTaskOwnSemaphore(msgSem))
+		{
+			semaphoreUnlock(msgSem);
+		}
+	}
+
+	//If no lock, return no distance
+	return 0;
+}
+
+float computeAngleToPoint(const int x, const int y)
+{
+	semaphoreLock(msgSem);
+
+	if (bDoesTaskOwnSemaphore(msgSem))
+	{
+		//Compute difference in distance
+		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+
+		//Compute difference in angle
+		return (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
+
+		if (bDoesTaskOwnSemaphore(msgSem))
+		{
+			semaphoreUnlock(msgSem);
+		}
+	}
+
+	//If no lock, return no angle
+	return 0;
+}
+
+distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
+{
+	distanceAngAngle out;
+
+	semaphoreLock(msgSem);
+
+	if (bDoesTaskOwnSemaphore(msgSem))
+	{
+		//Compute difference in distance
+		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+		out.length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+
+		//Compute difference in angle
+		out.theta = (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
+
+		if (bDoesTaskOwnSemaphore(msgSem))
+		{
+			semaphoreUnlock(msgSem);
+		}
+	}
+
+	//If no lock, return empty type
+	out.length = 0;
+	out.theta = 0;
+
+	return out;
+}
+
+bool moveToPoint(const int x, const int y)
+{
+	distanceAngAngle *temp = computeDistanceAndAngleToPoint(x, y);
+
+	turn(temp.theta);
+	driveStraight(temp.length);
+
+	return true;
+}
+
+bool pickUpStar(const int x, const int y)
+{
+	semaphoreLock(msgSem);
+
+	if (bDoesTaskOwnSemaphore(msgSem))
+	{
+
 
 		if (bDoesTaskOwnSemaphore(msgSem))
 		{
 			semaphoreUnlock(msgSem);
 		}
 
-		turn(thetaDiff);
-		driveStraight(distance);
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 #endif //MOTORCONTROL_H_INCLUDED

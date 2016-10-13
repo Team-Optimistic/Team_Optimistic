@@ -29,6 +29,32 @@ void setIntakeMotors(const int power)
 {
 }
 
+/*
+Intakes a star
+@return Whether the operation was successful
+*/
+bool intakeStar()
+{
+	//Move star into bucket
+	setIntakeMotors(127);
+	while (SensorValue[intakePot] < 100) { wait1Msec(5); }
+
+	setIntakeMotors(0);
+	wait1Msec(100);
+
+	setIntakeMotors(-127);
+	while (SensorValue[intakePot] > 0) { wait1Msec(5); }
+
+	setIntakeMotors(0);
+
+	return true;
+}
+
+/*
+Drives in a straight line for a distance
+@param distance Distance to drive for
+@return Whether the operation was successful
+*/
 bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -110,6 +136,11 @@ bool driveStraight(const int distance)
 	return true;
 }
 
+/*
+Turns to an angle
+@param angle Angle to turn to
+@return Whether the operation was successful
+*/
 bool turn(const int angle)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -187,7 +218,12 @@ bool turn(const int angle)
 
 	return true;
 }
-
+/*
+Computes the distance to a point
+@param x X coordinate of other point
+@param y Y coordinate of other point
+@return distance to point
+*/
 float computeDistanceToPoint(const int x, const int y)
 {
 	semaphoreLock(msgSem);
@@ -208,6 +244,12 @@ float computeDistanceToPoint(const int x, const int y)
 	return 0;
 }
 
+/*
+Computes the angle to a point
+@param x X coordinate of other point
+@param y Y coordinate of other point
+@return angle to point
+*/
 float computeAngleToPoint(const int x, const int y)
 {
 	semaphoreLock(msgSem);
@@ -230,6 +272,12 @@ float computeAngleToPoint(const int x, const int y)
 	return 0;
 }
 
+/*
+Computes the distance and angle from current location to a point
+@param x X coordinate of other point
+@param y Y coordinate of other point
+@return distance and angle to point
+*/
 distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAngAngle out;
@@ -258,23 +306,37 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 	return out;
 }
 
-bool moveToPoint(const int x, const int y)
+/*
+Turns and drives to a point
+@param x X coordinate to move to
+@param y Y coordinate to move to
+@param offset Backward offset from final distance to point
+*/
+bool moveToPoint(const int x, const int y, int offset = 0)
 {
 	distanceAngAngle *temp = computeDistanceAndAngleToPoint(x, y);
 
 	turn(temp.theta);
-	driveStraight(temp.length);
+	driveStraight(temp.length - offset);
 
 	return true;
 }
 
+/*
+Picks up a star
+@param x X coordinate of star
+@param y Y coordinate of star
+@return Whether operation was successful
+ */
 bool pickUpStar(const int x, const int y)
 {
 	semaphoreLock(msgSem);
 
 	if (bDoesTaskOwnSemaphore(msgSem))
 	{
-
+		//Move to slightly behind star
+		moveToPoint(x, y, 10);
+		intakeStar();
 
 		if (bDoesTaskOwnSemaphore(msgSem))
 		{

@@ -1,5 +1,5 @@
-#ifndef MOTORCONTROL_H_INCLUDED
-#define MOTORCONTROL_H_INCLUDED
+#ifndef MOTORCONTROL_C_INCLUDED
+#define MOTORCONTROL_C_INCLUDED
 
 #include "uartHandler.c"
 
@@ -29,6 +29,7 @@ void setIntakeMotors(const int power)
 {
 }
 
+#warning "IntakeStar"
 /*
 Intakes a star
 @return Whether the operation was successful
@@ -50,6 +51,7 @@ bool intakeStar()
 	return true;
 }
 
+#warning "DriveStraight"
 /*
 Drives in a straight line for a distance
 @param distance Distance to drive for
@@ -136,6 +138,7 @@ bool driveStraight(const int distance)
 	return true;
 }
 
+#warning "Turn"
 /*
 Turns to an angle
 @param angle Angle to turn to
@@ -218,6 +221,8 @@ bool turn(const int angle)
 
 	return true;
 }
+
+#warning "ComputeDistanceToPoint"
 /*
 Computes the distance to a point
 @param x X coordinate of other point
@@ -244,6 +249,7 @@ float computeDistanceToPoint(const int x, const int y)
 	return 0;
 }
 
+#warning "ComputeAngleToPoint"
 /*
 Computes the angle to a point
 @param x X coordinate of other point
@@ -272,6 +278,7 @@ float computeAngleToPoint(const int x, const int y)
 	return 0;
 }
 
+#warning "ComputeDistanceAndAngleToPoint"
 /*
 Computes the distance and angle from current location to a point
 @param x X coordinate of other point
@@ -280,7 +287,7 @@ Computes the distance and angle from current location to a point
 */
 distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
-	distanceAngAngle out;
+	distanceAndAngle out;
 
 	semaphoreLock(msgSem);
 
@@ -306,6 +313,7 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 	return out;
 }
 
+#warning "MoveToPoint"
 /*
 Turns and drives to a point
 @param x X coordinate to move to
@@ -314,14 +322,15 @@ Turns and drives to a point
 */
 bool moveToPoint(const int x, const int y, int offset = 0)
 {
-	distanceAngAngle *temp = computeDistanceAndAngleToPoint(x, y);
+	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
 
-	turn(temp.theta);
-	driveStraight(temp.length - offset);
+	turn(temp->theta);
+	driveStraight(temp->length - offset);
 
 	return true;
 }
 
+#warning "PickUpStar"
 /*
 Picks up a star
 @param x X coordinate of star

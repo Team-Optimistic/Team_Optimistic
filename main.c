@@ -10,7 +10,6 @@
 #include "BCI\BCI.h"
 
 #include "motorControl.c"
-#include "uartHandler.c"
 
 task main()
 {

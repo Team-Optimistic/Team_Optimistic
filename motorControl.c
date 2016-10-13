@@ -358,4 +358,4 @@ bool pickUpStar(const int x, const int y)
 	return false;
 }
 
-#endif //MOTORCONTROL_H_INCLUDED
+#endif //MOTORCONTROL_C_INCLUDED

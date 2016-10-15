@@ -33,6 +33,8 @@ bool isSameObject(const short x, const short y)
 //Drives the robot based on recieved commands
 task commandRobot()
 {
+  short xDemand, yDemand;
+
   while (true)
   {
     if (!isWorking)
@@ -41,19 +43,27 @@ task commandRobot()
 
       if (bDoesTaskOwnSemaphore(msgSem))
       {
+        xDemand = msg[MSG_X_COORD];
+        yDemand = msg[MSG_Y_COORD];
+
+        if (bDoesTaskOwnSemaphore(msgSem))
+        {
+          semaphoreUnlock(msgSem);
+        }
+
         switch (msg[MSG_PICKUP])
         {
           case MSG_PICKUP_NONE:
-            if (!isSameObject(msg[MSG_X_COORD], msg[MSG_Y_COORD]))
+            if (!isSameObject(xDemand, yDemand))
             {
-              moveToPoint(msg[MSG_X_COORD], msg[MSG_Y_COORD]);
+              moveToPoint(xDemand, yDemand);
             }
             break;
 
           case MSG_PICKUP_STAR:
-            if (!isSameObject(msg[MSG_X_COORD], msg[MSG_Y_COORD]))
+            if (!isSameObject(xDemand, yDemand))
             {
-              pickUpStar(msg[MSG_X_COORD], msg[MSG_Y_COORD]);
+              pickUpStar(xDemand, yDemand);
             }
             break;
 
@@ -62,11 +72,6 @@ task commandRobot()
 
           default:
             break;
-        }
-
-        if (bDoesTaskOwnSemaphore(msgSem))
-        {
-          semaphoreUnlock(msgSem);
         }
       }
     }

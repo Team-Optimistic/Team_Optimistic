@@ -38,43 +38,42 @@ task commandRobot()
 
   while (true)
   {
-    if (!isWorking)
+    BCI_lockSem(msgSem, "commandRobot")
     {
-      BCI_lockSem(msgSem, "commandRobot")
+      xDemand = msg[MSG_X_COORD];
+      yDemand = msg[MSG_Y_COORD];
+
+      BCI_unlockSem(msgSem, "commandRobot")
+
+      switch (msg[MSG_PICKUP])
       {
-        xDemand = msg[MSG_X_COORD];
-        yDemand = msg[MSG_Y_COORD];
+        case MSG_PICKUP_NONE:
+          if (!isSameObject(xDemand, yDemand))
+          {
+            moveToPoint(xDemand, yDemand);
+          }
+          break;
 
-        BCI_unlockSem(msgSem, "commandRobot")
+        case MSG_PICKUP_STAR:
+          if (!isSameObject(xDemand, yDemand))
+          {
+            pickUpStar(xDemand, yDemand);
+          }
+          break;
 
-        switch (msg[MSG_PICKUP])
-        {
-          case MSG_PICKUP_NONE:
-            if (!isSameObject(xDemand, yDemand))
-            {
-              moveToPoint(xDemand, yDemand);
-            }
-            break;
+        case MSG_PICKUP_CUBE:
+          if (!isSameObject(xDemand, yDemand))
+          {
+            pickUpCube(xDemand, yDemand);
+          }
+          break;
 
-          case MSG_PICKUP_STAR:
-            if (!isSameObject(xDemand, yDemand))
-            {
-              pickUpStar(xDemand, yDemand);
-            }
-            break;
-
-          case MSG_PICKUP_CUBE:
-            if (!isSameObject(xDemand, yDemand))
-            {
-              pickUpCube(xDemand, yDemand);
-            }
-            break;
-
-          default:
-            break;
-        }
+        default:
+          break;
       }
     }
+
+    wait1Msec(1);
   }
 }
 

@@ -231,18 +231,13 @@ Computes the distance to a point
 */
 float computeDistanceToPoint(const int x, const int y)
 {
-	semaphoreLock(msgSem);
-
-	if (bDoesTaskOwnSemaphore(msgSem))
+	BCI_lockSem(msgSem, "computeDistanceToPoint")
 	{
 		//Compute difference in distance
 		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
 		return sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
-		if (bDoesTaskOwnSemaphore(msgSem))
-		{
-			semaphoreUnlock(msgSem);
-		}
+		BCI_unlockSem(msgSem, "computeDistanceToPoint")
 	}
 
 	//If no lock, return no distance
@@ -258,9 +253,7 @@ Computes the angle to a point
 */
 float computeAngleToPoint(const int x, const int y)
 {
-	semaphoreLock(msgSem);
-
-	if (bDoesTaskOwnSemaphore(msgSem))
+	BCI_lockSem(msgSem, "computeAngleToPoint")
 	{
 		//Compute difference in distance
 		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
@@ -268,10 +261,7 @@ float computeAngleToPoint(const int x, const int y)
 		//Compute difference in angle
 		return (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
 
-		if (bDoesTaskOwnSemaphore(msgSem))
-		{
-			semaphoreUnlock(msgSem);
-		}
+		BCI_unlockSem(msgSem, "computeAngleToPoint")
 	}
 
 	//If no lock, return no angle
@@ -289,9 +279,7 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAndAngle out;
 
-	semaphoreLock(msgSem);
-
-	if (bDoesTaskOwnSemaphore(msgSem))
+	BCI_lockSem(msgSem, "computeDistanceAndAngleToPoint")
 	{
 		//Compute difference in distance
 		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
@@ -300,10 +288,7 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 		//Compute difference in angle
 		out.theta = (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
 
-		if (bDoesTaskOwnSemaphore(msgSem))
-		{
-			semaphoreUnlock(msgSem);
-		}
+		BCI_unlockSem(msgSem, "computeDistanceAndAngleToPoint")
 	}
 
 	//If no lock, return empty type
@@ -319,6 +304,7 @@ Turns and drives to a point
 @param x X coordinate to move to
 @param y Y coordinate to move to
 @param offset Backward offset from final distance to point
+@return Whether the operation was successful
 */
 bool moveToPoint(const int x, const int y, int offset = 0)
 {
@@ -339,23 +325,22 @@ Picks up a star
  */
 bool pickUpStar(const int x, const int y)
 {
-	semaphoreLock(msgSem);
+	//Move to slightly behind star
+	moveToPoint(x, y, 10);
+	intakeStar();
 
-	if (bDoesTaskOwnSemaphore(msgSem))
-	{
-		//Move to slightly behind star
-		moveToPoint(x, y, 10);
-		intakeStar();
+	return true;
+}
 
-		if (bDoesTaskOwnSemaphore(msgSem))
-		{
-			semaphoreUnlock(msgSem);
-		}
-
-		return true;
-	}
-
-	return false;
+#warning "PickUpCube"
+/*
+Picks up a cube and scores it
+@param x X coordinate of cube
+@param y Y coordinate of cube
+@return Whether the operation was successful
+ */
+bool pickUpCube(const int x, const int y)
+{
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

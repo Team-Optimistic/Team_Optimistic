@@ -9,6 +9,7 @@ static short iso_x = -1, iso_y = -1;
 Returns whether the input coordinates are the same as the last
 @param x New x coord
 @param y New y coord
+@return Whether the input coordinates are the same as the last
  */
 bool isSameObject(const short x, const short y)
 {
@@ -68,6 +69,10 @@ task commandRobot()
             break;
 
           case MSG_PICKUP_CUBE:
+            if (!isSameObject(xDemand, yDemand))
+            {
+              pickUpCube(xDemand, yDemand);
+            }
             break;
 
           default:

@@ -10,7 +10,6 @@
 	<short intake pot val>
 	<short left quad val>
 	<short right quad val>
-	<short isWorking>
 
 	Message recieve structure is
 	<start byte 0xFA>
@@ -20,7 +19,9 @@
 	<short estimated theta>
 	<short x coordinate demand>
 	<short y coordinate demand>
-	<short pick up object>
+	<short pick up object> // 0 = do not pick up,
+												 // 1 = pick up star
+												 // 2 = pick up cube
 */
 
 //Message length (excluding start byte)
@@ -35,6 +36,11 @@ short msg[MSG_LENGTH];
 #define MSG_X_COORD   4
 #define MSG_Y_COORD   5
 #define MSG_PICKUP    6
+
+//Pickup types
+#define MSG_PICKUP_NONE 0
+#define MSG_PICKUP_STAR 1
+#define MSG_PICKUP_CUBE 2
 
 //Message write semaphore, always get lock before reading or writing
 TSemaphore msgSem;
@@ -64,9 +70,6 @@ void sendCurrentData()
 	//Send digital data
 	sendChar(UART1, (short)SensorValue[leftQuad]);
 	sendChar(UART1, (short)SensorValue[rightQuad]);
-
-	//Send isWorking flag
-	sendChar(UART1, isWorking);
 }
 
 //Reads a new message

@@ -1,6 +1,8 @@
 #ifndef UARTHANDLER_H_INCLUDED
 #define UARTHANDLER_H_INCLUDED
 
+#include "decisionHandler.c"
+
 /*
 	Message send structure is
 	<start byte 0xFA>
@@ -8,6 +10,7 @@
 	<short intake pot val>
 	<short left quad val>
 	<short right quad val>
+	<short isWorking>
 
 	Message recieve structure is
 	<start byte 0xFA>
@@ -61,6 +64,9 @@ void sendCurrentData()
 	//Send digital data
 	sendChar(UART1, (short)SensorValue[leftQuad]);
 	sendChar(UART1, (short)SensorValue[rightQuad]);
+
+	//Send isWorking flag
+	sendChar(UART1, isWorking);
 }
 
 //Reads a new message

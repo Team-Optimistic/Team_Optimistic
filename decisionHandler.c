@@ -40,17 +40,12 @@ task commandRobot()
   {
     if (!isWorking)
     {
-      semaphoreLock(msgSem);
-
-      if (bDoesTaskOwnSemaphore(msgSem))
+      BCI_lockSem(msgSem, "commandRobot")
       {
         xDemand = msg[MSG_X_COORD];
         yDemand = msg[MSG_Y_COORD];
 
-        if (bDoesTaskOwnSemaphore(msgSem))
-        {
-          semaphoreUnlock(msgSem);
-        }
+        BCI_unlockSem(msgSem, "commandRobot")
 
         switch (msg[MSG_PICKUP])
         {

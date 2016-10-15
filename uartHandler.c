@@ -83,11 +83,7 @@ task readBuffer()
 		//Load start byte into temp variable
 		if ((msgFlagHolder = getChar(UART1)) == 0xFA)
 		{
-			//Get lock for message array
-			semaphoreLock(msgSem);
-
-			//If we have lock
-			if (bDoesTaskOwnSemaphore(msgSem))
+			BCI_lockSem(msgSem, "readBuffer")
 			{
 				//If start flag is seen, read in rest of message
 				for (index = 0; index < MSG_LENGTH; index++)
@@ -100,12 +96,7 @@ task readBuffer()
 				}
 			}
 
-			//If we still have lock
-			if (bDoesTaskOwnSemaphore(msgSem))
-			{
-				//Write is done, release lock
-				semaphoreUnlock(msgSem);
-			}
+			BCI_unlockSem(msgSem)
 		}
 
 		//Task wait

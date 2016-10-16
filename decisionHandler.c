@@ -32,7 +32,7 @@ bool isSameObject(const short x, const short y)
 //Drives the robot based on recieved commands
 task commandRobot()
 {
-  short xDemand, yDemand;
+  short xDemand, yDemand, pickup;
 
   while (true)
   {
@@ -40,10 +40,11 @@ task commandRobot()
     {
       xDemand = msg[MSG_X_COORD];
       yDemand = msg[MSG_Y_COORD];
+      pickup = msg[MSG_PICKUP];
 
       BCI_unlockSem(msgSem, "commandRobot")
 
-      switch (msg[MSG_PICKUP])
+      switch (pickup)
       {
         case MSG_PICKUP_NONE:
           if (!isSameObject(xDemand, yDemand))

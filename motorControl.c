@@ -83,6 +83,42 @@ bool dumpIntake()
 	//dump that. Then, take what we dropped and dump it as well. If there isn't,
 	//drive back and dump. Lastly, set currentStarTotal to 0.
 
+	bool keepGoing = true;
+	short msgIDCounter = 0;
+
+	while (keepGoing)
+	{
+		sendGetBehindRequest(msgIDCounter);
+		msgIDCounter++;
+
+		BCI_lockSem(spc_msgSem, "dumpIntake")
+		{
+			short xDemand, yDemand, pickup;
+
+			xDemand = spc_msg[SPC_MSG_X_COORD];
+			yDemand = spc_msg[SPC_MSG_Y_COORD];
+			pickup = spc_msg[SPC_MSG_PICKUP];
+
+			BCI_unlockSem(spc_msgSem, "dumpIntake")
+
+			switch (pickup)
+			{
+				case SPC_MSG_PICKUP_CLEAR:
+					//Nothing in our way, drive back and dump
+					break;
+
+				case SPC_MSG_PICKUP_STAR:
+					//Star in our way, drop what we have and intake it
+					//See if there are any other objects in our way
+					//Wait to score stars until we have a full intake
+
+				case SPC_MSG_PICKUP_CUBE:
+					//Cube in our way, drop what we have a score it
+					//See if there are any other objects in our way
+			}
+		}
+	}
+
 	return true;
 }
 

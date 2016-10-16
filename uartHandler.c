@@ -40,8 +40,23 @@ short msg[MSG_LENGTH];
 #define MSG_PICKUP_STAR 1
 #define MSG_PICKUP_CUBE 2
 
-//Message write semaphore, always get lock before reading or writing
+//Special message for backing up
+#define SPC_MSG_LENGTH 3
+short spc_msg[SPC_MSG_LENGTH];
+#define SPC_MSG_X_COORD 0
+#define SPC_MSG_Y_COORD 1
+#define SPC_MSG_PICKUP  2
+#define SPC_MSG_PICKUP_CLEAR 0
+#define SPC_MSG_PICKUP_STAR  1
+#define SPC_MSG_PICKUP_CUBE  2
+
+//Message write semaphore, always get lock before reading
+//Only task readBuffer() may write to msg
 TSemaphore msgSem;
+
+//Special message semaphore, always get lock before reading
+//Only task readBuffer() may write to spc_msg
+TSemaphore spc_msgSem;
 
 //General UART semaphore, always get lock before writing
 //Only task readBuffer() may read from UART
@@ -91,7 +106,7 @@ void sendCurrentData()
 Requests the pi send back the position of an object behind the robot
  */
 #warning "sendGetBehindRequest"
-void sendGetBehindRequest()
+void sendGetBehindRequest(const short msg_id)
 {
 	BCI_lockSem(uartSem, "sendGetBehindRequest")
 	{
@@ -101,6 +116,9 @@ void sendGetBehindRequest()
 
 		//Send msg header
 		sendChar(UART1, msgCount++);
+
+		//Send msg id
+		sendCHar(UART1, msg_id);
 
 		BCI_unlockSem(uartSem, "sendGetBehindRequest")
 	}
@@ -129,6 +147,13 @@ task readBuffer()
 					if (index == 0 && (msgDoubleFlagHolder = getChar(UART1)) == 0xFA)
 					{
 						//Read in special message
+						for (index = 0; index < SPC_MSG_LENGTH; index++)
+						{
+							if ((spc_msg[index] = getChar(UART1)) == 0xFF)
+							{
+								index--;
+							}
+						}
 						break;
 					}
 					//0xFF represents empty, so ignore it

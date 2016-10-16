@@ -1,8 +1,15 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
+bool intakeStar();
+bool intakeCube();
+bool dumpIntake();
+bool dumpStars();
+
+//Number of stars in the intake
 static int currentStarTotal = 0;
 
+//Barely used type to return two values
 typedef struct distanceAndAngle_t
 {
 	float length;
@@ -29,11 +36,11 @@ void setIntakeMotors(const int power)
 {
 }
 
-#warning "IntakeStar"
 /*
 Intakes a star
 @return Whether the operation was successful
 */
+#warning "IntakeStar"
 bool intakeStar()
 {
 	if (currentStarTotal == 0)
@@ -48,26 +55,27 @@ bool intakeStar()
 	return true;
 }
 
-#warning "IntakeCube"
 /*
 Intakes a cube
 @return Whether the operation was successful
  */
+#warning "IntakeCube"
 bool intakeCube()
 {
 	if (currentStarTotal != 0)
 	{
+		dumpStars();
 	}
 	else
 	{
 	}
 }
 
-#warning "DumpIntake"
 /*
 Dumps the intake over the fence
 @return bool Whether the operation was successful
  */
+#warning "DumpIntake"
 bool dumpIntake()
 {
 	//Communicate with pi and determine if there is anything blocking our way to
@@ -78,14 +86,13 @@ bool dumpIntake()
 	return true;
 }
 
-#warning "DumpStars"
 /*
 Randomly selects a strategy based on a probability distribution and dumps based
 on the strategy
-@param currentStarTotal Current number of stars in the intake
 @return bool Whether the operation was successful
  */
-bool dumpStars(const int currentStarTotal)
+#warning "DumpStars"
+bool dumpStars()
 {
 	//Randomly select a strategy
 	//Depending on the strategy and currentStarTotal, either
@@ -95,12 +102,12 @@ bool dumpStars(const int currentStarTotal)
 	return true;
 }
 
-#warning "DriveStraight"
 /*
 Drives in a straight line for a distance
 @param distance Distance to drive for
 @return Whether the operation was successful
 */
+#warning "DriveStraight"
 bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -113,7 +120,7 @@ bool driveStraight(const int distance)
 	//Angle PID controller's target is 0
 	const int targetDistance = distance;
 
-	pos_PID distancePID , anglePID;
+	pos_PID distancePID, anglePID;
 
 	pos_PID_InitController(&distancePID, &distanceElapsed, 0, 0, 0);
 	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
@@ -182,12 +189,12 @@ bool driveStraight(const int distance)
 	return true;
 }
 
-#warning "Turn"
 /*
 Turns to an angle
 @param angle Angle to turn to
 @return Whether the operation was successful
 */
+#warning "Turn"
 bool turn(const int angle)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -204,9 +211,7 @@ bool turn(const int angle)
 	int targetAngle = angle;
 
 	pos_PID anglePID;
-
 	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
-
 	pos_PID_SetTargetPosition(&anglePID, 0);
 
 	//If angle PID controller is at target
@@ -266,13 +271,13 @@ bool turn(const int angle)
 	return true;
 }
 
-#warning "ComputeDistanceToPoint"
 /*
 Computes the distance to a point
 @param x X coordinate of other point
 @param y Y coordinate of other point
 @return distance to point
 */
+#warning "ComputeDistanceToPoint"
 float computeDistanceToPoint(const int x, const int y)
 {
 	BCI_lockSem(msgSem, "computeDistanceToPoint")
@@ -288,13 +293,13 @@ float computeDistanceToPoint(const int x, const int y)
 	return 0;
 }
 
-#warning "ComputeAngleToPoint"
 /*
 Computes the angle to a point
 @param x X coordinate of other point
 @param y Y coordinate of other point
 @return angle to point
 */
+#warning "ComputeAngleToPoint"
 float computeAngleToPoint(const int x, const int y)
 {
 	BCI_lockSem(msgSem, "computeAngleToPoint")
@@ -312,13 +317,13 @@ float computeAngleToPoint(const int x, const int y)
 	return 0;
 }
 
-#warning "ComputeDistanceAndAngleToPoint"
 /*
 Computes the distance and angle from current location to a point
 @param x X coordinate of other point
 @param y Y coordinate of other point
 @return distance and angle to point
 */
+#warning "ComputeDistanceAndAngleToPoint"
 distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAndAngle out;
@@ -342,7 +347,6 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 	return out;
 }
 
-#warning "MoveToPoint"
 /*
 Turns and drives to a point
 @param x X coordinate to move to
@@ -350,6 +354,7 @@ Turns and drives to a point
 @param offset Backward offset from final distance to point
 @return Whether the operation was successful
 */
+#warning "MoveToPoint"
 bool moveToPoint(const int x, const int y, int offset = 0)
 {
 	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
@@ -360,13 +365,13 @@ bool moveToPoint(const int x, const int y, int offset = 0)
 	return true;
 }
 
-#warning "PickUpStar"
 /*
 Picks up a star
 @param x X coordinate of star
 @param y Y coordinate of star
 @return Whether operation was successful
  */
+#warning "PickUpStar"
 bool pickUpStar(const int x, const int y)
 {
 	//Move to slightly behind star
@@ -374,18 +379,18 @@ bool pickUpStar(const int x, const int y)
 	intakeStar();
 
 	//Dump stars
-	dumpStars(currentStarTotal);
+	dumpStars();
 
 	return true;
 }
 
-#warning "PickUpCube"
 /*
 Picks up a cube and scores it
 @param x X coordinate of cube
 @param y Y coordinate of cube
 @return Whether the operation was successful
  */
+#warning "PickUpCube"
 bool pickUpCube(const int x, const int y)
 {
 	//Dump intake if we have anything, we cannot pick up a cube with stars in the

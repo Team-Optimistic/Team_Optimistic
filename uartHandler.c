@@ -43,38 +43,77 @@ short msg[MSG_LENGTH];
 //Message write semaphore, always get lock before reading or writing
 TSemaphore msgSem;
 
+//General UART semaphore, always get lock before writing
+//Only task readBuffer() may read from UART
+TSemaphore uartSem;
+
 //Total message count
 static short msgCount;
 
+/*
+Initializes everything this file needs for comms with the pi
+ */
+#warning "initUART"
 void initUART()
 {
 	msgCount = 0;
 	semaphoreInitialize(msgSem);
+	semaphoreInitialize(uartSem);
 	setBaudRate(UART1, baudRate9600);
 }
 
-//Sends a new message
+/*
+Sends a standard message to the pi
+ */
+#warning "sendCurrentData"
 void sendCurrentData()
 {
-	//Send start byte
-	sendChar(UART1, 0xFA);
+	BCI_lockSem(uartSem, "sendCurrentData")
+	{
+		//Send start byte
+		sendChar(UART1, 0xFA);
 
-	//Send msg header
-	sendChar(UART1, msgCount++);
+		//Send msg header
+		sendChar(UART1, msgCount++);
 
-	//Send analog data
-	sendChar(UART1, (short)SensorValue[intakePot]);
+		//Send analog data
+		sendChar(UART1, (short)SensorValue[intakePot]);
 
-	//Send digital data
-	sendChar(UART1, (short)SensorValue[leftQuad]);
-	sendChar(UART1, (short)SensorValue[rightQuad]);
+		//Send digital data
+		sendChar(UART1, (short)SensorValue[leftQuad]);
+		sendChar(UART1, (short)SensorValue[rightQuad]);
+
+		BCI_unlockSem(uartSem, "sendCurrentData")
+	}
 }
 
-//Reads a new message
+/*
+Requests the pi send back the position of an object behind the robot
+ */
+#warning "sendGetBehindRequest"
+void sendGetBehindRequest()
+{
+	BCI_lockSem(uartSem, "sendGetBehindRequest")
+	{
+		//Send double start byte
+		sendChar(UART1, 0xFA);
+		sendChar(UART1, 0xFA);
+
+		//Send msg header
+		sendChar(UART1, msgCount++);
+
+		BCI_unlockSem(uartSem, "sendGetBehindRequest")
+	}
+}
+
+/*
+Polls uart for a message and records it into msg[]
+ */
+#warning "readBuffer"
 task readBuffer()
 {
 	unsigned int index = 0;
-	short msgFlagHolder;
+	short msgFlagHolder, msgDoubleFlagHolder;
 
 	while (true)
 	{
@@ -86,15 +125,33 @@ task readBuffer()
 				//If start flag is seen, read in rest of message
 				for (index = 0; index < MSG_LENGTH; index++)
 				{
+					//If double flag, break and treat specially
+					if (index == 0 && (msgDoubleFlagHolder = getChar(UART1)) == 0xFA)
+					{
+						//Read in special message
+						break;
+					}
 					//0xFF represents empty, so ignore it
-					if ((msg[index] = getChar(UART1)) == 0xFF)
+					else if (msgDoubleFlagHolder == 0xFF)
+					{
+						msgDoubleFlagHolder = 0;
+						index--;
+					}
+					//msgDoubleFlagHolder has our data, take it
+					else if (msgDoubleFlagHolder != 0xFF)
+					{
+						msgDoubleFlagHolder = 0;
+						msg[index] = msgDoubleFlagHolder;
+					}
+					//0xFF represents empty, so ignore it
+					else if (msg[index] = getChar(UART1)) == 0xFF)
 					{
 						index--;
 					}
 				}
-			}
 
-			BCI_unlockSem(msgSem)
+				BCI_unlockSem(msgSem)
+			}
 		}
 
 		//Task wait

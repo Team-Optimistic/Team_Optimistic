@@ -1,6 +1,8 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
+static int currentStarTotal = 0;
+
 typedef struct distanceAndAngle_t
 {
 	float length;
@@ -34,17 +36,46 @@ Intakes a star
 */
 bool intakeStar()
 {
-	//Move star into bucket
-	setIntakeMotors(127);
-	while (SensorValue[intakePot] < 100) { wait1Msec(5); }
+	if (currentStarTotal == 0)
+	{
+	}
+	else
+	{
+	}
 
-	setIntakeMotors(0);
-	wait1Msec(100);
+	currentStarTotal++;
 
-	setIntakeMotors(-127);
-	while (SensorValue[intakePot] > 0) { wait1Msec(5); }
+	return true;
+}
 
-	setIntakeMotors(0);
+#warning "DumpIntake"
+/*
+Dumps the intake over the fence
+@return bool Whether the operation was successful
+ */
+bool dumpIntake()
+{
+	//Communicate with pi and determine if there is anything blocking our way to
+	//the fence. If there is, drop what we have and intake whats in our way, and
+	//dump that. Then, take what we dropped and dump it as well. If there isn't,
+	//drive back and dump.
+
+	return true;
+}
+
+#warning "DumpStars"
+/*
+Randomly selected a strategy based on a probability distribution and dumps stars
+based on the strategy
+@param currentStarTotal Current number of stars in the intake
+@return bool Whether the operation was successful
+ */
+bool dumpStars(const int currentStarTotal)
+{
+	//Randomly select a strategy
+	//Depending on the strategy and currentStarTotal, either
+	// - Dump stars with dumpIntake, or
+	// - Keep stars
 
 	return true;
 }
@@ -326,6 +357,9 @@ bool pickUpStar(const int x, const int y)
 	//Move to slightly behind star
 	moveToPoint(x, y, 10);
 	intakeStar();
+
+	//Dump stars
+	dumpStars(currentStarTotal);
 
 	return true;
 }

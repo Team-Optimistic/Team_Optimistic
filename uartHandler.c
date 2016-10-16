@@ -2,16 +2,19 @@
 #define UARTHANDLER_H_INCLUDED
 
 /*
-	Message send structure is
+	Message header is
 	<start byte 0xFA>
-	<short message count>
+	<msg type byte>
+	<short msg count>
+
+	Message send structure is
+	<header>
 	<short intake pot val>
 	<short left quad val>
 	<short right quad val>
 
 	Message recieve structure is
-	<start byte 0xFA>
-	<short message count>
+	<header>
 	<short estimated x>
 	<short estimated y>
 	<short estimated theta>
@@ -24,14 +27,11 @@
 
 /*
 	Special message send structure is
-	<start byte 0xFA>
-	<start byte 0xFA>
-	<short message count>
+	<header>
 	<short message id>
 
 	Special message recieve structure is
-	<start byte 0xFA>
-	<start byte 0xFA>
+	<header>
 	<short x coordinate demand>
 	<short y coordinate demand>
 	<short pick up object> // 0 = no object
@@ -39,25 +39,21 @@
 												 // 2 = cube
  */
 
-//Message length (excluding start byte)
-#define MSG_LENGTH 7
+//Standard message
+#define STD_MSG_LENGTH 7
+short std_msg[STD_MSG_LENGTH];
+#define STD_MSG_COUNT     0
+#define STD_MSG_EST_X     1
+#define STD_MSG_EST_Y     2
+#define STD_MSG_EST_THETA 3
+#define STD_MSG_X_COORD   4
+#define STD_MSG_Y_COORD   5
+#define STD_MSG_PICKUP    6
+#define STD_MSG_PICKUP_NONE 0
+#define STD_MSG_PICKUP_STAR 1
+#define STD_MSG_PICKUP_CUBE 2
 
-//Current message
-short msg[MSG_LENGTH];
-#define MSG_COUNT     0
-#define MSG_EST_X     1
-#define MSG_EST_Y     2
-#define MSG_EST_THETA 3
-#define MSG_X_COORD   4
-#define MSG_Y_COORD   5
-#define MSG_PICKUP    6
-
-//Pickup types
-#define MSG_PICKUP_NONE 0
-#define MSG_PICKUP_STAR 1
-#define MSG_PICKUP_CUBE 2
-
-//Special message for backing up
+//Message to get objects behind us
 #define SPC_MSG_LENGTH 3
 short spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_X_COORD 0
@@ -69,7 +65,7 @@ short spc_msg[SPC_MSG_LENGTH];
 
 //Message write semaphore, always get lock before reading
 //Only task readBuffer() may write to msg
-TSemaphore msgSem;
+TSemaphore std_msgSem;
 
 //Special message semaphore, always get lock before reading
 //Only task readBuffer() may write to spc_msg
@@ -79,8 +75,16 @@ TSemaphore spc_msgSem;
 //Only task readBuffer() may read from UART
 TSemaphore uartSem;
 
-//Total message count
-static short msgCount;
+//Message count
+#define MSG_COUNT_LENGTH 3
+short msgCount[MSG_COUNT_LENGTH];
+#define MSG_COUNT_TOTAL 0
+#define MSG_COUNT_STD   1
+#define MSG_COUNT_SPC   2
+
+//Message types
+#define STD_MSG_TYPE MSG_COUNT_STD
+#define SPC_MSG_TYPE MSG_COUNT_SPC
 
 /*
 Initializes everything this file needs for comms with the pi
@@ -88,33 +92,87 @@ Initializes everything this file needs for comms with the pi
 #warning "initUART"
 void initUART()
 {
-	msgCount = 0;
-	semaphoreInitialize(msgSem);
+	for (unsigned int i = 0; i < MSG_COUNT_LENGTH; i++)
+	{
+		msgCount[i] = 0;
+	}
+
+	semaphoreInitialize(std_msgSem);
 	semaphoreInitialize(spc_msgSem);
 	semaphoreInitialize(uartSem);
+
 	setBaudRate(UART1, baudRate9600);
+}
+
+/*
+Generates new message count without side-effects
+@param type Message type
+ */
+short uart_getMessageCount_Soft(const short type)
+{
+	return msgCount[type] + 1 >= 0xFF ? 0 : msgCount[type] + 1;
+}
+
+/*
+Generates new message count
+@param type Message type
+ */
+short uart_getMessageCount(const short type)
+{
+	return msgCount[type] + 1 >= 0xFF ? 0 : (msgCount[type] = msgCount[type] + 1);
+}
+
+/*
+Verifies message count
+@param type Message type
+@param count New message count
+ */
+bool uart_verifyMessageCount(const short type, const short count)
+{
+	//Check if new count is what's expected
+	const bool isGood = count == uart_getMessageCount_Soft(type);
+	if (isGood)
+	{
+		msgCount[type] = count;
+		return true;
+	}
+
+	return false;
+}
+
+/*
+Sends a message header
+@param type Message type
+ */
+void uart_sendMessageHeader(const short type)
+{
+	//Send start byte
+	sendChar(UART1, 0xFA);
+
+	//Send msg type
+	sendChar(UART1, type);
+
+	//Send msg count
+	sendChar(UART1, uart_getMessageCount(type));
 }
 
 /*
 Sends a standard message to the pi
  */
-#warning "sendCurrentData"
-void sendCurrentData()
+#warning "sendStandardMessage"
+void sendStandardMessage()
 {
 	BCI_lockSem(uartSem, "sendCurrentData")
 	{
-		//Send start byte
-		sendChar(UART1, 0xFA);
-
-		//Send msg header
-		sendChar(UART1, msgCount++);
+		//Send header
+		uart_sendMessageHeader(STD_MSG_TYPE);
 
 		//Send analog data
-		sendChar(UART1, (short)SensorValue[intakePot]);
+		sendChar(UART1, SensorValue[intakePot]);
 
 		//Send digital data
-		sendChar(UART1, (short)SensorValue[leftQuad]);
-		sendChar(UART1, (short)SensorValue[rightQuad]);
+		sendChar(UART1, SensorValue[leftQuad]);
+		sendChar(UART1, SensorValue[rightQuad]);
 
 		BCI_unlockSem(uartSem, "sendCurrentData")
 	}
@@ -124,21 +182,29 @@ void sendCurrentData()
 Requests the pi send back the position of an object behind the robot
  */
 #warning "sendGetBehindRequest"
-void sendGetBehindRequest(const short msg_id)
+void sendGetBehindRequest()
 {
 	BCI_lockSem(uartSem, "sendGetBehindRequest")
 	{
-		//Send double start byte
-		sendChar(UART1, 0xFA);
-		sendChar(UART1, 0xFA);
-
-		//Send msg header
-		sendChar(UART1, msgCount++);
-
-		//Send msg id
-		sendCHar(UART1, msg_id);
+		//Send header
+		uart_sendMessageHeader(SPC_MSG_TYPE);
 
 		BCI_unlockSem(uartSem, "sendGetBehindRequest")
+	}
+}
+
+/*
+Reads in a message
+ */
+void uart_readMsg(short *msg, const int length)
+{
+	for (unsigned int index = 0; index < length; index++)
+	{
+		//Trash 0xFF
+		if ((msg[index] = getChar(UART1)) == 0xFF)
+		{
+			index--;
+		}
 	}
 }
 
@@ -149,51 +215,44 @@ Polls uart for a message and records it into msg[]
 task readBuffer()
 {
 	unsigned int index = 0;
-	short msgFlagHolder, msgDoubleFlagHolder;
+	short msgFlagHolder, msgTypeFlagHolder, msgCountFlagHolder;
 
 	while (true)
 	{
 		//Load start byte into temp variable
 		if ((msgFlagHolder = getChar(UART1)) == 0xFA)
 		{
-			BCI_lockSem(msgSem, "readBuffer")
+			BCI_lockSem(std_msgSem, "readBuffer")
 			{
-				//If start flag is seen, read in rest of message
-				for (index = 0; index < MSG_LENGTH; index++)
+				//Get msg type
+				while ((msgTypeFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }
+
+				//Get msg count
+				while ((msgCountFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }
+
+				//Verify msg count
+				if (!uart_verifyMessageCount(msgTypeFlagHolder, msgCountFlagHolder))
 				{
-					//If double flag, break and treat specially
-					if (index == 0 && (msgDoubleFlagHolder = getChar(UART1)) == 0xFA)
-					{
-						//Read in special message
-						for (index = 0; index < SPC_MSG_LENGTH; index++)
-						{
-							if ((spc_msg[index] = getChar(UART1)) == 0xFF)
-							{
-								index--;
-							}
-						}
-						break;
-					}
-					//0xFF represents empty, so ignore it
-					else if (msgDoubleFlagHolder == 0xFF)
-					{
-						msgDoubleFlagHolder = 0;
-						index--;
-					}
-					//msgDoubleFlagHolder has our data, take it
-					else if (msgDoubleFlagHolder != 0xFF)
-					{
-						msgDoubleFlagHolder = 0;
-						msg[index] = msgDoubleFlagHolder;
-					}
-					//0xFF represents empty, so ignore it
-					else if (msg[index] = getChar(UART1)) == 0xFF)
-					{
-						index--;
-					}
+					writeDebugStreamLine("Bad msg count");
 				}
 
-				BCI_unlockSem(msgSem)
+				switch (msgTypeFlagHolder)
+				{
+					case STD_MSG_TYPE:
+						//Read in std msg
+						uart_readMsg(&std_msg, STD_MSG_LENGTH);
+						break;
+
+					case SPC_MSG_TYPE:
+						//Read in spc msg
+						uart_readMsg(&spc_msg, SPC_MSG_LENGTH);
+						break;
+
+					default:
+						break;
+				}
+
+				BCI_unlockSem(std_msgSem, "readBuffer")
 			}
 		}
 

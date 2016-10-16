@@ -84,13 +84,11 @@ bool dumpIntake()
 	//drive back and dump. Lastly, set currentStarTotal to 0.
 
 	bool keepGoing = true;
-	short msgIDCounter = 0;
 
 	//Loop to clear what's behind us
 	while (keepGoing)
 	{
-		sendGetBehindRequest(msgIDCounter);
-		msgIDCounter++;
+		sendGetBehindRequest();
 
 		BCI_lockSem(spc_msgSem, "dumpIntake")
 		{
@@ -322,13 +320,13 @@ Computes the distance to a point
 #warning "ComputeDistanceToPoint"
 float computeDistanceToPoint(const int x, const int y)
 {
-	BCI_lockSem(msgSem, "computeDistanceToPoint")
+	BCI_lockSem(std_msgSem, "computeDistanceToPoint")
 	{
 		//Compute difference in distance
-		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 		return sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
-		BCI_unlockSem(msgSem, "computeDistanceToPoint")
+		BCI_unlockSem(std_msgSem, "computeDistanceToPoint")
 	}
 
 	//If no lock, return no distance
@@ -344,15 +342,15 @@ Computes the angle to a point
 #warning "ComputeAngleToPoint"
 float computeAngleToPoint(const int x, const int y)
 {
-	BCI_lockSem(msgSem, "computeAngleToPoint")
+	BCI_lockSem(std_msgSem, "computeAngleToPoint")
 	{
 		//Compute difference in distance
-		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 
 		//Compute difference in angle
-		return (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
+		return (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
 
-		BCI_unlockSem(msgSem, "computeAngleToPoint")
+		BCI_unlockSem(std_msgSem, "computeAngleToPoint")
 	}
 
 	//If no lock, return no angle
@@ -370,16 +368,16 @@ distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAndAngle out;
 
-	BCI_lockSem(msgSem, "computeDistanceAndAngleToPoint")
+	BCI_lockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	{
 		//Compute difference in distance
-		const float xDiff = x - msg[MSG_EST_X], yDiff = y - msg[MSG_EST_Y];
+		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 		out.length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
 		//Compute difference in angle
-		out.theta = (atan2(yDiff, xDiff) * (180 / PI)) - msg[MSG_EST_THETA];
+		out.theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
 
-		BCI_unlockSem(msgSem, "computeDistanceAndAngleToPoint")
+		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	}
 
 	//If no lock, return empty type

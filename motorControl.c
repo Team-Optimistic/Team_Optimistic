@@ -65,8 +65,8 @@ bool dumpIntake()
 
 #warning "DumpStars"
 /*
-Randomly selected a strategy based on a probability distribution and dumps stars
-based on the strategy
+Randomly selects a strategy based on a probability distribution and dumps based
+on the strategy
 @param currentStarTotal Current number of stars in the intake
 @return bool Whether the operation was successful
  */

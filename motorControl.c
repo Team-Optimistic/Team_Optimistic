@@ -58,7 +58,7 @@ bool dumpIntake()
 	//Communicate with pi and determine if there is anything blocking our way to
 	//the fence. If there is, drop what we have and intake whats in our way, and
 	//dump that. Then, take what we dropped and dump it as well. If there isn't,
-	//drive back and dump.
+	//drive back and dump. Lastly, set currentStarTotal to 0.
 
 	return true;
 }
@@ -373,6 +373,21 @@ Picks up a cube and scores it
  */
 bool pickUpCube(const int x, const int y)
 {
+	//Dump intake if we have anything, we cannot pick up a cube with stars in the
+	//intake
+	if (currentStarTotal != 0)
+	{
+		dumpIntake();
+	}
+
+	//Move to slightly behind cube
+	moveToPoint(x, y, 10);
+	intakeCube();
+
+	//Dump cube
+	dumpIntake();
+
+	return true;
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

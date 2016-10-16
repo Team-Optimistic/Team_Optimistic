@@ -214,7 +214,6 @@ Polls uart for a message and records it into msg[]
 #warning "readBuffer"
 task readBuffer()
 {
-	unsigned int index = 0;
 	short msgFlagHolder, msgTypeFlagHolder, msgCountFlagHolder;
 
 	while (true)
@@ -240,12 +239,12 @@ task readBuffer()
 				{
 					case STD_MSG_TYPE:
 						//Read in std msg
-						uart_readMsg(&std_msg, STD_MSG_LENGTH);
+						uart_readMsg(std_msg, STD_MSG_LENGTH);
 						break;
 
 					case SPC_MSG_TYPE:
 						//Read in spc msg
-						uart_readMsg(&spc_msg, SPC_MSG_LENGTH);
+						uart_readMsg(spc_msg, SPC_MSG_LENGTH);
 						break;
 
 					default:

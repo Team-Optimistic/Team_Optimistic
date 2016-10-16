@@ -36,31 +36,31 @@ task commandRobot()
 
   while (true)
   {
-    BCI_lockSem(msgSem, "commandRobot")
+    BCI_lockSem(std_msgSem, "commandRobot")
     {
-      xDemand = msg[MSG_X_COORD];
-      yDemand = msg[MSG_Y_COORD];
-      pickup = msg[MSG_PICKUP];
+      xDemand = std_msg[STD_MSG_X_COORD];
+      yDemand = std_msg[STD_MSG_Y_COORD];
+      pickup = std_msg[STD_MSG_PICKUP];
 
-      BCI_unlockSem(msgSem, "commandRobot")
+      BCI_unlockSem(std_msgSem, "commandRobot")
 
       switch (pickup)
       {
-        case MSG_PICKUP_NONE:
+        case STD_MSG_PICKUP_NONE:
           if (!isSameObject(xDemand, yDemand))
           {
             moveToPoint(xDemand, yDemand);
           }
           break;
 
-        case MSG_PICKUP_STAR:
+        case STD_MSG_PICKUP_STAR:
           if (!isSameObject(xDemand, yDemand))
           {
             pickUpStar(xDemand, yDemand);
           }
           break;
 
-        case MSG_PICKUP_CUBE:
+        case STD_MSG_PICKUP_CUBE:
           if (!isSameObject(xDemand, yDemand))
           {
             pickUpCube(xDemand, yDemand);

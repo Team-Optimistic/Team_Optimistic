@@ -69,6 +69,8 @@ bool intakeCube()
 	else
 	{
 	}
+
+	return true;
 }
 
 /*
@@ -111,10 +113,15 @@ bool dumpIntake()
 					//Star in our way, drop what we have and intake it
 					//See if there are any other objects in our way
 					//Wait to score stars until we have a full intake
+					break;
 
 				case SPC_MSG_PICKUP_CUBE:
 					//Cube in our way, drop what we have a score it
 					//See if there are any other objects in our way
+					break;
+
+				default:
+					break;
 			}
 		}
 	}

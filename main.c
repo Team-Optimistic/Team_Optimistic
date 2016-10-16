@@ -24,19 +24,7 @@ task main()
 	while (true)
 	{
 		//Send data to pi
-		sendCurrentData();
-
-		//Read current message and write to debug stream
-		semaphoreLock(msgSem);
-		if (bDoesTaskOwnSemaphore(msgSem))
-		{
-			writeDebugStreamLine("%d,%d,%d", msg[0], msg[1], msg[2]);
-
-			if (bDoesTaskOwnSemaphore(msgSem))
-			{
-				semaphoreUnlock(msgSem);
-			}
-		}
+		sendStandardMessage();
 
 		//Task wait
 		wait1Msec(15);

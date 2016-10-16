@@ -86,6 +86,7 @@ bool dumpIntake()
 	bool keepGoing = true;
 	short msgIDCounter = 0;
 
+	//Loop to clear what's behind us
 	while (keepGoing)
 	{
 		sendGetBehindRequest(msgIDCounter);
@@ -105,6 +106,7 @@ bool dumpIntake()
 			{
 				case SPC_MSG_PICKUP_CLEAR:
 					//Nothing in our way, drive back and dump
+					keepGoing = false;
 					break;
 
 				case SPC_MSG_PICKUP_STAR:
@@ -118,6 +120,8 @@ bool dumpIntake()
 			}
 		}
 	}
+
+	//Nothing else behind us, score what we put down
 
 	return true;
 }
@@ -192,7 +196,8 @@ bool driveStraight(const int distance)
 		//Overall displacement is the average of left and right displacements
 		distanceElapsed = (currentLeft + currentRight) / 2.0;
 
-		//Angle change doesn't need to be a real angle, just the difference in displacements
+		//Angle change doesn't need to be a real angle, just the difference in
+		//displacements
 		angleChange = currentRight - currentLeft;
 
 		//Get output from both PID's
@@ -275,7 +280,8 @@ bool turn(const int angle)
 		currentLeft = SensorValue[leftQuad] - encoderLeft;
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
-		//Angle change doesn't need to be a real angle, just the difference in displacements
+		//Angle change doesn't need to be a real angle, just the difference in
+		//displacements
 		angleChange = currentRight / angleScale;
 
 		//Get output from PID

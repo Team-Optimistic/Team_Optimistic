@@ -48,6 +48,21 @@ bool intakeStar()
 	return true;
 }
 
+#warning "IntakeCube"
+/*
+Intakes a cube
+@return Whether the operation was successful
+ */
+bool intakeCube()
+{
+	if (currentStarTotal != 0)
+	{
+	}
+	else
+	{
+	}
+}
+
 #warning "DumpIntake"
 /*
 Dumps the intake over the fence

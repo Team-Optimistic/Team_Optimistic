@@ -17,10 +17,27 @@
 	<short estimated theta>
 	<short x coordinate demand>
 	<short y coordinate demand>
-	<short pick up object> // 0 = do not pick up,
+	<short pick up object> // 0 = do not pick up
 												 // 1 = pick up star
 												 // 2 = pick up cube
 */
+
+/*
+	Special message send structure is
+	<start byte 0xFA>
+	<start byte 0xFA>
+	<short message count>
+	<short message id>
+
+	Special message recieve structure is
+	<start byte 0xFA>
+	<start byte 0xFA>
+	<short x coordinate demand>
+	<short y coordinate demand>
+	<short pick up object> // 0 = no object
+												 // 1 = star
+												 // 2 = cube
+ */
 
 //Message length (excluding start byte)
 #define MSG_LENGTH 7
@@ -73,6 +90,7 @@ void initUART()
 {
 	msgCount = 0;
 	semaphoreInitialize(msgSem);
+	semaphoreInitialize(spc_msgSem);
 	semaphoreInitialize(uartSem);
 	setBaudRate(UART1, baudRate9600);
 }

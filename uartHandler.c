@@ -1,8 +1,6 @@
 #ifndef UARTHANDLER_H_INCLUDED
 #define UARTHANDLER_H_INCLUDED
 
-#include "decisionHandler.c"
-
 /*
 	Message send structure is
 	<start byte 0xFA>

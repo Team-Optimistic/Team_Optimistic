@@ -1,8 +1,6 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
-#include "uartHandler.c"
-
 typedef struct distanceAndAngle_t
 {
 	float length;

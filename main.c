@@ -10,7 +10,9 @@
 #define BCI_SEM_DEBUG
 #include "BCI\BCI.h"
 
+#include "uartHandler.c"
 #include "motorControl.c"
+#include "decisionHandler.c"
 
 task main()
 {

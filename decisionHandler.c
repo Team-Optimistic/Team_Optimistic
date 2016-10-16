@@ -1,8 +1,6 @@
 #ifndef DECISIONHANDLER_C_INCLUDED
 #define DECISIONHANDLER_C_INCLUDED
 
-#include "uartHandler.c"
-
 static short iso_x = -1, iso_y = -1;
 
 /*

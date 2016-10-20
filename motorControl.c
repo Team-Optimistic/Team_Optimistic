@@ -52,6 +52,8 @@ bool intakeStar()
 
 	currentStarTotal++;
 
+	sendMPCMsg();
+
 	return true;
 }
 
@@ -69,6 +71,8 @@ bool intakeCube()
 	else
 	{
 	}
+
+	sendMPCMsg();
 
 	return true;
 }
@@ -99,12 +103,10 @@ bool dumpIntake()
 	bool keepGoing = true;
 	while (keepGoing)
 	{
-		//Cheeky flags
-		mpc_msg[0] = -1;
-
 		sendSPCMsg();
 
-		while (mpc_msg[0] == -1) { wait1Msec(15); }
+		//Wait until reply
+		while (!mpgMsgFlag) { wait1Msec(15); }
 
 		BCI_lockSem(mpc_msgSem, "dumpIntake")
 		{

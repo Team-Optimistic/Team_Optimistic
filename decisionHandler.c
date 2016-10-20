@@ -41,8 +41,8 @@ task commandRobot()
       xDemand = std_msg[STD_MSG_X_COORD];
       yDemand = std_msg[STD_MSG_Y_COORD];
       pickup = std_msg[STD_MSG_PICKUP];
-
       BCI_unlockSem(std_msgSem, "commandRobot")
+    }
 
       switch (pickup)
       {
@@ -70,7 +70,6 @@ task commandRobot()
         default:
           break;
       }
-    }
 
     wait1Msec(1);
   }

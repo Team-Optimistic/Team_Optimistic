@@ -21,6 +21,9 @@ task main()
 	//Start reading from pi
 	startTask(readBuffer);
 
+	//Let robot drive itself
+	startTask(commandRobot);
+
 	while (true)
 	{
 		//Send data to pi

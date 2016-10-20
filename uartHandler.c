@@ -72,6 +72,7 @@ short spc_msg[SPC_MSG_LENGTH];
 //Message to pick up an object
 #define MPC_MSG_LENGTH 3
 short mpc_msg[MPC_MSG_LENGTH];
+bool mpgMsgFlag;
 #define MPC_MSG_X_COORD   0
 #define MPC_MSG_Y_COORD   1
 #define MPC_MSG_PICKUP    2
@@ -204,6 +205,9 @@ void sendSPCMsg()
 		//Send header
 		uart_sendMessageHeader(SPC_MSG_TYPE);
 
+		//Reset MPC flag
+		mpgMsgFlag = false;
+
 		BCI_unlockSem(uartSem, "sendSPCMsg")
 	}
 }
@@ -260,6 +264,12 @@ task readBuffer()
 			{
 				//Get msg type
 				while ((msgTypeFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }
+
+				//Set MPC flag
+				if (msgTypeFlagHolder == MPC_MSG_TYPE)
+				{
+					mpgMsgFlag = true;
+				}
 
 				//Get msg count
 				while ((msgCountFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }

@@ -235,7 +235,7 @@ void sendMPCMsg()
 /*
 Reads in a message
  */
-void uart_readMsg(short *msg, const int length)
+void uart_readMsg(short *msg, const unsigned int length)
 {
 	for (unsigned int index = 0; index < length; index++)
 	{

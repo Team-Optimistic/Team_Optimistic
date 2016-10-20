@@ -5,6 +5,8 @@ bool intakeStar();
 bool intakeCube();
 bool dumpIntake();
 bool dumpStars();
+bool driveStraight(const int distance);
+bool turn(const int angle);
 
 //Number of stars in the intake
 static int currentStarTotal = 0;

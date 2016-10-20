@@ -18,11 +18,6 @@
 	<short estimated x>
 	<short estimated y>
 	<short estimated theta>
-	<short x coordinate demand>
-	<short y coordinate demand>
-	<short pick up object> // 0 = do not pick up
-												 // 1 = pick up star
-												 // 2 = pick up cube
 */
 
 /*
@@ -39,19 +34,22 @@
 												 // 2 = cube
  */
 
+/*
+	MPC msg recieve structure is
+	<header>
+	<short x coordinate demand>
+	<short y coordinate demand>
+	<short pick up object> // 0 = do not pick up
+												 // 1 = pick up star
+												 // 2 = pick up cube
+ */
+
 //Standard message
-#define STD_MSG_LENGTH 7
+#define STD_MSG_LENGTH 4
 short std_msg[STD_MSG_LENGTH];
-#define STD_MSG_COUNT     0
-#define STD_MSG_EST_X     1
-#define STD_MSG_EST_Y     2
-#define STD_MSG_EST_THETA 3
-#define STD_MSG_X_COORD   4
-#define STD_MSG_Y_COORD   5
-#define STD_MSG_PICKUP    6
-#define STD_MSG_PICKUP_NONE 0
-#define STD_MSG_PICKUP_STAR 1
-#define STD_MSG_PICKUP_CUBE 2
+#define STD_MSG_EST_X     0
+#define STD_MSG_EST_Y     1
+#define STD_MSG_EST_THETA 2
 
 //Message to get objects behind us
 #define SPC_MSG_LENGTH 3
@@ -63,28 +61,36 @@ short spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_PICKUP_STAR  1
 #define SPC_MSG_PICKUP_CUBE  2
 
+//Message to pick up an object
+#define MPC_MSG_LENGTH 3
+short mpc_msg[MPC_MSG_LENGTH];
+#define STD_MSG_X_COORD   0
+#define STD_MSG_Y_COORD   1
+#define STD_MSG_PICKUP    2
+#define STD_MSG_PICKUP_NONE 0
+#define STD_MSG_PICKUP_STAR 1
+#define STD_MSG_PICKUP_CUBE 2
+
 //Message write semaphore, always get lock before reading
 //Only task readBuffer() may write to msg
-TSemaphore std_msgSem;
-
-//Special message semaphore, always get lock before reading
-//Only task readBuffer() may write to spc_msg
-TSemaphore spc_msgSem;
+TSemaphore std_msgSem, spc_msgSem, mpc_msgSem;
 
 //General UART semaphore, always get lock before writing
 //Only task readBuffer() may read from UART
 TSemaphore uartSem;
 
 //Message count
-#define MSG_COUNT_LENGTH 3
+#define MSG_COUNT_LENGTH 4
 short msgCount[MSG_COUNT_LENGTH];
 #define MSG_COUNT_TOTAL 0
 #define MSG_COUNT_STD   1
 #define MSG_COUNT_SPC   2
+#define MSG_COUNT_MPC   3
 
 //Message types
 #define STD_MSG_TYPE MSG_COUNT_STD
 #define SPC_MSG_TYPE MSG_COUNT_SPC
+#define MPC_MSG_TYPE MSG_COUNT_MPC
 
 /*
 Initializes everything this file needs for comms with the pi
@@ -99,6 +105,7 @@ void initUART()
 
 	semaphoreInitialize(std_msgSem);
 	semaphoreInitialize(spc_msgSem);
+	semaphoreInitialize(mpc_msgSem);
 	semaphoreInitialize(uartSem);
 
 	setBaudRate(UART1, baudRate9600);

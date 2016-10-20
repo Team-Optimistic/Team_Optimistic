@@ -90,7 +90,7 @@ bool dumpIntake()
 	//Loop to clear what's behind us
 	while (keepGoing)
 	{
-		sendGetBehindRequest();
+		sendSPCMsg();
 
 		BCI_lockSem(spc_msgSem, "dumpIntake")
 		{

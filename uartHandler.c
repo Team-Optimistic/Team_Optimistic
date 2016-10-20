@@ -35,6 +35,14 @@
  */
 
 /*
+	MPC msg send structure is
+	<header>
+	<short last x coordinate demand>
+	<short last y coordinate demand>
+	<short last pick up object> // 0 = do not pick up
+												 			// 1 = pick up star
+												 			// 2 = pick up cube
+
 	MPC msg recieve structure is
 	<header>
 	<short x coordinate demand>
@@ -64,12 +72,12 @@ short spc_msg[SPC_MSG_LENGTH];
 //Message to pick up an object
 #define MPC_MSG_LENGTH 3
 short mpc_msg[MPC_MSG_LENGTH];
-#define STD_MSG_X_COORD   0
-#define STD_MSG_Y_COORD   1
-#define STD_MSG_PICKUP    2
-#define STD_MSG_PICKUP_NONE 0
-#define STD_MSG_PICKUP_STAR 1
-#define STD_MSG_PICKUP_CUBE 2
+#define MPC_MSG_X_COORD   0
+#define MPC_MSG_Y_COORD   1
+#define MPC_MSG_PICKUP    2
+#define MPC_MSG_PICKUP_NONE 0
+#define MPC_MSG_PICKUP_STAR 1
+#define MPC_MSG_PICKUP_CUBE 2
 
 //Message write semaphore, always get lock before reading
 //Only task readBuffer() may write to msg
@@ -88,9 +96,9 @@ short msgCount[MSG_COUNT_LENGTH];
 #define MSG_COUNT_MPC   3
 
 //Message types
-#define STD_MSG_TYPE MSG_COUNT_STD
-#define SPC_MSG_TYPE MSG_COUNT_SPC
-#define MPC_MSG_TYPE MSG_COUNT_MPC
+#define STD_MSG_TYPE 1
+#define SPC_MSG_TYPE 2
+#define MPC_MSG_TYPE 3
 
 /*
 Initializes everything this file needs for comms with the pi
@@ -166,10 +174,10 @@ void uart_sendMessageHeader(const short type)
 /*
 Sends a standard message to the pi
  */
-#warning "sendStandardMessage"
-void sendStandardMessage()
+#warning "sendSTDMsg"
+void sendSTDMsg()
 {
-	BCI_lockSem(uartSem, "sendCurrentData")
+	BCI_lockSem(uartSem, "sendSTDMsg")
 	{
 		//Send header
 		uart_sendMessageHeader(STD_MSG_TYPE);
@@ -181,22 +189,42 @@ void sendStandardMessage()
 		sendChar(UART1, SensorValue[leftQuad]);
 		sendChar(UART1, SensorValue[rightQuad]);
 
-		BCI_unlockSem(uartSem, "sendCurrentData")
+		BCI_unlockSem(uartSem, "sendSTDMsg")
 	}
 }
 
 /*
 Requests the pi send back the position of an object behind the robot
  */
-#warning "sendGetBehindRequest"
-void sendGetBehindRequest()
+#warning "sendSPCMsg"
+void sendSPCMsg()
 {
-	BCI_lockSem(uartSem, "sendGetBehindRequest")
+	BCI_lockSem(uartSem, "sendSPCMsg")
 	{
 		//Send header
 		uart_sendMessageHeader(SPC_MSG_TYPE);
 
-		BCI_unlockSem(uartSem, "sendGetBehindRequest")
+		BCI_unlockSem(uartSem, "sendSPCMsg")
+	}
+}
+
+/*
+Tells the pi what object we just picked up
+ */
+#warning "sendMPCMsg"
+void sendMPCMsg()
+{
+	BCI_lockSem(uartSem, "sendMPCMsg")
+	{
+		//Send header
+		uart_sendMessageHeader(MPC_MSG_TYPE);
+
+		//Send data
+		sendChar(UART1, mpc_msg[MPC_MSG_X_COORD]);
+		sendChar(UART1, mpc_msg[MPC_MSG_Y_COORD]);
+		sendChar(UART1, mpc_msg[MPC_MSG_PICKUP]);
+
+		BCI_unlockSem(uartSem, "sendMPCMsg")
 	}
 }
 

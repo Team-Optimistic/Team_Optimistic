@@ -24,7 +24,7 @@ task main()
 	while (true)
 	{
 		//Send data to pi
-		sendStandardMessage();
+		sendSTDMsg();
 
 		//Task wait
 		wait1Msec(15);

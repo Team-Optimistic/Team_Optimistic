@@ -75,9 +75,9 @@ short mpc_msg[MPC_MSG_LENGTH];
 #define MPC_MSG_X_COORD   0
 #define MPC_MSG_Y_COORD   1
 #define MPC_MSG_PICKUP    2
-#define MPC_MSG_PICKUP_NONE 0
-#define MPC_MSG_PICKUP_STAR 1
-#define MPC_MSG_PICKUP_CUBE 2
+#define MPC_MSG_PICKUP_CLEAR 0
+#define MPC_MSG_PICKUP_STAR  1
+#define MPC_MSG_PICKUP_CUBE  2
 
 //Message write semaphore, always get lock before reading
 //Only task readBuffer() may write to msg
@@ -280,6 +280,11 @@ task readBuffer()
 					case SPC_MSG_TYPE:
 						//Read in spc msg
 						uart_readMsg(spc_msg, SPC_MSG_LENGTH);
+						break;
+
+					case MPC_MSG_TYPE:
+						//Read in mpc msg
+						uart_readMsg(mpc_msg, MPC_MSG_TYPE);
 						break;
 
 					default:

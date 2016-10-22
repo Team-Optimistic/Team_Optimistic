@@ -32,38 +32,40 @@ bool isSameObject(const short x, const short y)
 //Drives the robot based on recieved commands
 task commandRobot()
 {
-  short xDemand, yDemand, pickup;
+  short xDemand[3], yDemand[3], pickup[3];
 
   while (true)
   {
     BCI_lockSem(mpc_msgSem, "commandRobot")
     {
-      xDemand = mpc_msg[MPC_MSG_X_COORD];
-      yDemand = mpc_msg[MPC_MSG_Y_COORD];
-      pickup = mpc_msg[MPC_MSG_PICKUP];
+      for (int i = 0; i < 3; i++)
+      {
+        xDemand[i] = mpc_msg[MPC_MSG_X_COORD + (i * 3)];
+        yDemand[i] = mpc_msg[MPC_MSG_Y_COORD + (i * 3)];
+        pickup[i] = mpc_msg[MPC_MSG_PICKUP];
+      }
       BCI_unlockSem(mpc_msgSem, "commandRobot")
     }
 
-      switch (pickup)
+      //First instruction determines type of following ones
+      //We can only follow multiple instructions if we are getting stars
+      switch (pickup[0])
       {
         case MPC_MSG_PICKUP_CLEAR:
-          if (!isSameObject(xDemand, yDemand))
+          if (!isSameObject(xDemand[0], yDemand[0]))
           {
-            moveToPoint(xDemand, yDemand);
+            moveToPoint(xDemand[0], yDemand[0]);
           }
           break;
 
         case MPC_MSG_PICKUP_STAR:
-          if (!isSameObject(xDemand, yDemand))
-          {
-            pickUpStar(xDemand, yDemand);
-          }
+          pickUpStars(xDemand, yDemand);
           break;
 
         case MPC_MSG_PICKUP_CUBE:
-          if (!isSameObject(xDemand, yDemand))
+          if (!isSameObject(xDemand[0], yDemand[0]))
           {
-            pickUpCube(xDemand, yDemand);
+            pickUpCube(xDemand[0], yDemand[0]);
           }
           break;
 

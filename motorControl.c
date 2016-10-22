@@ -42,7 +42,7 @@ void setIntakeMotors(const int power)
 Intakes a star
 @return Whether the operation was successful
 */
-#warning "IntakeStar"
+#warning "intakeStar"
 bool intakeStar()
 {
 	if (currentStarTotal == 0)
@@ -63,7 +63,7 @@ bool intakeStar()
 Intakes a cube
 @return Whether the operation was successful
  */
-#warning "IntakeCube"
+#warning iIntakeCube"
 bool intakeCube()
 {
 	if (currentStarTotal != 0)
@@ -83,7 +83,7 @@ bool intakeCube()
 Dumps the intake over the fence
 @return bool Whether the operation was successful
  */
-#warning "DumpIntake"
+#warning "dumpIntake"
 bool dumpIntake()
 {
 	//Turn so our back faces the fence
@@ -108,7 +108,7 @@ bool dumpIntake()
 		sendSPCMsg();
 
 		//Wait until reply
-		while (!mpgMsgFlag) { wait1Msec(15); }
+		while (!mpcMsgFlag) { wait1Msec(15); }
 
 		BCI_lockSem(mpc_msgSem, "dumpIntake")
 		{
@@ -154,7 +154,7 @@ Randomly selects a strategy based on a probability distribution and dumps based
 on the strategy
 @return bool Whether the operation was successful
  */
-#warning "DumpStars"
+#warning "dumpStars"
 bool dumpStars()
 {
 	//Randomly select a strategy
@@ -170,7 +170,7 @@ Drives in a straight line for a distance
 @param distance Distance to drive for
 @return Whether the operation was successful
 */
-#warning "DriveStraight"
+#warning "driveStraight"
 bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -258,7 +258,7 @@ Turns to an angle
 @param angle Angle to turn to
 @return Whether the operation was successful
 */
-#warning "Turn"
+#warning "turn"
 bool turn(const int angle)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -342,7 +342,7 @@ Computes the distance to a point
 @param y Y coordinate of other point
 @return distance to point
 */
-#warning "ComputeDistanceToPoint"
+#warning "computeDistanceToPoint"
 float computeDistanceToPoint(const int x, const int y)
 {
 	BCI_lockSem(std_msgSem, "computeDistanceToPoint")
@@ -364,7 +364,7 @@ Computes the angle to a point
 @param y Y coordinate of other point
 @return angle to point
 */
-#warning "ComputeAngleToPoint"
+#warning "computeAngleToPoint"
 float computeAngleToPoint(const int x, const int y)
 {
 	BCI_lockSem(std_msgSem, "computeAngleToPoint")
@@ -388,7 +388,7 @@ Computes the distance and angle from current location to a point
 @param y Y coordinate of other point
 @return distance and angle to point
 */
-#warning "ComputeDistanceAndAngleToPoint"
+#warning "computeDistanceAndAngleToPoint"
 distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAndAngle out;
@@ -419,7 +419,7 @@ Turns and drives to a point
 @param offset Backward offset from final distance to point
 @return Whether the operation was successful
 */
-#warning "MoveToPoint"
+#warning "moveToPoint"
 bool moveToPoint(const int x, const int y, int offset = 0)
 {
 	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
@@ -436,7 +436,7 @@ Picks up a star
 @param y Y coordinate of star
 @return Whether operation was successful
  */
-#warning "PickUpStar"
+#warning "pickUpStar"
 bool pickUpStar(const int x, const int y)
 {
 	//Move to slightly behind star
@@ -450,12 +450,24 @@ bool pickUpStar(const int x, const int y)
 }
 
 /*
+Picks up multiple stars
+@param x X coordinates
+@param y Y coordinates
+@return Whether the operation was successful
+ */
+#warning "pickUpStars"
+bool pickUpStars(const int *x, const int *y)
+{
+	
+}
+
+/*
 Picks up a cube and scores it
 @param x X coordinate of cube
 @param y Y coordinate of cube
 @return Whether the operation was successful
  */
-#warning "PickUpCube"
+#warning "pickUpCube"
 bool pickUpCube(const int x, const int y)
 {
 	//Dump intake if we have anything, we cannot pick up a cube with stars in the

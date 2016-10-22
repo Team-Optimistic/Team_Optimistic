@@ -50,6 +50,21 @@
 	<short pick up object> // 0 = do not pick up
 												 // 1 = pick up star
 												 // 2 = pick up cube
+ 	<short x coordinate demand>
+ 	<short y coordinate demand>
+ 	<short pick up object> // 0 = do not pick up
+ 												 // 1 = pick up star
+ 												 // 2 = pick up cube
+	<short x coordinate demand>
+	<short y coordinate demand>
+	<short pick up object> // 0 = do not pick up
+												 // 1 = pick up star
+												 // 2 = pick up cube
+ 	<short x coordinate demand>
+ 	<short y coordinate demand>
+ 	<short pick up object> // 0 = do not pick up
+ 												 // 1 = pick up star
+ 												 // 2 = pick up cube
  */
 
 //Standard message
@@ -70,9 +85,9 @@ short spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_PICKUP_CUBE  2
 
 //Message to pick up an object
-#define MPC_MSG_LENGTH 3
+#define MPC_MSG_LENGTH 12
 short mpc_msg[MPC_MSG_LENGTH];
-bool mpgMsgFlag;
+bool mpcMsgFlag;
 #define MPC_MSG_X_COORD   0
 #define MPC_MSG_Y_COORD   1
 #define MPC_MSG_PICKUP    2
@@ -206,7 +221,7 @@ void sendSPCMsg()
 		uart_sendMessageHeader(SPC_MSG_TYPE);
 
 		//Reset MPC flag
-		mpgMsgFlag = false;
+		mpcMsgFlag = false;
 
 		BCI_unlockSem(uartSem, "sendSPCMsg")
 	}
@@ -268,7 +283,7 @@ task readBuffer()
 				//Set MPC flag
 				if (msgTypeFlagHolder == MPC_MSG_TYPE)
 				{
-					mpgMsgFlag = true;
+					mpcMsgFlag = true;
 				}
 
 				//Get msg count
@@ -294,7 +309,7 @@ task readBuffer()
 
 					case MPC_MSG_TYPE:
 						//Read in mpc msg
-						uart_readMsg(mpc_msg, MPC_MSG_TYPE);
+						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
 						break;
 
 					default:

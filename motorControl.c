@@ -84,6 +84,70 @@ Dumps the intake over the fence
 @return bool Whether the operation was successful
  */
 #warning "dumpIntake"
+// bool dumpIntake()
+// {
+// 	//Turn so our back faces the fence
+// 	short currentAngle;
+// 	BCI_lockSem(std_msgSem, "dumpIntake")
+// 	{
+// 		currentAngle = std_msg[STD_MSG_EST_THETA];
+// 		BCI_unlockSem(std_msgSem, "dumpIntake")
+// 	}
+//
+// 	turn(90 - currentAngle);
+//
+// 	//Communicate with pi and determine if there is anything blocking our way to
+// 	//the fence. If there is, drop what we have and intake whats in our way, and
+// 	//dump that. Then, take what we dropped and dump it as well. If there isn't,
+// 	//drive back and dump. Lastly, set currentStarTotal to 0.
+//
+// 	//Loop to clear what's behind us
+// 	bool keepGoing = true;
+// 	while (keepGoing)
+// 	{
+// 		sendSPCMsg();
+//
+// 		//Wait until reply
+// 		while (!mpcMsgFlag) { wait1Msec(15); }
+//
+// 		BCI_lockSem(mpc_msgSem, "dumpIntake")
+// 		{
+// 			short xDemand, yDemand, pickup;
+//
+// 			xDemand = mpc_msg[MPC_MSG_X_COORD];
+// 			yDemand = mpc_msg[MPC_MSG_Y_COORD];
+// 			pickup = mpc_msg[MPC_MSG_PICKUP];
+//
+// 			BCI_unlockSem(mpc_msgSem, "dumpIntake")
+//
+// 			switch (pickup)
+// 			{
+// 				case MPC_MSG_PICKUP_CLEAR:
+// 					//Nothing in our way, drive back and dump
+// 					keepGoing = false;
+// 					break;
+//
+// 				case MPC_MSG_PICKUP_STAR:
+// 					//Star in our way, drop what we have and intake it
+// 					//See if there are any other objects in our way
+// 					//Wait to score stars until we have a full intake
+// 					break;
+//
+// 				case MPC_MSG_PICKUP_CUBE:
+// 					//Cube in our way, drop what we have a score it
+// 					//See if there are any other objects in our way
+// 					break;
+//
+// 				default:
+// 					break;
+// 			}
+// 		}
+// 	}
+//
+// 	//Nothing else behind us, score what we put down
+//
+// 	return true;
+// }
 bool dumpIntake()
 {
 	//Turn so our back faces the fence
@@ -96,57 +160,8 @@ bool dumpIntake()
 
 	turn(90 - currentAngle);
 
-	//Communicate with pi and determine if there is anything blocking our way to
-	//the fence. If there is, drop what we have and intake whats in our way, and
-	//dump that. Then, take what we dropped and dump it as well. If there isn't,
-	//drive back and dump. Lastly, set currentStarTotal to 0.
-
-	//Loop to clear what's behind us
-	bool keepGoing = true;
-	while (keepGoing)
-	{
-		sendSPCMsg();
-
-		//Wait until reply
-		while (!mpcMsgFlag) { wait1Msec(15); }
-
-		BCI_lockSem(mpc_msgSem, "dumpIntake")
-		{
-			short xDemand, yDemand, pickup;
-
-			xDemand = mpc_msg[MPC_MSG_X_COORD];
-			yDemand = mpc_msg[MPC_MSG_Y_COORD];
-			pickup = mpc_msg[MPC_MSG_PICKUP];
-
-			BCI_unlockSem(mpc_msgSem, "dumpIntake")
-
-			switch (pickup)
-			{
-				case MPC_MSG_PICKUP_CLEAR:
-					//Nothing in our way, drive back and dump
-					keepGoing = false;
-					break;
-
-				case MPC_MSG_PICKUP_STAR:
-					//Star in our way, drop what we have and intake it
-					//See if there are any other objects in our way
-					//Wait to score stars until we have a full intake
-					break;
-
-				case MPC_MSG_PICKUP_CUBE:
-					//Cube in our way, drop what we have a score it
-					//See if there are any other objects in our way
-					break;
-
-				default:
-					break;
-			}
-		}
-	}
-
-	//Nothing else behind us, score what we put down
-
-	return true;
+	//Drive back and dump
+	
 }
 
 /*
@@ -458,7 +473,7 @@ Picks up multiple stars
 #warning "pickUpStars"
 bool pickUpStars(const int *x, const int *y)
 {
-	
+
 }
 
 /*

@@ -6,26 +6,32 @@
 	<start byte 0xFA>
 	<msg type byte>
 	<short msg count>
+*/
 
-	Message send structure is
+//-----------------------------------------------------------------------------
+
+/*
+	STD msg send structure is
 	<header>
 	<short intake pot val>
 	<short left quad val>
 	<short right quad val>
 
-	Message recieve structure is
+	STD msg recieve structure is
 	<header>
 	<short estimated x>
 	<short estimated y>
 	<short estimated theta>
 */
 
+//-----------------------------------------------------------------------------
+
 /*
-	Special message send structure is
+	SPC msg send structure is
 	<header>
 	<short message id>
 
-	Special message recieve structure is
+	SPC msg recieve structure is
 	<header>
 	<short x coordinate demand>
 	<short y coordinate demand>
@@ -34,14 +40,11 @@
 												 // 2 = cube
  */
 
+ //-----------------------------------------------------------------------------
+
 /*
 	MPC msg send structure is
 	<header>
-	<short last x coordinate demand>
-	<short last y coordinate demand>
-	<short last pick up object> // 0 = do not pick up
-												 			// 1 = pick up star
-												 			// 2 = pick up cube
 
 	MPC msg recieve structure is
 	<header>
@@ -237,11 +240,6 @@ void sendMPCMsg()
 	{
 		//Send header
 		uart_sendMessageHeader(MPC_MSG_TYPE);
-
-		//Send data
-		sendChar(UART1, mpc_msg[MPC_MSG_X_COORD]);
-		sendChar(UART1, mpc_msg[MPC_MSG_Y_COORD]);
-		sendChar(UART1, mpc_msg[MPC_MSG_PICKUP]);
 
 		BCI_unlockSem(uartSem, "sendMPCMsg")
 	}

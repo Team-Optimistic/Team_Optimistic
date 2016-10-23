@@ -1,4 +1,4 @@
-#ifndef DECISIONHANDLER_C_INCLUDED
+	#ifndef DECISIONHANDLER_C_INCLUDED
 #define DECISIONHANDLER_C_INCLUDED
 
 static short iso_x = -1, iso_y = -1;

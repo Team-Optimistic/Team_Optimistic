@@ -39,6 +39,50 @@ void setIntakeMotors(const int power)
 }
 
 /*
+Keeps the intake closed
+ */
+task keepIntakeClosed()
+{
+	//Intake PID
+	pos_PID pid;
+
+	//PID target position
+	int targetPos, prevPos = 0;
+
+	//Target timeout and sensor deadband
+	const int timeout = 200, deadband = 5;
+
+	//Timer for reaching target
+	timer t;
+	timer_Initialize(&t);
+
+	//Start to close intake
+	setIntakeMotors(30);
+
+	//Loop until at target
+	do
+	{
+		targetPos = SensorValue[intakePot];
+
+		//We're at target if the intake hasn't closed more in the timeout period
+		if (targetPos <= prevPos + deadband && targetPos >= prevPos - deadband)
+		{
+			timer_PlaceMarker(&t);
+		}
+	} while (timer_GetDTFromMarker(&t) <= timeout);
+
+	//Use small bias to start
+	pos_PID_InitController(&pid, intakePot, 0, 0, 0, 20);
+	pos_PID_SetTargetPosition(&pid, targetPos);
+
+	while (true)
+	{
+		setIntakeMotors(pos_PID_StepController(&pid));
+		wait1Msec(15);
+	}
+}
+
+/*
 Intakes a star
 @return Whether the operation was successful
 */
@@ -63,7 +107,7 @@ bool intakeStar()
 Intakes a cube
 @return Whether the operation was successful
  */
-#warning iIntakeCube"
+#warning "IntakeCube"
 bool intakeCube()
 {
 	if (currentStarTotal != 0)
@@ -161,7 +205,7 @@ bool dumpIntake()
 	turn(90 - currentAngle);
 
 	//Drive back and dump
-	
+
 }
 
 /*
@@ -471,7 +515,7 @@ Picks up multiple stars
 @return Whether the operation was successful
  */
 #warning "pickUpStars"
-bool pickUpStars(const int *x, const int *y)
+bool pickUpStars(const short *x, const short *y)
 {
 
 }

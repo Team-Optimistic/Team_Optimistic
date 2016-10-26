@@ -20,12 +20,10 @@ typedef struct distanceAndAngle_t
 
 void setLeftMotors(const int powerValue)
 {
-	motor[leftMotor] = powerValue;
 }
 
 void setRightMotors(const int powerValue)
 {
-	motor[rightMotor] = powerValue;
 }
 
 void setAllDriveMotors(const int power)
@@ -35,6 +33,10 @@ void setAllDriveMotors(const int power)
 }
 
 void setIntakeMotors(const int power)
+{
+}
+
+void setLiftMotors(const int power)
 {
 }
 
@@ -73,6 +75,37 @@ task keepIntakeClosed()
 
 	//Use small bias to start
 	pos_PID_InitController(&pid, intakePot, 0, 0, 0, 20);
+	pos_PID_SetTargetPosition(&pid, targetPos);
+
+	while (true)
+	{
+		setIntakeMotors(pos_PID_StepController(&pid));
+		wait1Msec(15);
+	}
+}
+
+/*
+Keeps the intake open
+ */
+task keepIntakeOpen()
+{
+	//Intake PID
+	pos_PID pid;
+
+	//PID target position
+	int targetPos = 200, prevPos = 0;
+
+	//Target timeout and sensor deadband
+	const int timeout = 200, deadband = 5;
+
+	//Timer for reaching target
+	timer t;
+	timer_Initialize(&t);
+
+	//Start to close intake
+	setIntakeMotors(30);
+
+	pos_PID_InitController(&pid, intakePot, 0, 0, 0);
 	pos_PID_SetTargetPosition(&pid, targetPos);
 
 	while (true)
@@ -205,7 +238,36 @@ bool dumpIntake()
 	turn(90 - currentAngle);
 
 	//Drive back and dump
+	startTask(keepIntakeClosed);
+	setLiftMotors(127);
+	setAllDriveMotors(-127);
 
+	bool keepGoing = true;
+	while (keepGoing)
+	{
+		BCI_lockSem(std_msgSem, "dumpIntake")
+		{
+			//Back up until we're close to the fence
+			keepGoing = std_msg[STD_MSG_EST_Y] >= 70;
+			BCI_unlockSem(std_msgSem, "dumpIntake");
+		}
+
+		wait1Msec(5);
+	}
+
+	setAllDriveMotors(0);
+
+	keepGoing = true;
+	while (keepGoing)
+	{
+		//Raise the lift until we're just past vertical
+		keepGoing = SensorValue[liftPot] >= 200;
+		wait1Msec(5);
+	}
+
+	setLiftMotors(0);
+
+	stopTask(keepIntakeClosed);
 }
 
 /*

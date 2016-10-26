@@ -52,7 +52,7 @@ task keepIntakeClosed()
 	int targetPos, prevPos = 0;
 
 	//Target timeout and sensor deadband
-	const int timeout = 200, deadband = 5;
+	const int timeout = 200, deadband = 10;
 
 	//Timer for reaching target
 	timer t;
@@ -248,7 +248,7 @@ bool dumpIntake()
 		BCI_lockSem(std_msgSem, "dumpIntake")
 		{
 			//Back up until we're close to the fence
-			keepGoing = std_msg[STD_MSG_EST_Y] >= 70;
+			keepGoing = std_msg[STD_MSG_EST_Y] >= 65;
 			BCI_unlockSem(std_msgSem, "dumpIntake");
 		}
 
@@ -285,6 +285,9 @@ bool dumpStars()
 	//Depending on the strategy and currentStarTotal, either
 	// - Dump stars with dumpIntake, or
 	// - Keep stars
+
+	//For now, just dump the stars
+	dumpIntake();
 
 	return true;
 }
@@ -587,7 +590,35 @@ Picks up multiple stars
 #warning "pickUpStars"
 bool pickUpStars(const short *x, const short *y)
 {
+	const int intakeLength = 18;
 
+	//If the stars are along the wall, we need to swing turn in and drive along
+	//the wall to get them, then close the intake before we hit the wall
+	if (x[0] >= 144 - intakeLength ||
+			x[0] <= intakeLength ||
+			y[0] <= intakeLength)
+	{
+		//Drive to a point in front of one end of the wall
+		//For the left and right walls, drive next to the fence
+		//For the south wall, pick the closest corner
+		//
+		//Turn to face the wall
+		//
+		//Swing turn into being parallel to the wall
+		//
+		//Drive along the length of the wall to pool objects
+		//
+		//Close the intake and score
+	}
+	//Otherwise, we should drive around with our intake open to get them
+	else
+	{
+		//Drive around hitting each star
+		//
+		//Close the intake and score
+	}
+
+	dumpStars();
 }
 
 /*

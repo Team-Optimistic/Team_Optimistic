@@ -20,8 +20,9 @@ bool isSameObject(const short x, const short y)
     return false;
   }
 
-  const bool out = (fabs(x - iso_x) < maxDeviance) ||
-                   (fabs(y - iso_y) < maxDeviance);
+  bool out = (fabs(x - iso_x) < maxDeviance) ||
+             (fabs(y - iso_y) < maxDeviance);
+						 
   iso_x = x;
   iso_y = y;
 

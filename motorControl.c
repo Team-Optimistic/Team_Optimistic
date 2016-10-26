@@ -5,7 +5,7 @@ bool intakeStar();
 bool intakeCube();
 bool dumpIntake();
 bool dumpStars();
-bool driveStraight(const int distance);
+bool driveStraight(const int distance, int swingTheta = 0);
 bool turn(const int angle);
 
 //Number of stars in the intake
@@ -237,7 +237,7 @@ bool dumpIntake()
 
 	turn(90 - currentAngle);
 
-	//Drive back and dump
+	//Pick up stars, drive back and dump
 	startTask(keepIntakeClosed);
 	setLiftMotors(127);
 	setAllDriveMotors(-127);
@@ -268,6 +268,9 @@ bool dumpIntake()
 	setLiftMotors(0);
 
 	stopTask(keepIntakeClosed);
+	startTask(keepIntakeOpen);
+
+	return true;
 }
 
 /*
@@ -289,10 +292,11 @@ bool dumpStars()
 /*
 Drives in a straight line for a distance
 @param distance Distance to drive for
+@param swingTheta Angle between left and right sides (make nonzero for a swing turn)
 @return Whether the operation was successful
 */
 #warning "driveStraight"
-bool driveStraight(const int distance)
+bool driveStraight(const int distance, int swingTheta)
 {
 	//Save left and right quad values instead of setting them to zero
 	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -310,7 +314,7 @@ bool driveStraight(const int distance)
 	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
 
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
-	pos_PID_SetTargetPosition(&anglePID, 0);
+	pos_PID_SetTargetPosition(&anglePID, swingTheta);
 
 	//If distance PID controller is at target
 	bool atTarget = false;

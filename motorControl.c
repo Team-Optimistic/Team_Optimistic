@@ -1,15 +1,9 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
-bool intakeStar();
-bool intakeCube();
 bool dumpIntake();
-bool dumpStars();
 bool driveStraight(const int distance, int swingTheta = 0);
 bool turn(const int angle);
-
-//Number of stars in the intake
-static int currentStarTotal = 0;
 
 //Barely used type to return two values
 typedef struct distanceAndAngle_t
@@ -43,6 +37,7 @@ void setLiftMotors(const int power)
 /*
 Keeps the intake closed
  */
+#warning "keepIntakeClosed"
 task keepIntakeClosed()
 {
 	//Intake PID
@@ -87,6 +82,7 @@ task keepIntakeClosed()
 /*
 Keeps the intake open
  */
+#warning "keepIntakeOpen"
 task keepIntakeOpen()
 {
 	//Intake PID
@@ -113,47 +109,6 @@ task keepIntakeOpen()
 		setIntakeMotors(pos_PID_StepController(&pid));
 		wait1Msec(15);
 	}
-}
-
-/*
-Intakes a star
-@return Whether the operation was successful
-*/
-#warning "intakeStar"
-bool intakeStar()
-{
-	if (currentStarTotal == 0)
-	{
-	}
-	else
-	{
-	}
-
-	currentStarTotal++;
-
-	sendMPCMsg();
-
-	return true;
-}
-
-/*
-Intakes a cube
-@return Whether the operation was successful
- */
-#warning "IntakeCube"
-bool intakeCube()
-{
-	if (currentStarTotal != 0)
-	{
-		dumpStars();
-	}
-	else
-	{
-	}
-
-	sendMPCMsg();
-
-	return true;
 }
 
 /*
@@ -269,25 +224,6 @@ bool dumpIntake()
 
 	stopTask(keepIntakeClosed);
 	startTask(keepIntakeOpen);
-
-	return true;
-}
-
-/*
-Randomly selects a strategy based on a probability distribution and dumps based
-on the strategy
-@return bool Whether the operation was successful
- */
-#warning "dumpStars"
-bool dumpStars()
-{
-	//Randomly select a strategy
-	//Depending on the strategy and currentStarTotal, either
-	// - Dump stars with dumpIntake, or
-	// - Keep stars
-
-	//For now, just dump the stars
-	dumpIntake();
 
 	return true;
 }
@@ -563,25 +499,6 @@ bool moveToPoint(const int x, const int y, int offset = 0)
 }
 
 /*
-Picks up a star
-@param x X coordinate of star
-@param y Y coordinate of star
-@return Whether operation was successful
- */
-#warning "pickUpStar"
-bool pickUpStar(const int x, const int y)
-{
-	//Move to slightly behind star
-	moveToPoint(x, y, 10);
-	intakeStar();
-
-	//Dump stars
-	dumpStars();
-
-	return true;
-}
-
-/*
 Picks up multiple stars
 @param x X coordinates
 @param y Y coordinates
@@ -618,7 +535,13 @@ bool pickUpStars(const short *x, const short *y)
 		//Close the intake and score
 	}
 
-	dumpStars();
+	//Dump stars
+	dumpIntake();
+
+	//Tell pi we are done
+	sendMPCMsg();
+
+	return true;
 }
 
 /*
@@ -630,19 +553,17 @@ Picks up a cube and scores it
 #warning "pickUpCube"
 bool pickUpCube(const int x, const int y)
 {
-	//Dump intake if we have anything, we cannot pick up a cube with stars in the
-	//intake
-	if (currentStarTotal != 0)
-	{
-		dumpIntake();
-	}
+	//Move to cube
+	moveToPoint(x, y);
 
-	//Move to slightly behind cube
-	moveToPoint(x, y, 10);
-	intakeCube();
+	//Close intake
+	startTask(keepIntakeCLosed);
 
 	//Dump cube
 	dumpIntake();
+
+	//Tell pi we are done
+	sendMPCMsg();
 
 	return true;
 }

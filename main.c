@@ -9,6 +9,7 @@
 #define BCI_SEM_DEBUG_FULL
 #define MENU_NUM 1
 #define LCD_NO_CALLBACKS
+#define LCD_NO_SAFETY
 #include "BCI\BCI.h"
 
 #include "uartHandler.c"
@@ -46,7 +47,7 @@ task updateMenus()
 	string msg;
 	while (true)
 	{
-		sprintf(msg, "Theta: %d", SensorValue[leftQuad] - SensorValue[rightQuad]);0
+		sprintf(msg, "Theta: %d", SensorValue[leftQuad] - SensorValue[rightQuad]);
 		changeMessage(pidReadout, msg);
 	}
 }

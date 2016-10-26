@@ -310,8 +310,8 @@ bool driveStraight(const int distance, int swingTheta)
 
 	pos_PID distancePID, anglePID;
 
-	pos_PID_InitController(&distancePID, &distanceElapsed, 0, 0, 0);
-	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
+	pos_PID_InitController(&distancePID, &distanceElapsed, 0.1, 0, 0);
+	pos_PID_InitController(&anglePID, &angleChange, 0.1, 0, 0);
 
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
 	pos_PID_SetTargetPosition(&anglePID, swingTheta);
@@ -371,6 +371,10 @@ bool driveStraight(const int distance, int swingTheta)
 		{
 			atTarget = true;
 		}
+
+		writeDebugStreamLine("left: %d, right: %d", distOutput + angleOutput, distOutput - angleOutput);
+
+		wait1Msec(15);
 	}
 
 	setAllDriveMotors(0);

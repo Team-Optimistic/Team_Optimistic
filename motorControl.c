@@ -336,7 +336,7 @@ bool turn(const int angle)
 	float angleChange = 0;
 
 	//Radius of robot
-	const float robotRadius = 11.5;
+	const float robotRadius = 10.21875;
 	const float angleScale = 0.017453 * robotRadius; //2pi*radius*(theta/360)=encoder
 
 	//Target angle

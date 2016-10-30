@@ -62,7 +62,7 @@ task keepIntakeClosed()
 		targetPos = SensorValue[intakePot];
 
 		//We're at target if the intake hasn't closed more in the timeout period
-		if (targetPos <= prevPos + deadband && targetPos >= prevPos - deadband)
+		if (targetPos >= prevPos + deadband && targetPos <= prevPos - deadband)
 		{
 			timer_PlaceMarker(&t);
 		}
@@ -311,8 +311,6 @@ bool driveStraight(const int distance, int swingTheta)
 			atTarget = true;
 		}
 
-		writeDebugStreamLine("left: %d, right: %d", distOutput + angleOutput, distOutput - angleOutput);
-
 		wait1Msec(15);
 	}
 
@@ -397,6 +395,8 @@ bool turn(const int angle)
 		{
 			atTarget = true;
 		}
+
+		wait1Msec(15);
 	}
 
 	setAllDriveMotors(0);

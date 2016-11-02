@@ -513,7 +513,8 @@ bool pickUpStars(const short *x, const short *y)
 	//the wall to get them, then close the intake before we hit the wall
 	if (x[0] >= 144 - intakeLength ||
 			x[0] <= intakeLength ||
-			y[0] <= intakeLength)
+			y[0] <= intakeLength ||
+			y[0] >= 72 - intakeLength)
 	{
 		//Drive to a point in front of one end of the wall
 		//For the left and right walls, drive next to the fence

@@ -14,10 +14,18 @@ typedef struct distanceAndAngle_t
 
 void setLeftMotors(const int powerValue)
 {
+	motor[leftDrive11] = powerValue;
+	motor[leftDrive12] = powerValue;
+	motor[leftDrive21] = powerValue;
+	motor[leftDrive22] = powerValue;
 }
 
 void setRightMotors(const int powerValue)
 {
+	motor[rightDrive11] = powerValue;
+	motor[rightDrive12] = powerValue;
+	motor[rightDrive21] = powerValue;
+	motor[rightDrive22] = powerValue;
 }
 
 void setAllDriveMotors(const int power)

@@ -44,79 +44,88 @@ void setLiftMotors(const int power)
 }
 
 /*
-Keeps the intake closed
+Handles the intake and lift
  */
-#warning "keepIntakeClosed"
-task keepIntakeClosed()
+#warning "intakeAndLiftTask"
+bool intakeOpen = true, liftDown = true;
+task intakeAndLiftTask()
 {
-	//Intake PID
-	pos_PID pid;
+	pos_PID intakePID, liftPID;
 
-	//PID target position
-	int targetPos, prevPos = 0;
+	const int intakeDeadband = 10, intakeTimeout = 250;
+	int intakeTarget, intakeTargetLast = 0;
+	bool intakeFirstUpdate = true, intakeOpenLast = true;
 
-	//Target timeout and sensor deadband
-	const int timeout = 200, deadband = 10;
+	int liftTarget;
+	bool liftFirstUpdate = true, liftDownLast = true;
 
-	//Timer for reaching target
-	timer t;
-	timer_Initialize(&t);
+	pos_PID_InitController(&intakePID, intakePot, 0, 0, 0);
+	pos_PID_InitController(&liftPID, liftIME, 0, 0, 0, -5);
 
-	//Start to close intake
-	setIntakeMotors(30);
+	timer intakeTimer;
+	timer_Initialize(&intakeTimer);
 
-	//Loop until at target
-	do
+	while (true)
 	{
-		targetPos = SensorValue[intakePot];
-
-		//We're at target if the intake hasn't closed more in the timeout period
-		if (targetPos >= prevPos + deadband && targetPos <= prevPos - deadband)
+		//We need to set target position again if we change state
+		if (intakeOpen != intakeOpenLast)
 		{
-			timer_PlaceMarker(&t);
+			intakeFirstUpdate = true;
 		}
-	} while (timer_GetDTFromMarker(&t) <= timeout);
 
-	//Use small bias to start
-	pos_PID_InitController(&pid, intakePot, 0, 0, 0, 20);
-	pos_PID_SetTargetPosition(&pid, targetPos);
+		//Keep intake open
+		if (intakeOpen)
+		{
+			if (intakeFirstUpdate)
+			{
+				intakeTarget = 200;
+				pos_PID_SetTargetPosition(&intakePID, intakeTarget);
+				intakeFirstUpdate = false;
+			}
 
-	while (true)
-	{
-		setIntakeMotors(pos_PID_StepController(&pid));
-		wait1Msec(15);
-	}
-}
+			setIntakeMotors(pos_PID_StepController(&intakePID));
+			#error "Find out if positive values open the intake"
+		}
+		//Keep intake closed
+		else
+		{
+			if (intakeFirstUpdate)
+			{
+				setIntakeMotors(-127);
 
-/*
-Keeps the intake open
- */
-#warning "keepIntakeOpen"
-task keepIntakeOpen()
-{
-	//Intake PID
-	pos_PID pid;
+				intakeTarget = SensorValue[intakePot];
 
-	//PID target position
-	int targetPos = 200, prevPos = 0;
+				//We're at target if the intake hasn't closed more in the timeout period
+				if (intakeTarget >= intakeTargetLast + intakeDeadband &&
+					  intakeTarget <= intakeTargetLast - intakeDeadband)
+				{
+					timer_PlaceMarker(&t);
+				}
 
-	//Target timeout and sensor deadband
-	const int timeout = 200, deadband = 5;
+				//If we've been at the target for long enough
+				if (timer_GetDTFromMarker(&t) >= intakeTimeout)
+				{
+					pos_PID_ChangeBias(&intakePID, -10);
+					pos_PID_SetTargetPosition(&intakePID, intakeTarget);
 
-	//Timer for reaching target
-	timer t;
-	timer_Initialize(&t);
+					//Break from this part of loop
+					intakeFirstUpdate = false;
+				}
+			}
 
-	//Start to close intake
-	setIntakeMotors(30);
+			setIntakeMotors(pos_PID_StepController(&intakePID));
+		}
 
-	pos_PID_InitController(&pid, intakePot, 0, 0, 0);
-	pos_PID_SetTargetPosition(&pid, targetPos);
+		//Keep lift down
+		if (liftDown)
+		{
 
-	while (true)
-	{
-		setIntakeMotors(pos_PID_StepController(&pid));
-		wait1Msec(15);
+		}
+		//Keep lift up
+		else
+		{
+
+		}
 	}
 }
 

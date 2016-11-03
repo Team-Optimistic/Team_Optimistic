@@ -244,8 +244,9 @@ bool dumpIntake()
 	turn(90 - currentAngle);
 
 	//Pick up stars, drive back and dump
-	startTask(keepIntakeClosed);
-	setLiftMotors(127);
+	intakeOpen = false;
+	liftDown = false;
+	startTask(intakeAndLiftTask);
 	setAllDriveMotors(-127);
 
 	bool keepGoing = true;
@@ -263,18 +264,15 @@ bool dumpIntake()
 
 	setAllDriveMotors(0);
 
+	//Wait until lift is up
 	keepGoing = true;
 	while (keepGoing)
 	{
-		//Raise the lift until we're just past vertical
-		keepGoing = SensorValue[liftPot] >= 200;
+		keepGoing = nMotorEncoder[liftMotors] >= 200;
 		wait1Msec(5);
 	}
 
-	setLiftMotors(0);
-
-	stopTask(keepIntakeClosed);
-	startTask(keepIntakeOpen);
+	intakeOpen = false;
 
 	return true;
 }
@@ -609,7 +607,8 @@ bool pickUpCube(const int x, const int y)
 	moveToPoint(x, y);
 
 	//Close intake
-	startTask(keepIntakeCLosed);
+	intakeOpen = false;
+	startTask(intakeAndLiftTask);
 
 	//Dump cube
 	dumpIntake();

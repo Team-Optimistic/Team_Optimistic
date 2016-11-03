@@ -60,7 +60,7 @@ task intakeAndLiftTask()
 	bool liftFirstUpdate = true, liftDownLast = true;
 
 	pos_PID_InitController(&intakePID, intakePot, 0, 0, 0);
-	pos_PID_InitController(&liftPID, liftIME, 0, 0, 0, -5);
+	pos_PID_InitController(&liftPID, liftMotors, 0, 0, 0, -5);
 
 	timer intakeTimer;
 	timer_Initialize(&intakeTimer);
@@ -71,6 +71,11 @@ task intakeAndLiftTask()
 		if (intakeOpen != intakeOpenLast)
 		{
 			intakeFirstUpdate = true;
+		}
+
+		if (liftDown != liftDownLast)
+		{
+			liftFirstUpdate = true;
 		}
 
 		//Keep intake open
@@ -99,11 +104,11 @@ task intakeAndLiftTask()
 				if (intakeTarget >= intakeTargetLast + intakeDeadband &&
 					  intakeTarget <= intakeTargetLast - intakeDeadband)
 				{
-					timer_PlaceMarker(&t);
+					timer_PlaceMarker(&intakeTimer);
 				}
 
 				//If we've been at the target for long enough
-				if (timer_GetDTFromMarker(&t) >= intakeTimeout)
+				if (timer_GetDTFromMarker(&intakeTimer) >= intakeTimeout)
 				{
 					pos_PID_ChangeBias(&intakePID, -10);
 					pos_PID_SetTargetPosition(&intakePID, intakeTarget);
@@ -119,7 +124,18 @@ task intakeAndLiftTask()
 		//Keep lift down
 		if (liftDown)
 		{
-
+			if (liftFirstUpdate)
+			{
+				//If we hit the button at the bottom of the lift
+				if (SensorValue[liftStopButton])
+				{
+					setLiftMotors(-127);
+					nMotorEncoder[liftMotors] = 0;
+					pos_PID_SetTargetPosition(&liftPID, 0);
+					
+					liftFirstUpdate = false;
+				}
+			}
 		}
 		//Keep lift up
 		else

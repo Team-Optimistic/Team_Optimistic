@@ -132,16 +132,33 @@ task intakeAndLiftTask()
 					setLiftMotors(-127);
 					nMotorEncoder[liftMotors] = 0;
 					pos_PID_SetTargetPosition(&liftPID, 0);
-					
+
 					liftFirstUpdate = false;
 				}
 			}
+
+			setLiftMotors(pos_PID_StepController(&liftPID));
 		}
 		//Keep lift up
 		else
 		{
+			if (liftFirstUpdate)
+			{
+				//If we hit the button at the botto of the lift
+				if (SensorValue[liftStopButton])
+				{
+					nMotorEncoder[liftMotors] = 0;
+				}
 
+				pos_PID_SetTargetPosition(&liftPID, 200);
+
+				liftFirstUpdate = false;
+			}
+
+			setLiftMotors(pos_PID_StepController(&liftPID));
 		}
+
+		wait1Msec(15);
 	}
 }
 

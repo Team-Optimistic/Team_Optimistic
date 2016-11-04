@@ -318,8 +318,7 @@ task readBuffer()
 			}
 		}
 
-		//Task wait
-		wait1Msec(1);
+		abortTimeSlice();
 	}
 }
 

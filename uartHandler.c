@@ -188,6 +188,10 @@ void uart_sendMessageHeader(const short type)
 
 	//Send msg count
 	sendChar(UART1, uart_getMessageCount(type));
+
+	#ifdef (UARTHANDLER_DEBUG)
+		writeDebugStreamLine("UART Handler: Sent message header: 0xFA,%d,%d",type,msgCount[type]);
+	#endif
 }
 
 /*
@@ -208,6 +212,10 @@ void sendSTDMsg()
 		sendChar(UART1, SensorValue[leftQuad]);
 		sendChar(UART1, SensorValue[rightQuad]);
 
+		#ifdef (UARTHANDLER_DEBUG)
+			writeDebugStreamLine("UART Handler: Sent STD msg");
+		#endif
+
 		BCI_unlockSem(uartSem, "sendSTDMsg")
 	}
 }
@@ -226,6 +234,10 @@ void sendSPCMsg()
 		//Reset MPC flag
 		mpcMsgFlag = false;
 
+		#ifdef (UARTHANDLER_DEBUG)
+			writeDebugStreamLine("UART Handler: Sent SPC msg");
+		#endif
+
 		BCI_unlockSem(uartSem, "sendSPCMsg")
 	}
 }
@@ -240,6 +252,10 @@ void sendMPCMsg()
 	{
 		//Send header
 		uart_sendMessageHeader(MPC_MSG_TYPE);
+
+		#ifdef (UARTHANDLER_DEBUG)
+			writeDebugStreamLine("UART Handler: Sent MPC msg");
+		#endif
 
 		BCI_unlockSem(uartSem, "sendMPCMsg")
 	}

@@ -20,6 +20,7 @@
 #define BCI_SEM_DEBUG_FULL
 #include "BCI\BCI.h"
 
+#define UARTHANDLER_DEBUG
 #include "uartHandler.c"
 #include "motorControl.c"
 #include "decisionHandler.c"

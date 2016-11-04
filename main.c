@@ -28,30 +28,28 @@ task main()
 {
 	motor[lidar] = 64; //7.51V
 
+	//driveStraight(100);
+
+	initUART();
+
+	//Start reading from pi
+	startTask(readBuffer);
+
+	// //Let robot drive itself
+	// startTask(commandRobot);
+
 	while (true)
 	{
+		//Send data to pi
+		sendSTDMsg();
+
+		//Temporary driver cotrol
 		setLeftMotors(vexRT[JOY_JOY_LV]);
 		setRightMotors(vexRT[JOY_JOY_RV]);
 		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
 		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+
+		//Task wait
+		wait1Msec(15);
 	}
-
-	//driveStraight(100);
-
-	//initUART();
-
-	////Start reading from pi
-	//startTask(readBuffer);
-
-	////Let robot drive itself
-	//startTask(commandRobot);
-
-	//while (true)
-	//{
-	//	//Send data to pi
-	//	sendSTDMsg();
-
-	//	//Task wait
-	//	wait1Msec(15);
-	//}
 }

@@ -1,10 +1,10 @@
-#pragma config(UART_Usage, UART1, uartUserControl, baudRate9600, IOPins, None, None)
-#pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
+#pragma config(UART_Usage, UART1, uartUserControl, baudRate115200, IOPins, None, None)
+#pragma config(UART_Usage, UART2, uartUserControl, baudRate115200, IOPins, None, None)
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    intakePot,      sensorNone)
 #pragma config(Sensor, dgtl1,  leftQuad,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  rightQuad,      sensorQuadEncoder)
-#pragma config(Sensor, dgtl5,  liftStopButton, sensorTouch)
+#pragma config(Sensor, dgtl11, liftStopButton, sensorTouch)
 #pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           rightDrive11,  tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           rightDrive22,  tmotorVex393_MC29, openLoop)
@@ -32,12 +32,13 @@ task main()
 
 	motor[lidar] = 64; //7.51V
 
-	//driveStraight(100);
+	driveStraight(3300);
+	writeDebugStreamLine("done");
 
-	initUART();
+	//initUART();
 
 	//Start reading from pi
-	startTask(readBuffer);
+	//startTask(readBuffer);
 
 	// //Let robot drive itself
 	// startTask(commandRobot);
@@ -45,7 +46,7 @@ task main()
 	while (true)
 	{
 		//Send data to pi
-		sendSTDMsg();
+		//sendSTDMsg();
 
 		//Temporary driver cotrol
 		setLeftMotors(vexRT[JOY_JOY_LV]);

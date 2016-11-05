@@ -291,6 +291,7 @@ bool driveStraight(const int distance, int swingTheta)
 
 	//Total distance elapsed since start and total angle change since start
 	float distanceElapsed = 0, angleChange = 0;
+	float lastDistance = 0;
 
 	//Target distance for the distance PID controller
 	//Angle PID controller's target is 0
@@ -298,8 +299,16 @@ bool driveStraight(const int distance, int swingTheta)
 
 	pos_PID distancePID, anglePID;
 
-	pos_PID_InitController(&distancePID, &distanceElapsed, 0.1, 0, 0);
-	pos_PID_InitController(&anglePID, &angleChange, 0.1, 0, 0);
+	if (distance <= 800)
+	{
+		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.1);
+		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
+	}
+	else
+	{
+		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.2);
+		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.5, 0);
+	}
 
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
 	pos_PID_SetTargetPosition(&anglePID, swingTheta);
@@ -308,7 +317,10 @@ bool driveStraight(const int distance, int swingTheta)
 	bool atTarget = false;
 
 	//Distance that is "close enough" to target
-	const int atTargetDistance = 5;
+	const int atTargetDistance = 15;
+
+	//Threshold for not moving
+	int threshold = 2;
 
 	//Timer for being at target
 	timer atTargetTimer;
@@ -349,10 +361,17 @@ bool driveStraight(const int distance, int swingTheta)
 		{
 			timer_PlaceHardMarker(&atTargetTimer);
 		}
+		//Place mark if we haven't moved much
+		else if (fabs(distanceElapsed - lastDistance) <= threshold)
+		{
+			timer_PlaceHardMarker(&atTargetTimer);
+		}
 		else
 		{
 			timer_ClearHardMarker(&atTargetTimer);
 		}
+
+		lastDistance = distanceElapsed;
 
 		//If we've been close enough for long enough, we're there
 		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)

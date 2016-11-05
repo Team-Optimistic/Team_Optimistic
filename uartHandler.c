@@ -313,7 +313,12 @@ task readBuffer()
 	{
 		//Load start byte into temp variable
 		msgFlagHolder = getChar(UART1);
-		writeDebugStreamLine("%d", msgFlagHolder);
+
+		if (msgFlagHolder != -1)
+		{
+			writeDebugStreamLine("%d", msgFlagHolder);
+		}
+
 		if (msgFlagHolder == 0xFA)
 		{
 			//Get msg type

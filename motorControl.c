@@ -89,7 +89,7 @@ task intakeAndLiftTask()
 			}
 
 			setIntakeMotors(pos_PID_StepController(&intakePID));
-			#error "Find out if positive values open the intake"
+			//#error "Find out if positive values open the intake"
 		}
 		//Keep intake closed
 		else

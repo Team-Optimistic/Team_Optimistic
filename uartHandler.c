@@ -125,17 +125,24 @@ Initializes everything this file needs for comms with the pi
 #warning "initUART"
 void initUART()
 {
+	//Initialize counts
 	for (unsigned int i = 0; i < MSG_COUNT_LENGTH; i++)
 	{
 		msgCount[i] = 0;
 	}
 
+	//Initialize semaphores
 	semaphoreInitialize(std_msgSem);
 	semaphoreInitialize(spc_msgSem);
 	semaphoreInitialize(mpc_msgSem);
 	semaphoreInitialize(uartSem);
 
-	setBaudRate(UART1, baudRate9600);
+	//Setup UART1
+	configureSerialPort(UART1, uartUserControl);
+	setBaudRate(UART1, baudRate115200);
+
+	//Purge UART1
+	while(getChar(UART1) != -1) {}
 }
 
 /*
@@ -144,7 +151,13 @@ Generates new message count without side-effects
  */
 short uart_getMessageCount_Soft(const short type)
 {
-	return msgCount[type] + 1 >= 0xFF ? 0 : msgCount[type] + 1;
+	if (type >= 3)
+	{
+		writeDebugStreamLine("UART Handler: GetMsgCountSoft: Bad type: %d", type);
+		return 0;
+	}
+
+	return msgCount[type] + 1 >= 255 ? 0 : msgCount[type] + 1;
 }
 
 /*
@@ -153,7 +166,13 @@ Generates new message count
  */
 short uart_getMessageCount(const short type)
 {
-	return msgCount[type] + 1 >= 0xFF ? 0 : (msgCount[type] = msgCount[type] + 1);
+	if (type >= 3)
+	{
+		writeDebugStreamLine("UART Handler: GetMsgCount: Bad type: %d", type);
+		return 0;
+	}
+
+	return msgCount[type] + 1 >= 255 ? (msgCount[type] = 0) : (msgCount[type] = msgCount[type] + 1);
 }
 
 /*
@@ -189,8 +208,8 @@ void uart_sendMessageHeader(const short type)
 	//Send msg count
 	sendChar(UART1, uart_getMessageCount(type));
 
-	#ifdef (UARTHANDLER_DEBUG)
-		writeDebugStreamLine("UART Handler: Sent message header: 0xFA,%d,%d",type,msgCount[type]);
+	#ifdef UARTHANDLER_DEBUG)
+		writeDebugStreamLine("UART Handler: Sent message header: 0xFA,%d,%d", type, msgCount[type]);
 	#endif
 }
 
@@ -212,7 +231,9 @@ void sendSTDMsg()
 		sendChar(UART1, SensorValue[leftQuad]);
 		sendChar(UART1, SensorValue[rightQuad]);
 
-		#ifdef (UARTHANDLER_DEBUG)
+		while (!bXmitComplete(UART1)) { wait1Msec(1); }
+
+		#ifdef UARTHANDLER_DEBUG)
 			writeDebugStreamLine("UART Handler: Sent STD msg");
 		#endif
 
@@ -234,7 +255,9 @@ void sendSPCMsg()
 		//Reset MPC flag
 		mpcMsgFlag = false;
 
-		#ifdef (UARTHANDLER_DEBUG)
+		while (!bXmitComplete(UART1)) { wait1Msec(1); }
+
+		#ifdef UARTHANDLER_DEBUG)
 			writeDebugStreamLine("UART Handler: Sent SPC msg");
 		#endif
 
@@ -253,7 +276,9 @@ void sendMPCMsg()
 		//Send header
 		uart_sendMessageHeader(MPC_MSG_TYPE);
 
-		#ifdef (UARTHANDLER_DEBUG)
+		while (!bXmitComplete(UART1)) { wait1Msec(1); }
+
+		#ifdef UARTHANDLER_DEBUG)
 			writeDebugStreamLine("UART Handler: Sent MPC msg");
 		#endif
 
@@ -268,8 +293,8 @@ void uart_readMsg(short *msg, const unsigned int length)
 {
 	for (unsigned int index = 0; index < length; index++)
 	{
-		//Trash 0xFF
-		if ((msg[index] = getChar(UART1)) == 0xFF)
+		//
+		if ((msg[index] = getChar(UART1)) == BCI_UART_NO_DATA)
 		{
 			index--;
 		}
@@ -287,54 +312,68 @@ task readBuffer()
 	while (true)
 	{
 		//Load start byte into temp variable
-		if ((msgFlagHolder = getChar(UART1)) == 0xFA)
+		msgFlagHolder = getChar(UART1);
+		writeDebugStreamLine("%d", msgFlagHolder);
+		if (msgFlagHolder == 0xFA)
 		{
-			BCI_lockSem(std_msgSem, "readBuffer")
+			//Get msg type
+			BCI_UART_ReadNextData(msgTypeFlagHolder, UART1)
+
+			//Set MPC flag
+			if (msgTypeFlagHolder == MPC_MSG_TYPE)
 			{
-				//Get msg type
-				while ((msgTypeFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }
+				mpcMsgFlag = true;
+			}
 
-				//Set MPC flag
-				if (msgTypeFlagHolder == MPC_MSG_TYPE)
-				{
-					mpcMsgFlag = true;
-				}
+			//Get msg count
+			BCI_UART_ReadNextData(msgCountFlagHolder, UART1)
 
-				//Get msg count
-				while ((msgCountFlagHolder = getChar(UART1)) == 0xFF) { wait1Msec(1); }
-
+			#ifdef UARTHANDLER_DEBUG
 				//Verify msg count
 				if (!uart_verifyMessageCount(msgTypeFlagHolder, msgCountFlagHolder))
 				{
-					writeDebugStreamLine("Bad msg count");
+						writeDebugStreamLine("UART Handler: ReadBuffer: Bad msg count: %d", msgCountFlagHolder);
 				}
+			#endif
 
-				switch (msgTypeFlagHolder)
-				{
-					case STD_MSG_TYPE:
-						//Read in std msg
+			switch (msgTypeFlagHolder)
+			{
+				case STD_MSG_TYPE:
+					//Read in std msg
+					BCI_lockSem(std_msgSem, "readBuffer")
+					{
 						uart_readMsg(std_msg, STD_MSG_LENGTH);
-						break;
 
-					case SPC_MSG_TYPE:
-						//Read in spc msg
+						BCI_unlockSem(std_msgSem, "readBuffer")
+					}
+					break;
+
+				case SPC_MSG_TYPE:
+					//Read in spc msg
+					BCI_lockSem(spc_msgSem, "readBuffer")
+					{
 						uart_readMsg(spc_msg, SPC_MSG_LENGTH);
-						break;
 
-					case MPC_MSG_TYPE:
-						//Read in mpc msg
+						BCI_unlockSem(spc_msgSem, "readBuffer")
+					}
+					break;
+
+				case MPC_MSG_TYPE:
+					//Read in mpc msg
+					BCI_lockSem(mpc_msgSem, "readBuffer")
+					{
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
-						break;
 
-					default:
-						break;
-				}
+						BCI_unlockSem(mpc_msgSem, "readBuffer")
+					}
+					break;
 
-				BCI_unlockSem(std_msgSem, "readBuffer")
+				default:
+					break;
 			}
 		}
 
-		abortTimeSlice();
+		wait1Msec(15);
 	}
 }
 

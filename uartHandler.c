@@ -142,7 +142,7 @@ void initUART()
 	setBaudRate(UART1, baudRate115200);
 
 	//Purge UART1
-	while(getChar(UART1) != -1) {}
+	BCI_UART_ClearDataInBuffer(UART1);
 }
 
 /*

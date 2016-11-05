@@ -2,7 +2,7 @@
 #define MOTORCONTROL_C_INCLUDED
 
 bool dumpIntake();
-bool driveStraight(const int distance, int swingTheta = 0);
+bool driveStraight(const int distance);
 bool turn(const int angle);
 
 //Barely used type to return two values
@@ -284,7 +284,7 @@ Drives in a straight line for a distance
 @return Whether the operation was successful
 */
 #warning "driveStraight"
-bool driveStraight(const int distance, int swingTheta)
+bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
 	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -311,7 +311,7 @@ bool driveStraight(const int distance, int swingTheta)
 	}
 
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
-	pos_PID_SetTargetPosition(&anglePID, swingTheta);
+	pos_PID_SetTargetPosition(&anglePID, 0);
 
 	//If distance PID controller is at target
 	bool atTarget = false;

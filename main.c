@@ -32,9 +32,6 @@ task main()
 
 	motor[lidar] = 64; //7.51V
 
-	turn(650);
-	writeDebugStreamLine("done");
-
 	//initUART();
 
 	//Start reading from pi

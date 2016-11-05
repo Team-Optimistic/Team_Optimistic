@@ -32,7 +32,7 @@ task main()
 
 	motor[lidar] = 64; //7.51V
 
-	driveStraight(3300);
+	turn(650);
 	writeDebugStreamLine("done");
 
 	//initUART();

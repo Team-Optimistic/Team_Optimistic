@@ -320,7 +320,7 @@ bool driveStraight(const int distance, int swingTheta)
 	const int atTargetDistance = 15;
 
 	//Threshold for not moving
-	int threshold = 2;
+	const int threshold = 2;
 
 	//Timer for being at target
 	timer atTargetTimer;
@@ -399,7 +399,7 @@ bool turn(const int angle)
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
 
 	//Total angle change since start
-	float angleChange = 0;
+	float angleChange = 0, lastAngle = 0;
 
 	//Radius of robot
 	const float robotRadius = 10.21875;
@@ -409,14 +409,24 @@ bool turn(const int angle)
 	int targetAngle = angle;
 
 	pos_PID anglePID;
-	pos_PID_InitController(&anglePID, &angleChange, 0, 0, 0);
-	pos_PID_SetTargetPosition(&anglePID, 0);
+	if (angle <= 350)
+	{
+		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.1);
+	}
+	else
+	{
+		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.2);
+	}
+	pos_PID_SetTargetPosition(&anglePID, targetAngle);
 
 	//If angle PID controller is at target
 	bool atTarget = false;
 
 	//Angle that is "close enough" to target
 	const int atTargetAngle = 10;
+
+	//Threshold for not moving
+	const int threshold = 2;
 
 	//Timer for being at target
 	timer atTargetTimer;
@@ -437,9 +447,8 @@ bool turn(const int angle)
 		currentLeft = SensorValue[leftQuad] - encoderLeft;
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
-		//Angle change doesn't need to be a real angle, just the difference in
-		//displacements
-		angleChange = currentRight / angleScale;
+		angleChange = ((-1 * currentLeft) + currentRight) / 2.0;
+		writeDebugStreamLine("%d", angleChange);
 
 		//Get output from PID
 		angleOutput = pos_PID_StepController(&anglePID);
@@ -453,10 +462,17 @@ bool turn(const int angle)
 		{
 			timer_PlaceHardMarker(&atTargetTimer);
 		}
+		//Place mark if we haven't moved much
+		else if (fabs(angleChange - lastAngle) <= threshold)
+		{
+			timer_PlaceHardMarker(&atTargetTimer);
+		}
 		else
 		{
 			timer_ClearHardMarker(&atTargetTimer);
 		}
+
+		lastAngle = angleChange;
 
 		//If we've been close enough for long enough, we're there
 		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)

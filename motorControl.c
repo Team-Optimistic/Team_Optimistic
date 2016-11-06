@@ -53,14 +53,13 @@ task intakeAndLiftTask()
 	pos_PID intakePID, liftPID;
 
 	const int intakeDeadband = 10, intakeTimeout = 250;
-	int intakeTarget, intakeTargetLast = 0;
 	bool intakeFirstUpdate = true, intakeOpenLast = true;
 
 	int liftTarget;
 	bool liftFirstUpdate = true, liftDownLast = true;
 
-	pos_PID_InitController(&intakePID, intakePot, 0, 0, 0);
-	pos_PID_InitController(&liftPID, liftMotors, 0, 0, 0, -5);
+	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0.01);
+	pos_PID_InitController(&liftPID, liftMotors, 0.3, 0.2, 0.1, -10);
 
 	timer intakeTimer;
 	timer_Initialize(&intakeTimer);
@@ -83,42 +82,25 @@ task intakeAndLiftTask()
 		{
 			if (intakeFirstUpdate)
 			{
-				intakeTarget = 200;
-				pos_PID_SetTargetPosition(&intakePID, intakeTarget);
+				pos_PID_SetTargetPosition(&intakePID, 1900);
 				intakeFirstUpdate = false;
 			}
 
 			setIntakeMotors(pos_PID_StepController(&intakePID));
-			//#error "Find out if positive values open the intake"
 		}
 		//Keep intake closed
 		else
 		{
 			if (intakeFirstUpdate)
 			{
-				setIntakeMotors(-127);
-
-				intakeTarget = SensorValue[intakePot];
-
-				//We're at target if the intake hasn't closed more in the timeout period
-				if (intakeTarget >= intakeTargetLast + intakeDeadband &&
-					  intakeTarget <= intakeTargetLast - intakeDeadband)
-				{
-					timer_PlaceMarker(&intakeTimer);
-				}
-
-				//If we've been at the target for long enough
-				if (timer_GetDTFromMarker(&intakeTimer) >= intakeTimeout)
-				{
-					pos_PID_ChangeBias(&intakePID, -10);
-					pos_PID_SetTargetPosition(&intakePID, intakeTarget);
-
-					//Break from this part of loop
-					intakeFirstUpdate = false;
-				}
+				pos_PID_SetTargetPosition(&intakePID, 680);
+				intakeFirstUpdate = false;
 			}
 
-			setIntakeMotors(pos_PID_StepController(&intakePID));
+			//Bound PID output to +- 50
+			setIntakeMotors(pos_PID_StepController(&intakePID) > 50 ? 50 :
+											pos_PID_GetOutput(&intakePID) < -50 ? -50 :
+											pos_PID_GetOutput(&intakePID));
 		}
 
 		//Keep lift down
@@ -126,15 +108,14 @@ task intakeAndLiftTask()
 		{
 			if (liftFirstUpdate)
 			{
-				//If we hit the button at the bottom of the lift
-				if (SensorValue[liftStopButton])
-				{
-					setLiftMotors(-127);
-					nMotorEncoder[liftMotors] = 0;
-					pos_PID_SetTargetPosition(&liftPID, 0);
+				pos_PID_SetTargetPosition(&liftPID, 0);
+				liftFirstUpdate = false;
+			}
 
-					liftFirstUpdate = false;
-				}
+			//If we hit the button at the bottom of the lift
+			if (SensorValue[liftStopButton])
+			{
+				nMotorEncoder[liftMotors] = 0;
 			}
 
 			setLiftMotors(pos_PID_StepController(&liftPID));
@@ -144,15 +125,14 @@ task intakeAndLiftTask()
 		{
 			if (liftFirstUpdate)
 			{
-				//If we hit the button at the botto of the lift
-				if (SensorValue[liftStopButton])
-				{
-					nMotorEncoder[liftMotors] = 0;
-				}
-
 				pos_PID_SetTargetPosition(&liftPID, 200);
-
 				liftFirstUpdate = false;
+			}
+
+			//If we hit the button at the bottom of the lift
+			if (SensorValue[liftStopButton])
+			{
+				nMotorEncoder[liftMotors] = 0;
 			}
 
 			setLiftMotors(pos_PID_StepController(&liftPID));

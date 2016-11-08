@@ -71,7 +71,7 @@
  */
 
 //Standard message
-#define STD_MSG_LENGTH 4
+#define STD_MSG_LENGTH 3
 short std_msg[STD_MSG_LENGTH];
 #define STD_MSG_EST_X     0
 #define STD_MSG_EST_Y     1
@@ -213,6 +213,8 @@ void uart_sendMessageHeader(const short type)
 	#endif
 }
 
+union long2Bytes { long l; char b[sizeof(long)]; };
+long2Bytes stdMsgUnion;
 /*
 Sends a standard message to the pi
  */
@@ -228,8 +230,17 @@ void sendSTDMsg()
 		sendChar(UART1, SensorValue[intakePot]);
 
 		//Send digital data
-		sendChar(UART1, SensorValue[leftQuad]);
-		sendChar(UART1, SensorValue[rightQuad]);
+		stdMsgUnion.l = SensorValue[leftQuad];
+		sendChar(UART1, stdMsgUnion.b[0]);
+		sendChar(UART1, stdMsgUnion.b[1]);
+		sendChar(UART1, stdMsgUnion.b[2]);
+		sendChar(UART1, stdMsgUnion.b[3]);
+
+		stdMsgUnion.l = SensorValue[rightQuad];
+		sendChar(UART1, stdMsgUnion.b[0]);
+		sendChar(UART1, stdMsgUnion.b[1]);
+		sendChar(UART1, stdMsgUnion.b[2]);
+		sendChar(UART1, stdMsgUnion.b[3]);
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 
@@ -293,12 +304,10 @@ void uart_readMsg(short *msg, const unsigned int length)
 {
 	for (unsigned int index = 0; index < length; index++)
 	{
-		//
-		if ((msg[index] = getChar(UART1)) == BCI_UART_NO_DATA)
-		{
-			index--;
-		}
+		BCI_UART_ReadNextData(msg[index], UART1);
+		writeDebugStream("%d,", msg[index]);
 	}
+	writeDebugStreamLine(";");
 }
 
 /*
@@ -314,10 +323,10 @@ task readBuffer()
 		//Load start byte into temp variable
 		msgFlagHolder = getChar(UART1);
 
-		if (msgFlagHolder != -1)
-		{
-			writeDebugStreamLine("%d", msgFlagHolder);
-		}
+		//if (msgFlagHolder != -1)
+		//{
+		//	writeDebugStreamLine("%d", msgFlagHolder);
+		//}
 
 		if (msgFlagHolder == 0xFA)
 		{
@@ -347,6 +356,7 @@ task readBuffer()
 					//Read in std msg
 					BCI_lockSem(std_msgSem, "readBuffer")
 					{
+						writeDebugStream("STD Msg: ");
 						uart_readMsg(std_msg, STD_MSG_LENGTH);
 
 						BCI_unlockSem(std_msgSem, "readBuffer")
@@ -357,6 +367,7 @@ task readBuffer()
 					//Read in spc msg
 					BCI_lockSem(spc_msgSem, "readBuffer")
 					{
+						writeDebugStream("SPC Msg: ");
 						uart_readMsg(spc_msg, SPC_MSG_LENGTH);
 
 						BCI_unlockSem(spc_msgSem, "readBuffer")
@@ -367,6 +378,7 @@ task readBuffer()
 					//Read in mpc msg
 					BCI_lockSem(mpc_msgSem, "readBuffer")
 					{
+						writeDebugStream("MPC Msg: ");
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
 
 						BCI_unlockSem(mpc_msgSem, "readBuffer")

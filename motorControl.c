@@ -389,7 +389,7 @@ bool turn(const int angle)
 	int targetAngle = angle;
 
 	pos_PID anglePID;
-	if (angle <= 350)
+	if (fabs(angle) <= 350)
 	{
 		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.1);
 	}

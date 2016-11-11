@@ -14,17 +14,15 @@ typedef struct distanceAndAngle_t
 
 void setLeftMotors(const int powerValue)
 {
-	motor[leftDrive11] = powerValue;
-	motor[leftDrive12] = powerValue;
-	motor[leftDrive2122] = powerValue;
+	motor[leftDriveLF] = powerValue;
+	motor[leftDriveLB] = powerValue;
 }
 
 void setRightMotors(const int powerValue)
 {
-	motor[rightDrive11] = powerValue;
-	motor[rightDrive12] = powerValue;
-	motor[rightDrive21] = powerValue;
-	motor[rightDrive22] = powerValue;
+	motor[rightDriveRFU] = powerValue;
+	motor[rightDriveRFD] = powerValue;
+	motor[rightDriveRB] = powerValue;
 }
 
 void setAllDriveMotors(const int power)
@@ -35,12 +33,14 @@ void setAllDriveMotors(const int power)
 
 void setIntakeMotors(const int power)
 {
-	motor[intakeMotors] = power;
+	motor[intakeLeft] = power;
+	motor[intakeRight] = power;
 }
 
 void setLiftMotors(const int power)
 {
-	motor[liftMotors] = power;
+	motor[liftLeft] = power;
+	motor[liftRight] = power;
 }
 
 /*
@@ -59,7 +59,7 @@ task intakeAndLiftTask()
 	bool liftFirstUpdate = true, liftDownLast = true;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0.01);
-	pos_PID_InitController(&liftPID, liftMotors, 0.3, 0.2, 0.1, -10);
+	pos_PID_InitController(&liftPID, liftRight, 0.3, 0.2, 0.1, -10);
 
 	timer intakeTimer;
 	timer_Initialize(&intakeTimer);
@@ -115,7 +115,7 @@ task intakeAndLiftTask()
 			//If we hit the button at the bottom of the lift
 			if (SensorValue[liftStopButton])
 			{
-				nMotorEncoder[liftMotors] = 0;
+				nMotorEncoder[liftRight] = 0;
 			}
 
 			setLiftMotors(pos_PID_StepController(&liftPID));
@@ -132,7 +132,7 @@ task intakeAndLiftTask()
 			//If we hit the button at the bottom of the lift
 			if (SensorValue[liftStopButton])
 			{
-				nMotorEncoder[liftMotors] = 0;
+				nMotorEncoder[liftRight] = 0;
 			}
 
 			setLiftMotors(pos_PID_StepController(&liftPID));
@@ -248,7 +248,7 @@ bool dumpIntake()
 	keepGoing = true;
 	while (keepGoing)
 	{
-		keepGoing = nMotorEncoder[liftMotors] >= 200;
+		keepGoing = nMotorEncoder[liftRight] >= 200;
 		wait1Msec(5);
 	}
 

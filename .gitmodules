@@ -1,0 +1,3 @@
+[submodule "BCI"]
+	path = BCI
+	url = https://github.com/VTOW/BCI.git

@@ -21,6 +21,10 @@
 //#define MENU_NUM 1
 //#define LCD_NO_CALLBACKS
 //#define LCD_NO_SAFETY
+//#define BCI_USE_HEAP
+#define BCI_USE_UART
+#define BCI_USE_TIMER
+#define BCI_USE_POS_PID
 #include "BCI\BCI.h"
 
 //#define UARTHANDLER_DEBUG
@@ -59,6 +63,17 @@ task main()
 		setRightMotors(vexRT[JOY_JOY_RV]);
 		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
 		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+
+		if (vexRT[JOY_BTN_RU])
+		{
+			motor[lidar] += 1;
+			waitForZero(vexRT[JOY_BTN_RU]);
+		}
+		else if (vexRT[JOY_BTN_RD])
+		{
+			motor[lidar] -= 1;
+			waitForZero(vexRT[JOY_BTN_RD]);
+		}
 
 		//Task wait
 		wait1Msec(15);

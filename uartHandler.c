@@ -16,6 +16,7 @@
 	<short intake pot val>
 	<short left quad val>
 	<short right quad val>
+	<short dt>
 
 	STD msg recieve structure is
 	<header>
@@ -207,7 +208,7 @@ void uart_sendMessageHeader(const short type)
 	//Send msg count
 	sendChar(UART1, uart_getMessageCount(type));
 
-	#ifdef UARTHANDLER_DEBUG)
+	#ifdef UARTHANDLER_DEBUG
 		writeDebugStreamLine("UART Handler: Sent message header: 0xFA,%d,%d", type, msgCount[type]);
 	#endif
 }
@@ -217,6 +218,7 @@ long2Bytes stdMsgUnion;
 /*
 Sends a standard message to the pi
  */
+long sendSTDMsg_dt_last = nSysTime;
 void sendSTDMsg()
 {
 	BCI_lockSem(uartSem, "sendSTDMsg")
@@ -240,9 +242,12 @@ void sendSTDMsg()
 		sendChar(UART1, stdMsgUnion.b[2]);
 		sendChar(UART1, stdMsgUnion.b[3]);
 
+		sendChar(UART1, (short)(nSysTime - sendSTDMsg_dt_last));
+		sendSTDMsg_dt_last = nSysTime;
+
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 
-		#ifdef UARTHANDLER_DEBUG)
+		#ifdef UARTHANDLER_DEBUG
 			writeDebugStreamLine("UART Handler: Sent STD msg");
 		#endif
 
@@ -265,7 +270,7 @@ void sendSPCMsg()
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 
-		#ifdef UARTHANDLER_DEBUG)
+		#ifdef UARTHANDLER_DEBUG
 			writeDebugStreamLine("UART Handler: Sent SPC msg");
 		#endif
 
@@ -285,7 +290,7 @@ void sendMPCMsg()
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 
-		#ifdef UARTHANDLER_DEBUG)
+		#ifdef UARTHANDLER_DEBUG
 			writeDebugStreamLine("UART Handler: Sent MPC msg");
 		#endif
 

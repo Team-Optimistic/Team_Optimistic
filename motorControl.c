@@ -14,15 +14,14 @@ typedef struct distanceAndAngle_t
 
 void setLeftMotors(const int powerValue)
 {
-	motor[leftDriveLF] = powerValue;
-	motor[leftDriveLB] = powerValue;
+	motor[driveLFY] = powerValue;
+	motor[driveLB] = powerValue;
 }
 
 void setRightMotors(const int powerValue)
 {
-	motor[rightDriveRFU] = powerValue;
-	motor[rightDriveRFD] = powerValue;
-	motor[rightDriveRB] = powerValue;
+	motor[driveRFY] = powerValue;
+	motor[driveRB] = powerValue;
 }
 
 void setAllDriveMotors(const int power)
@@ -33,109 +32,78 @@ void setAllDriveMotors(const int power)
 
 void setIntakeMotors(const int power)
 {
-	motor[intakeLeft] = power;
-	motor[intakeRight] = power;
+	motor[intakeY] = power;
 }
 
 void setLiftMotors(const int power)
 {
-	motor[liftLeft] = power;
-	motor[liftRight] = power;
+	motor[liftLO] = power;
+	motor[liftLI] = power;
+	motor[liftRO] = power;
+	motor[liftRI] = power;
 }
 
 /*
 Handles the intake and lift
  */
-#warning "intakeAndLiftTask"
-bool intakeOpen = true, liftDown = true;
+enum intakeState
+{
+	INTAKE_OPEN,
+	INTAKE_CLOSED,
+	INTAKE_REST
+};
+
+enum liftState
+{
+	LIFT_UP,
+	LIFT_DOWN,
+	LIFT_REST
+};
+
+intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
+intakeState intakeAndLiftTask_liftState = LIFT_REST;
+
 task intakeAndLiftTask()
 {
 	pos_PID intakePID, liftPID;
 
-	const int intakeDeadband = 10, intakeTimeout = 250;
-	bool intakeFirstUpdate = true, intakeOpenLast = true;
+	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0.1, 0);
+	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.1, -10);
 
-	int liftTarget;
-	bool liftFirstUpdate = true, liftDownLast = true;
-
-	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0.01);
-	pos_PID_InitController(&liftPID, liftRight, 0.3, 0.2, 0.1, -10);
-
-	timer intakeTimer;
-	timer_Initialize(&intakeTimer);
+	pos_PID_SetTargetPosition(&intakePID, 2000); //Open position
 
 	while (true)
 	{
-		//We need to set target position again if we change state
-		if (intakeOpen != intakeOpenLast)
+		switch (intakeAndLiftTask_intakeState)
 		{
-			intakeFirstUpdate = true;
+			case INTAKE_OPEN:
+				setIntakeMotors(pos_PID_StepController(&intakePID));
+				break;
+
+			case INTAKE_CLOSED:
+				setIntakeMotors(-20);
+				break;
+
+			case INTAKE_REST:
+				setIntakeMotors(0);
+				break;
 		}
 
-		if (liftDown != liftDownLast)
+		switch (intakeAndLiftTask_liftState)
 		{
-			liftFirstUpdate = true;
-		}
+			case LIFT_UP:
+				pos_PID_SetTargetPosition(&liftPID, 200); //Up position
+				setLiftMotors(pos_PID_StepController(&liftPID));
+				break;
 
-		//Keep intake open
-		if (intakeOpen)
-		{
-			if (intakeFirstUpdate)
-			{
-				pos_PID_SetTargetPosition(&intakePID, 1900);
-				intakeFirstUpdate = false;
-			}
-
-			setIntakeMotors(pos_PID_StepController(&intakePID));
-		}
-		//Keep intake closed
-		else
-		{
-			if (intakeFirstUpdate)
-			{
-				pos_PID_SetTargetPosition(&intakePID, 680);
-				intakeFirstUpdate = false;
-			}
-
-			//Bound PID output to +- 50
-			setIntakeMotors(pos_PID_StepController(&intakePID) > 50 ? 50 :
-											pos_PID_GetOutput(&intakePID) < -50 ? -50 :
-											pos_PID_GetOutput(&intakePID));
-		}
-
-		//Keep lift down
-		if (liftDown)
-		{
-			if (liftFirstUpdate)
-			{
+			case LIFT_DOWN:
 				pos_PID_SetTargetPosition(&liftPID, 0);
-				liftFirstUpdate = false;
-			}
+				setLiftMotors(pos_PID_StepController(&liftPID));
+				break;
 
-			//If we hit the button at the bottom of the lift
-			if (SensorValue[liftStopButton])
-			{
-				nMotorEncoder[liftRight] = 0;
-			}
-
-			setLiftMotors(pos_PID_StepController(&liftPID));
-		}
-		//Keep lift up
-		else
-		{
-			if (liftFirstUpdate)
-			{
-				pos_PID_SetTargetPosition(&liftPID, 200);
-				liftFirstUpdate = false;
-			}
-
-			//If we hit the button at the bottom of the lift
-			if (SensorValue[liftStopButton])
-			{
-				nMotorEncoder[liftRight] = 0;
-			}
-
-			setLiftMotors(pos_PID_StepController(&liftPID));
+			case LIFT_REST:
+				setLiftMotors(0);
+				break;
 		}
 
 		wait1Msec(15);
@@ -146,7 +114,6 @@ task intakeAndLiftTask()
 Dumps the intake over the fence
 @return bool Whether the operation was successful
  */
-#warning "dumpIntake"
 // bool dumpIntake()
 // {
 // 	//Turn so our back faces the fence
@@ -224,9 +191,10 @@ bool dumpIntake()
 	turn(90 - currentAngle);
 
 	//Pick up stars, drive back and dump
-	intakeOpen = false;
-	liftDown = false;
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
+
 	setAllDriveMotors(-127);
 
 	bool keepGoing = true;
@@ -248,11 +216,11 @@ bool dumpIntake()
 	keepGoing = true;
 	while (keepGoing)
 	{
-		keepGoing = nMotorEncoder[liftRight] >= 200;
+		keepGoing = nMotorEncoder[liftRI] >= 200;
 		wait1Msec(5);
 	}
 
-	intakeOpen = false;
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 
 	return true;
 }
@@ -263,7 +231,6 @@ Drives in a straight line for a distance
 @param swingTheta Angle between left and right sides (make nonzero for a swing turn)
 @return Whether the operation was successful
 */
-#warning "driveStraight"
 bool driveStraight(const int distance)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -372,7 +339,6 @@ Turns to an angle
 @param angle Angle to turn to
 @return Whether the operation was successful
 */
-#warning "turn"
 bool turn(const int angle)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -474,7 +440,6 @@ Computes the distance to a point
 @param y Y coordinate of other point
 @return distance to point
 */
-#warning "computeDistanceToPoint"
 float computeDistanceToPoint(const int x, const int y)
 {
 	BCI_lockSem(std_msgSem, "computeDistanceToPoint")
@@ -496,7 +461,6 @@ Computes the angle to a point
 @param y Y coordinate of other point
 @return angle to point
 */
-#warning "computeAngleToPoint"
 float computeAngleToPoint(const int x, const int y)
 {
 	BCI_lockSem(std_msgSem, "computeAngleToPoint")
@@ -520,7 +484,6 @@ Computes the distance and angle from current location to a point
 @param y Y coordinate of other point
 @return distance and angle to point
 */
-#warning "computeDistanceAndAngleToPoint"
 distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
 {
 	distanceAndAngle out;
@@ -551,7 +514,6 @@ Turns and drives to a point
 @param offset Backward offset from final distance to point
 @return Whether the operation was successful
 */
-#warning "moveToPoint"
 bool moveToPoint(const int x, const int y, int offset = 0)
 {
 	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
@@ -568,7 +530,6 @@ Picks up multiple stars
 @param y Y coordinates
 @return Whether the operation was successful
  */
-#warning "pickUpStars"
 bool pickUpStars(const short *x, const short *y)
 {
 	const int intakeLength = 18;
@@ -615,14 +576,13 @@ Picks up a cube and scores it
 @param y Y coordinate of cube
 @return Whether the operation was successful
  */
-#warning "pickUpCube"
 bool pickUpCube(const int x, const int y)
 {
 	//Move to cube
 	moveToPoint(x, y);
 
 	//Close intake
-	intakeOpen = false;
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	startTask(intakeAndLiftTask);
 
 	//Dump cube

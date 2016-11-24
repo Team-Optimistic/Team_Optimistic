@@ -89,6 +89,9 @@ task intakeAndLiftTask()
 				break;
 		}
 
+		if (SensorValue[liftStopButton])
+			nMotorEncoder[liftRI] = 0;
+
 		switch (intakeAndLiftTask_liftState)
 		{
 			case LIFT_UP:

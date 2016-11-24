@@ -241,8 +241,8 @@ void sendSTDMsg()
 		sendChar(UART1, stdMsgUnion.b[1]);
 		sendChar(UART1, stdMsgUnion.b[2]);
 		sendChar(UART1, stdMsgUnion.b[3]);
-
-		sendChar(UART1, (short)(nSysTime - sendSTDMsg_dt_last));
+	 	char dt = (char)(nSysTime - sendSTDMsg_dt_last);
+		sendChar(UART1, dt);
 		sendSTDMsg_dt_last = nSysTime;
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }

@@ -9,9 +9,9 @@
 #pragma config(Motor,  port2,           intakeY,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           liftLO,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           driveLFY,      tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           driveRFY,      tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port5,           driveRB,       tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port6,           driveLB,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port7,           driveRB,       tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port7,           driveRFY,      tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port8,           liftLI,        tmotorVex393_MC29, openLoop, reversed, encoderPort, I2C_1)
 #pragma config(Motor,  port9,           liftRO,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port10,          liftRI,        tmotorVex393_HBridge, openLoop)
@@ -50,6 +50,8 @@ task main()
 	// //Let robot drive itself
 	// startTask(commandRobot);
 
+	int leftVal, rightVal;
+
 	while (true)
 	{
 		//Send data to pi
@@ -58,9 +60,14 @@ task main()
 		//sprintf(voltageString, "Main: %1.2fV", nImmediateBatteryLevel / 1000.0);
 		//changeMessage(voltage, voltageString);
 
-		//Temporary driver cotrol
-		setLeftMotors(vexRT[JOY_JOY_LV]);
-		setRightMotors(vexRT[JOY_JOY_RV]);
+		//Temporary driver control
+		leftVal = vexRT[JOY_JOY_LV];
+		rightVal = vexRT[JOY_JOY_RV];
+		leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
+		rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
+
+		setLeftMotors(leftVal);
+		setRightMotors(rightVal);
 		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
 		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
 

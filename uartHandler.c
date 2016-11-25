@@ -125,7 +125,6 @@ short msgCount[MSG_COUNT_LENGTH];
 /*
 Initializes everything this file needs for comms with the pi
  */
-#warning "initUART"
 void initUART()
 {
 	//Initialize counts
@@ -221,7 +220,6 @@ long2Bytes stdMsgUnion;
 /*
 Sends a standard message to the pi
  */
-#warning "sendSTDMsg"
 long sendSTDMsg_dt_last = nSysTime;
 void sendSTDMsg()
 {
@@ -245,8 +243,8 @@ void sendSTDMsg()
 		sendChar(UART1, stdMsgUnion.b[1]);
 		sendChar(UART1, stdMsgUnion.b[2]);
 		sendChar(UART1, stdMsgUnion.b[3]);
-
-		sendChar(UART1, (short)(nSysTime - sendSTDMsg_dt_last));
+	 	char dt = (char)(nSysTime - sendSTDMsg_dt_last);
+		sendChar(UART1, dt);
 		sendSTDMsg_dt_last = nSysTime;
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
@@ -262,7 +260,6 @@ void sendSTDMsg()
 /*
 Requests the pi send back the position of an object behind the robot
  */
-#warning "sendSPCMsg"
 void sendSPCMsg()
 {
 	BCI_lockSem(uartSem, "sendSPCMsg")
@@ -286,7 +283,6 @@ void sendSPCMsg()
 /*
 Tells the pi what object we just picked up
  */
-#warning "sendMPCMsg"
 void sendMPCMsg()
 {
 	BCI_lockSem(uartSem, "sendMPCMsg")
@@ -318,7 +314,6 @@ void uart_readMsg(short *msg, const unsigned int length)
 /*
 Polls uart for a message and records it into msg[]
  */
-#warning "readBuffer"
 task readBuffer()
 {
 	short msgFlagHolder, msgTypeFlagHolder, msgCountFlagHolder;

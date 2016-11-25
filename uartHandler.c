@@ -23,6 +23,7 @@
 	<short estimated x>
 	<short estimated y>
 	<short estimated theta>
+	<short lidar rpm>
 */
 
 //-----------------------------------------------------------------------------
@@ -72,11 +73,12 @@
  */
 
 //Standard message
-#define STD_MSG_LENGTH 3
+#define STD_MSG_LENGTH 4
 short std_msg[STD_MSG_LENGTH];
 #define STD_MSG_EST_X     0
 #define STD_MSG_EST_Y     1
 #define STD_MSG_EST_THETA 2
+#define STD_MSG_LIDAR_RPM 3
 
 //Message to get objects behind us
 #define SPC_MSG_LENGTH 3
@@ -310,9 +312,7 @@ void uart_readMsg(short *msg, const unsigned int length)
 	for (unsigned int index = 0; index < length; index++)
 	{
 		BCI_UART_ReadNextData(msg[index], UART1);
-		writeDebugStream("%d,", msg[index]);
 	}
-	writeDebugStreamLine(";");
 }
 
 /*
@@ -327,11 +327,6 @@ task readBuffer()
 	{
 		//Load start byte into temp variable
 		msgFlagHolder = getChar(UART1);
-
-		//if (msgFlagHolder != -1)
-		//{
-		//	writeDebugStreamLine("%d", msgFlagHolder);
-		//}
 
 		if (msgFlagHolder == 0xFA)
 		{
@@ -393,6 +388,23 @@ task readBuffer()
 				default:
 					break;
 			}
+		}
+
+		BCI_lockSem(std_msgSem, "readBuffer")
+		{
+			if (std_msg[STD_MSG_LIDAR_RPM] != 0)
+			{
+				if (std_msg[STD_MSG_LIDAR_RPM] > 250)
+				{
+					motor[lidar]++;
+				}
+				else if (std_msg[STD_MSG_LIDAR_RPM] < 250)
+				{
+					motor[lidar]--;
+				}
+			}
+
+			BCI_unlockSem(std_msgSem, "readBuffer")
 		}
 
 		wait1Msec(15);

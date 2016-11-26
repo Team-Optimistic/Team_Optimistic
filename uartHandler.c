@@ -91,12 +91,12 @@ long spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_PICKUP_CUBE  2
 
 //Message to pick up an object
-#define MPC_MSG_LENGTH 20
+#define MPC_MSG_LENGTH 36
 long mpc_msg[MPC_MSG_LENGTH];
 bool mpcMsgFlag = false;
 #define MPC_MSG_X_COORD   0
-#define MPC_MSG_Y_COORD   2
-#define MPC_MSG_PICKUP    4
+#define MPC_MSG_Y_COORD   4
+#define MPC_MSG_PICKUP    8
 #define MPC_MSG_PICKUP_CLEAR 0
 #define MPC_MSG_PICKUP_STAR  1
 #define MPC_MSG_PICKUP_CUBE  2
@@ -363,7 +363,6 @@ task readBuffer()
 						conv.b[2] = std_msg[STD_MSG_EST_X + 2];
 						conv.b[3] = std_msg[STD_MSG_EST_X + 3];
 						std_msg[STD_MSG_EST_X] = conv.l;
-						writeDebugStreamLine("x: %d", std_msg[STD_MSG_EST_X]);
 
 						conv.b[0] = std_msg[STD_MSG_EST_Y];
 						conv.b[1] = std_msg[STD_MSG_EST_Y + 1];
@@ -397,13 +396,21 @@ task readBuffer()
 						#endif
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
 
-						conv.b[0] = mpc_msg[MPC_MSG_X_COORD];
-						conv.b[1] = mpc_msg[MPC_MSG_X_COORD + 1];
-						mpc_msg[MPC_MSG_X_COORD] = conv.l;
+						for (int i = 0; i < 4; i++)
+						{
+							conv.b[0] = mpc_msg[MPC_MSG_X_COORD + (i * 9)];
+							conv.b[1] = mpc_msg[MPC_MSG_X_COORD + 1 + (i * 9)];
+							conv.b[2] = mpc_msg[MPC_MSG_X_COORD + 2 + (i * 9)];
+							conv.b[3] = mpc_msg[MPC_MSG_X_COORD + 3 + (i * 9)];
+							mpc_msg[MPC_MSG_X_COORD + (i * 9)] = conv.l;
 
-						conv.b[0] = mpc_msg[MPC_MSG_Y_COORD];
-						conv.b[1] = mpc_msg[MPC_MSG_Y_COORD + 1];
-						mpc_msg[MPC_MSG_Y_COORD] = conv.l;
+							conv.b[0] = mpc_msg[MPC_MSG_Y_COORD + (i * 9)];
+							conv.b[1] = mpc_msg[MPC_MSG_Y_COORD + 1 + (i * 9)];
+							conv.b[2] = mpc_msg[MPC_MSG_Y_COORD + 2 + (i * 9)];
+							conv.b[3] = mpc_msg[MPC_MSG_Y_COORD + 3 + (i * 9)];
+							mpc_msg[MPC_MSG_Y_COORD + (i * 9)] = conv.l;
+							writeDebugStreamLine("mpc got (%d,%d)", mpc_msg[MPC_MSG_X_COORD + (i * 9)], mpc_msg[MPC_MSG_Y_COORD + (i * 9)]);
+						}
 
 						BCI_unlockSem(mpc_msgSem, "readBuffer")
 					}

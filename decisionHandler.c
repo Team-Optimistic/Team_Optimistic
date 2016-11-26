@@ -9,7 +9,7 @@ Returns whether the input coordinates are the same as the last
 @param y New y coord
 @return Whether the input coordinates are the same as the last
  */
-bool isSameObject(const short x, const short y)
+bool isSameObject(const long x, const long y)
 {
   //Maximum deviance to be considered a new object
   const float maxDeviance = 0.1;
@@ -33,7 +33,7 @@ bool isSameObject(const short x, const short y)
 //Drives the robot based on recieved commands
 task commandRobot()
 {
-  short xDemand[3], yDemand[3], pickup[3];
+  long xDemand[3], yDemand[3], pickup[3];
 
   while (true)
   {
@@ -58,7 +58,7 @@ task commandRobot()
         	writeDebugStreamLine("moving to point (%d,%d)", xDemand[0], yDemand[0]);
           if (!isSameObject(xDemand[0], yDemand[0]))
           {
-            moveToPoint(xDemand[0], yDemand[0]);
+            //moveToPoint(xDemand[0], yDemand[0]);
           }
           break;
 
@@ -78,7 +78,7 @@ task commandRobot()
       }
 	  }
 
-    wait1Msec(5);
+    wait1Msec(5000);
   }
 }
 

@@ -234,7 +234,7 @@ Drives in a straight line for a distance
 @param swingTheta Angle between left and right sides (make nonzero for a swing turn)
 @return Whether the operation was successful
 */
-bool driveStraight(const int distance)
+bool driveStraight(const long distance)
 {
 	//Save left and right quad values instead of setting them to zero
 	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -342,7 +342,7 @@ Turns to an angle
 @param angle Angle to turn to
 @return Whether the operation was successful
 */
-bool turn(const int angle)
+bool turn(const long angle)
 {
 	//Save left and right quad values instead of setting them to zero
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -443,7 +443,7 @@ Computes the distance to a point
 @param y Y coordinate of other point
 @return distance to point
 */
-float computeDistanceToPoint(const int x, const int y)
+float computeDistanceToPoint(const long x, const long y)
 {
 	BCI_lockSem(std_msgSem, "computeDistanceToPoint")
 	{
@@ -464,7 +464,7 @@ Computes the angle to a point
 @param y Y coordinate of other point
 @return angle to point
 */
-float computeAngleToPoint(const int x, const int y)
+float computeAngleToPoint(const long x, const long y)
 {
 	BCI_lockSem(std_msgSem, "computeAngleToPoint")
 	{
@@ -487,7 +487,7 @@ Computes the distance and angle from current location to a point
 @param y Y coordinate of other point
 @return distance and angle to point
 */
-distanceAndAngle* computeDistanceAndAngleToPoint(const int x, const int y)
+distanceAndAngle* computeDistanceAndAngleToPoint(const long x, const long y)
 {
 	distanceAndAngle out;
 
@@ -517,12 +517,15 @@ Turns and drives to a point
 @param offset Backward offset from final distance to point
 @return Whether the operation was successful
 */
-bool moveToPoint(const int x, const int y, int offset = 0)
+bool moveToPoint(const long x, const long y, long offset = 0)
 {
 	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
 
 	turn(temp->theta);
 	driveStraight(temp->length - offset);
+
+	//Tell pi we're done
+	sendMPCMsg();
 
 	return true;
 }
@@ -533,7 +536,7 @@ Picks up multiple stars
 @param y Y coordinates
 @return Whether the operation was successful
  */
-bool pickUpStars(const short *x, const short *y)
+bool pickUpStars(const long *x, const long *y)
 {
 	const int intakeLength = 18;
 
@@ -579,7 +582,7 @@ Picks up a cube and scores it
 @param y Y coordinate of cube
 @return Whether the operation was successful
  */
-bool pickUpCube(const int x, const int y)
+bool pickUpCube(const long x, const long y)
 {
 	//Move to cube
 	moveToPoint(x, y);

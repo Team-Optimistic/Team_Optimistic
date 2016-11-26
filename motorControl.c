@@ -191,14 +191,14 @@ Dumps the intake over the fence
 bool dumpIntake()
 {
 	//Turn so our back faces the fence
-	short currentAngle;
+	long currentAngle;
 	BCI_lockSem(std_msgSem, "dumpIntake")
 	{
 		currentAngle = std_msg[STD_MSG_EST_THETA];
 		BCI_unlockSem(std_msgSem, "dumpIntake")
 	}
 
-	turn(90 - currentAngle);
+	turn(180 - currentAngle);
 
 	//Pick up stars, drive back and dump
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
@@ -213,7 +213,7 @@ bool dumpIntake()
 		BCI_lockSem(std_msgSem, "dumpIntake")
 		{
 			//Back up until we're close to the fence
-			keepGoing = std_msg[STD_MSG_EST_Y] >= 65;
+			keepGoing = std_msg[STD_MSG_EST_Y] >= 300;//1828;
 			BCI_unlockSem(std_msgSem, "dumpIntake");
 		}
 
@@ -230,7 +230,7 @@ bool dumpIntake()
 		wait1Msec(5);
 	}
 
-	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 
 	return true;
 }
@@ -561,14 +561,13 @@ bool pickUpStars(const long *x, const long *y)
 		//
 		//Drive along the length of the wall to pool objects
 		//
-		//Close the intake and score
+		//Close intake
 	}
 	//Otherwise, we should drive around with our intake open to get them
 	else
 	{
 		//Drive around hitting each star
-		//
-		//Close the intake and score
+		//Close intake
 	}
 
 	//Dump stars
@@ -586,13 +585,14 @@ Picks up a cube and scores it
 bool pickUpCube(const long x, const long y)
 {
 	//Move to cube
-	moveToPoint(x, y);
+	moveToPoint(x, y, 100);
 
 	//Close intake
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	startTask(intakeAndLiftTask);
 
 	//Dump cube
+	writeDebugStreamLine("dumping intake");
 	dumpIntake();
 
 	return true;

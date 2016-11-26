@@ -1,7 +1,7 @@
 	#ifndef DECISIONHANDLER_C_INCLUDED
 #define DECISIONHANDLER_C_INCLUDED
 
-static short iso_x = -1, iso_y = -1;
+static long iso_x = -1, iso_y = -1;
 
 /*
 Returns whether the input coordinates are the same as the last
@@ -64,6 +64,7 @@ task commandRobot()
           break;
 
         case MPC_MSG_PICKUP_STAR:
+					writeDebugStreamLine("getting star at (%d,%d)". xDemand[0], yDemand[0]);
           pickUpStars(xDemand, yDemand);
           sendMPCMsg();
           break;

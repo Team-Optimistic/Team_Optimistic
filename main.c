@@ -36,7 +36,7 @@ task main()
 {
 	clearDebugStream();
 
-	motor[lidar] = 60; //64 at 7.51V, 48 at 8.27V
+	motor[lidar] = 70; //64 at 7.51V, 48 at 8.27V
 
 	//string voltageString = "";
 	//menu *voltage = newMenu(voltageString);

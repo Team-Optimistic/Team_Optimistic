@@ -22,7 +22,7 @@ bool isSameObject(const short x, const short y)
 
   bool out = (fabs(x - iso_x) < maxDeviance) ||
              (fabs(y - iso_y) < maxDeviance);
-						 
+
   iso_x = x;
   iso_y = y;
 
@@ -74,7 +74,7 @@ task commandRobot()
           break;
       }
 
-    wait1Msec(1);
+    wait1Msec(5);
   }
 }
 

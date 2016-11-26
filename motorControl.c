@@ -12,6 +12,13 @@ typedef struct distanceAndAngle_t
 	float theta;
 } distanceAndAngle;
 
+void initSensors()
+{
+	SensorValue[leftQuad] = 0;
+	SensorValue[rightQuad] = 0;
+	SensorValue[liftIME] = 0;
+}
+
 void setLeftMotors(const int powerValue)
 {
 	motor[driveLFY] = powerValue;
@@ -351,11 +358,10 @@ bool turn(const long angle)
 	float angleChange = 0, lastAngle = 0;
 
 	//Radius of robot
-	const float robotRadius = 10.21875;
-	const float angleScale = 0.017453 * robotRadius; //2pi*radius*(theta/360)=encoder
+	const float thetaConv = 12.75993;
 
 	//Target angle
-	int targetAngle = angle;
+	int targetAngle = angle * thetaConv;
 
 	pos_PID anglePID;
 	if (fabs(angle) <= 350)
@@ -396,7 +402,7 @@ bool turn(const long angle)
 		currentLeft = SensorValue[leftQuad] - encoderLeft;
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
-		angleChange = ((-1 * currentLeft) + currentRight) / 2.0;
+		angleChange = currentLeft - currentRight;
 
 		//Get output from PID
 		angleOutput = pos_PID_StepController(&anglePID);

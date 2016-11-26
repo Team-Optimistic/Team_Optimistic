@@ -74,7 +74,7 @@ task intakeAndLiftTask()
 {
 	pos_PID intakePID, liftPID;
 
-	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.0, 0.1, 0);
+	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.1, 0.1, 0);
 	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.1, -10);
 
 	while (true)
@@ -200,12 +200,12 @@ bool dumpIntake()
 		BCI_unlockSem(std_msgSem, "dumpIntake")
 	}
 
-	turn(180 - currentAngle);
-
 	//Pick up stars, drive back and dump
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
+
+	turn(180 - currentAngle);
 
 	setAllDriveMotors(-127);
 
@@ -592,6 +592,13 @@ bool pickUpCube(const long x, const long y)
 	//Close intake
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	startTask(intakeAndLiftTask);
+
+	bool keepGoing = false;
+	while (!keepGoing)
+	{
+		keepGoing = SensorValue[intakePot] <= 700;
+		wait1Msec(5);
+	}
 
 	//Dump cube
 	writeDebugStreamLine("dumping intake");

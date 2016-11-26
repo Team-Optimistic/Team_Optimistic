@@ -49,7 +49,7 @@ task main()
 	startTask(readBuffer);
 
 	//Let robot drive itself
-	//startTask(commandRobot);
+	startTask(commandRobot);
 
 	// int leftVal, rightVal;
 

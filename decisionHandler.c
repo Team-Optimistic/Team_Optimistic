@@ -64,12 +64,13 @@ task commandRobot()
           break;
 
         case MPC_MSG_PICKUP_STAR:
-					writeDebugStreamLine("getting star at (%d,%d)". xDemand[0], yDemand[0]);
+					writeDebugStreamLine("getting star at (%d,%d)", xDemand[0], yDemand[0]);
           pickUpStars(xDemand, yDemand);
           sendMPCMsg();
           break;
 
         case MPC_MSG_PICKUP_CUBE:
+					writeDebugStreamLine("getting cube at (%d,%d)", xDemand[0], yDemand[0]);
           if (!isSameObject(xDemand[0], yDemand[0]))
           {
             pickUpCube(xDemand[0], yDemand[0]);

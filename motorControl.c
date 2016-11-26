@@ -213,7 +213,7 @@ bool dumpIntake()
 		BCI_lockSem(std_msgSem, "dumpIntake")
 		{
 			//Back up until we're close to the fence
-			keepGoing = std_msg[STD_MSG_EST_Y] >= 300;//1828;
+			keepGoing = std_msg[STD_MSG_EST_X] >= 300;//1828;
 			BCI_unlockSem(std_msgSem, "dumpIntake");
 		}
 

@@ -58,27 +58,32 @@ task commandRobot()
         	writeDebugStreamLine("moving to point (%d,%d)", xDemand[0], yDemand[0]);
           if (!isSameObject(xDemand[0], yDemand[0]))
           {
-            //moveToPoint(xDemand[0], yDemand[0]);
+            moveToPoint(xDemand[0], yDemand[0]);
+            sendMPCMsg();
           }
           break;
 
         case MPC_MSG_PICKUP_STAR:
           pickUpStars(xDemand, yDemand);
+          sendMPCMsg();
           break;
 
         case MPC_MSG_PICKUP_CUBE:
           if (!isSameObject(xDemand[0], yDemand[0]))
           {
             pickUpCube(xDemand[0], yDemand[0]);
+            sendMPCMsg();
           }
           break;
 
         default:
           break;
       }
+
+      mpcMsgFlag = false;
 	  }
 
-    wait1Msec(5000);
+    wait1Msec(5);
   }
 }
 

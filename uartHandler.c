@@ -153,7 +153,7 @@ Generates new message count without side-effects
  */
 short uart_getMessageCount_Soft(const short type)
 {
-	if (type >= 3)
+	if (type > 3)
 	{
 		writeDebugStreamLine("UART Handler: GetMsgCountSoft: Bad type: %d", type);
 		return 0;
@@ -168,7 +168,7 @@ Generates new message count
  */
 short uart_getMessageCount(const short type)
 {
-	if (type >= 3)
+	if (type > 3)
 	{
 		writeDebugStreamLine("UART Handler: GetMsgCount: Bad type: %d", type);
 		return 0;
@@ -287,8 +287,14 @@ void sendMPCMsg()
 {
 	BCI_lockSem(uartSem, "sendMPCMsg")
 	{
-		//Send header
-		uart_sendMessageHeader(MPC_MSG_TYPE);
+		//Send start byte
+		sendChar(UART1, 0xFA);
+
+		//Send msg type
+		sendChar(UART1, MPC_MSG_TYPE);
+
+		//Send msg count
+		sendChar(UART1, msgCount[MSG_COUNT_MPC]);
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 
@@ -328,16 +334,10 @@ task readBuffer()
 		if (msgFlagHolder == 0xFA)
 		{
 			//Get msg type
-			BCI_UART_ReadNextData(msgTypeFlagHolder, UART1)
-
-			//Set MPC flag
-			if (msgTypeFlagHolder == MPC_MSG_TYPE)
-			{
-				mpcMsgFlag = true;
-			}
+			BCI_UART_ReadNextData(msgTypeFlagHolder, UART1);
 
 			//Get msg count
-			BCI_UART_ReadNextData(msgCountFlagHolder, UART1)
+			BCI_UART_ReadNextData(msgCountFlagHolder, UART1);
 
 			#ifdef UARTHANDLER_DEBUG
 				//Verify msg count
@@ -395,6 +395,8 @@ task readBuffer()
 							writeDebugStream("MPC Msg: ");
 						#endif
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
+
+						mpcMsgFlag = true;
 
 						for (int i = 0; i < 4; i++)
 						{

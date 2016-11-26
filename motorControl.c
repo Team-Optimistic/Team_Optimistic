@@ -397,7 +397,6 @@ bool turn(const long angle)
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
 		angleChange = ((-1 * currentLeft) + currentRight) / 2.0;
-		writeDebugStreamLine("%d", angleChange);
 
 		//Get output from PID
 		angleOutput = pos_PID_StepController(&anglePID);
@@ -483,31 +482,28 @@ float computeAngleToPoint(const long x, const long y)
 
 /*
 Computes the distance and angle from current location to a point
-@param x X coordinate of other point
-@param y Y coordinate of other point
-@return distance and angle to point
+@param x   X coordinate of other point
+@param y   Y coordinate of other point
+@param out Struct to write result to
 */
-distanceAndAngle* computeDistanceAndAngleToPoint(const long x, const long y)
+void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle *out)
 {
-	distanceAndAngle out;
+	//If no lock, return empty type
+	out->length = 0;
+	out->theta = 0;
 
 	BCI_lockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	{
 		//Compute difference in distance
+		writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
 		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
-		out.length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+		out->length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
 		//Compute difference in angle
-		out.theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
+		out->theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
 
 		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	}
-
-	//If no lock, return empty type
-	out.length = 0;
-	out.theta = 0;
-
-	return out;
 }
 
 /*
@@ -519,13 +515,15 @@ Turns and drives to a point
 */
 bool moveToPoint(const long x, const long y, long offset = 0)
 {
-	distanceAndAngle *temp = computeDistanceAndAngleToPoint(x, y);
+	distanceAndAngle temp;
+	computeDistanceAndAngleToPoint(x, y, &temp);
 
-	turn(temp->theta);
-	driveStraight(temp->length - offset);
+	writeDebugStreamLine("turning %1.2f", temp.theta);
+	turn(temp.theta);
 
-	//Tell pi we're done
-	sendMPCMsg();
+	writeDebugStreamLine("driving %1.2f", temp.length - offset);
+	driveStraight(temp.length - offset);
+	writeDebugStreamLine("done");
 
 	return true;
 }
@@ -570,9 +568,6 @@ bool pickUpStars(const long *x, const long *y)
 	//Dump stars
 	dumpIntake();
 
-	//Tell pi we are done
-	sendMPCMsg();
-
 	return true;
 }
 
@@ -593,9 +588,6 @@ bool pickUpCube(const long x, const long y)
 
 	//Dump cube
 	dumpIntake();
-
-	//Tell pi we are done
-	sendMPCMsg();
 
 	return true;
 }

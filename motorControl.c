@@ -74,21 +74,21 @@ task intakeAndLiftTask()
 {
 	pos_PID intakePID, liftPID;
 
-	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0.1, 0);
+	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.0, 0.1, 0);
 	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.1, -10);
-
-	pos_PID_SetTargetPosition(&intakePID, 2000); //Open position
 
 	while (true)
 	{
 		switch (intakeAndLiftTask_intakeState)
 		{
 			case INTAKE_OPEN:
+				pos_PID_SetTargetPosition(&intakePID, 1900);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_CLOSED:
-				setIntakeMotors(-20);
+				pos_PID_SetTargetPosition(&intakePID, 500);
+				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_REST:
@@ -97,12 +97,14 @@ task intakeAndLiftTask()
 		}
 
 		if (SensorValue[liftStopButton])
+		{
 			nMotorEncoder[liftRI] = 0;
+		}
 
 		switch (intakeAndLiftTask_liftState)
 		{
 			case LIFT_UP:
-				pos_PID_SetTargetPosition(&liftPID, 200); //Up position
+				pos_PID_SetTargetPosition(&liftPID, 1250); //Up position
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
@@ -213,7 +215,7 @@ bool dumpIntake()
 		BCI_lockSem(std_msgSem, "dumpIntake")
 		{
 			//Back up until we're close to the fence
-			keepGoing = std_msg[STD_MSG_EST_X] >= 300;//1828;
+			keepGoing = std_msg[STD_MSG_EST_X] >= 600;//1828;
 			BCI_unlockSem(std_msgSem, "dumpIntake");
 		}
 

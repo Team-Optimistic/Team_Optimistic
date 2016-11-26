@@ -73,16 +73,16 @@
  */
 
 //Standard message
-#define STD_MSG_LENGTH 4
-short std_msg[STD_MSG_LENGTH];
+#define STD_MSG_LENGTH 10
+long std_msg[STD_MSG_LENGTH];
 #define STD_MSG_EST_X     0
-#define STD_MSG_EST_Y     1
-#define STD_MSG_EST_THETA 2
-#define STD_MSG_LIDAR_RPM 3
+#define STD_MSG_EST_Y     4
+#define STD_MSG_EST_THETA 8
+#define STD_MSG_LIDAR_RPM 9
 
 //Message to get objects behind us
 #define SPC_MSG_LENGTH 3
-short spc_msg[SPC_MSG_LENGTH];
+long spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_X_COORD 0
 #define SPC_MSG_Y_COORD 1
 #define SPC_MSG_PICKUP  2
@@ -91,12 +91,12 @@ short spc_msg[SPC_MSG_LENGTH];
 #define SPC_MSG_PICKUP_CUBE  2
 
 //Message to pick up an object
-#define MPC_MSG_LENGTH 12
-short mpc_msg[MPC_MSG_LENGTH];
-bool mpcMsgFlag;
+#define MPC_MSG_LENGTH 20
+long mpc_msg[MPC_MSG_LENGTH];
+bool mpcMsgFlag = false;
 #define MPC_MSG_X_COORD   0
-#define MPC_MSG_Y_COORD   1
-#define MPC_MSG_PICKUP    2
+#define MPC_MSG_Y_COORD   2
+#define MPC_MSG_PICKUP    4
 #define MPC_MSG_PICKUP_CLEAR 0
 #define MPC_MSG_PICKUP_STAR  1
 #define MPC_MSG_PICKUP_CUBE  2
@@ -303,7 +303,7 @@ void sendMPCMsg()
 /*
 Reads in a message
  */
-void uart_readMsg(short *msg, const unsigned int length)
+void uart_readMsg(long *msg, const unsigned int length)
 {
 	for (unsigned int index = 0; index < length; index++)
 	{
@@ -317,6 +317,8 @@ Polls uart for a message and records it into msg[]
 task readBuffer()
 {
 	short msgFlagHolder, msgTypeFlagHolder, msgCountFlagHolder;
+
+	long2Bytes conv;
 
 	while (true)
 	{
@@ -351,8 +353,23 @@ task readBuffer()
 					//Read in std msg
 					BCI_lockSem(std_msgSem, "readBuffer")
 					{
-						writeDebugStream("STD Msg: ");
+						#ifdef UARTHANDLER_DEBUG
+							writeDebugStream("STD Msg: ");
+						#endif
 						uart_readMsg(std_msg, STD_MSG_LENGTH);
+
+						conv.b[0] = std_msg[STD_MSG_EST_X];
+						conv.b[1] = std_msg[STD_MSG_EST_X + 1];
+						conv.b[2] = std_msg[STD_MSG_EST_X + 2];
+						conv.b[3] = std_msg[STD_MSG_EST_X + 3];
+						std_msg[STD_MSG_EST_X] = conv.l;
+						writeDebugStreamLine("x: %d", std_msg[STD_MSG_EST_X]);
+
+						conv.b[0] = std_msg[STD_MSG_EST_Y];
+						conv.b[1] = std_msg[STD_MSG_EST_Y + 1];
+						conv.b[2] = std_msg[STD_MSG_EST_Y + 2];
+						conv.b[3] = std_msg[STD_MSG_EST_Y + 3];
+						std_msg[STD_MSG_EST_Y] = conv.l;
 
 						BCI_unlockSem(std_msgSem, "readBuffer")
 					}
@@ -362,7 +379,9 @@ task readBuffer()
 					//Read in spc msg
 					BCI_lockSem(spc_msgSem, "readBuffer")
 					{
-						writeDebugStream("SPC Msg: ");
+						#ifdef UARTHANDLER_DEBUG
+							writeDebugStream("SPC Msg: ");
+						#endif
 						uart_readMsg(spc_msg, SPC_MSG_LENGTH);
 
 						BCI_unlockSem(spc_msgSem, "readBuffer")
@@ -373,8 +392,18 @@ task readBuffer()
 					//Read in mpc msg
 					BCI_lockSem(mpc_msgSem, "readBuffer")
 					{
-						writeDebugStream("MPC Msg: ");
+						#ifdef UARTHANDLER_DEBUG
+							writeDebugStream("MPC Msg: ");
+						#endif
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
+
+						conv.b[0] = mpc_msg[MPC_MSG_X_COORD];
+						conv.b[1] = mpc_msg[MPC_MSG_X_COORD + 1];
+						mpc_msg[MPC_MSG_X_COORD] = conv.l;
+
+						conv.b[0] = mpc_msg[MPC_MSG_Y_COORD];
+						conv.b[1] = mpc_msg[MPC_MSG_Y_COORD + 1];
+						mpc_msg[MPC_MSG_Y_COORD] = conv.l;
 
 						BCI_unlockSem(mpc_msgSem, "readBuffer")
 					}
@@ -389,13 +418,13 @@ task readBuffer()
 		{
 			if (std_msg[STD_MSG_LIDAR_RPM] != 0)
 			{
-				if (std_msg[STD_MSG_LIDAR_RPM] > 250)
+				if (std_msg[STD_MSG_LIDAR_RPM] > 125)
 				{
-					motor[lidar]++;
+					motor[lidar] = motor[lidar] - 1;
 				}
-				else if (std_msg[STD_MSG_LIDAR_RPM] < 250)
+				else if (std_msg[STD_MSG_LIDAR_RPM] < 125)
 				{
-					motor[lidar]--;
+					motor[lidar] = motor[lidar] + 1;
 				}
 			}
 

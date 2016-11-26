@@ -47,10 +47,10 @@ task main()
 	//Start reading from pi
 	startTask(readBuffer);
 
-	// //Let robot drive itself
-	// startTask(commandRobot);
+	//Let robot drive itself
+	startTask(commandRobot);
 
-	int leftVal, rightVal;
+	// int leftVal, rightVal;
 
 	while (true)
 	{
@@ -61,26 +61,26 @@ task main()
 		//changeMessage(voltage, voltageString);
 
 		//Temporary driver control
-		leftVal = vexRT[JOY_JOY_LV];
-		rightVal = vexRT[JOY_JOY_RV];
-		leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
-		rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
-
-		setLeftMotors(leftVal);
-		setRightMotors(rightVal);
-		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
-
-		if (vexRT[JOY_BTN_RU])
-		{
-			motor[lidar] += 1;
-			waitForZero(vexRT[JOY_BTN_RU]);
-		}
-		else if (vexRT[JOY_BTN_RD])
-		{
-			motor[lidar] -= 1;
-			waitForZero(vexRT[JOY_BTN_RD]);
-		}
+		// leftVal = vexRT[JOY_JOY_LV];
+		// rightVal = vexRT[JOY_JOY_RV];
+		// leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
+		// rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
+		//
+		// setLeftMotors(leftVal);
+		// setRightMotors(rightVal);
+		// setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
+		// setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+		//
+		// if (vexRT[JOY_BTN_RU])
+		// {
+		// 	motor[lidar] += 1;
+		// 	waitForZero(vexRT[JOY_BTN_RU]);
+		// }
+		// else if (vexRT[JOY_BTN_RD])
+		// {
+		// 	motor[lidar] -= 1;
+		// 	waitForZero(vexRT[JOY_BTN_RD]);
+		// }
 
 		//Task wait
 		wait1Msec(15);

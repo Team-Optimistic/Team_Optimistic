@@ -70,8 +70,8 @@ task main()
 		// setLeftMotors(leftVal);
 		// setRightMotors(rightVal);
 
-		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+		//setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
+		//setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
 
 		if (vexRT[JOY_BTN_RU])
 		{

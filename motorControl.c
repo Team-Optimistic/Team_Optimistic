@@ -16,7 +16,6 @@ void initSensors()
 {
 	SensorValue[leftQuad] = 0;
 	SensorValue[rightQuad] = 0;
-	SensorValue[liftIME] = 0;
 }
 
 void setLeftMotors(const int powerValue)
@@ -57,14 +56,16 @@ enum intakeState
 {
 	INTAKE_OPEN,
 	INTAKE_CLOSED,
-	INTAKE_REST
+	INTAKE_REST,
+	INTAKE_WAIT
 };
 
 enum liftState
 {
 	LIFT_UP,
 	LIFT_DOWN,
-	LIFT_REST
+	LIFT_REST,
+	LIFT_WAIT
 };
 
 intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
@@ -74,25 +75,30 @@ task intakeAndLiftTask()
 {
 	pos_PID intakePID, liftPID;
 
-	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.1, 0.1, 0);
-	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.1, -10);
+	pos_PID_InitController(&intakePID, intakePot, 0.2, 0.1, 0, 0);
+	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.04, -10);
 
 	while (true)
 	{
 		switch (intakeAndLiftTask_intakeState)
 		{
 			case INTAKE_OPEN:
+				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, 1900);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_CLOSED:
+				pos_PID_ChangeBias(&intakePID, -30);
 				pos_PID_SetTargetPosition(&intakePID, 500);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_REST:
 				setIntakeMotors(0);
+				break;
+
+			case INTAKE_WAIT:
 				break;
 		}
 
@@ -104,7 +110,7 @@ task intakeAndLiftTask()
 		switch (intakeAndLiftTask_liftState)
 		{
 			case LIFT_UP:
-				pos_PID_SetTargetPosition(&liftPID, 1250); //Up position
+				pos_PID_SetTargetPosition(&liftPID, 1350); //Up position
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
@@ -115,6 +121,9 @@ task intakeAndLiftTask()
 
 			case LIFT_REST:
 				setLiftMotors(0);
+				break;
+
+			case LIFT_WAIT:
 				break;
 		}
 
@@ -216,6 +225,11 @@ bool dumpIntake()
 		{
 			//Back up until we're close to the fence
 			keepGoing = std_msg[STD_MSG_EST_X] >= 600;//1828;
+
+			if (nMotorEncoder[liftRI] >= 200)
+			{
+				intakeAndLiftTask_liftState = INTAKE_OPEN;
+			}
 			BCI_unlockSem(std_msgSem, "dumpIntake");
 		}
 
@@ -223,16 +237,6 @@ bool dumpIntake()
 	}
 
 	setAllDriveMotors(0);
-
-	//Wait until lift is up
-	keepGoing = true;
-	while (keepGoing)
-	{
-		keepGoing = nMotorEncoder[liftRI] >= 200;
-		wait1Msec(5);
-	}
-
-	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 
 	return true;
 }
@@ -591,18 +595,25 @@ bool pickUpCube(const long x, const long y)
 
 	//Close intake
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	intakeAndLiftTask_liftState = LIFT_WAIT;
 	startTask(intakeAndLiftTask);
+
+	setLiftMotors(-100);
+	wait1Msec(500);
+	intakeAndLiftTask_liftState = LIFT_DOWN;
 
 	bool keepGoing = false;
 	while (!keepGoing)
 	{
-		keepGoing = SensorValue[intakePot] <= 700;
+		keepGoing = SensorValue[intakePot] <= 850;
 		wait1Msec(5);
 	}
 
 	//Dump cube
-	writeDebugStreamLine("dumping intake");
 	dumpIntake();
+
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	intakeAndLiftTask_liftState = LIFT_DOWN;
 
 	return true;
 }

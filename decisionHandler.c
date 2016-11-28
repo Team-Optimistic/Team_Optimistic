@@ -1,34 +1,6 @@
-	#ifndef DECISIONHANDLER_C_INCLUDED
+#ifndef DECISIONHANDLER_C_INCLUDED
 #define DECISIONHANDLER_C_INCLUDED
 
-static long iso_x = -1, iso_y = -1;
-
-/*
-Returns whether the input coordinates are the same as the last
-@param x New x coord
-@param y New y coord
-@return Whether the input coordinates are the same as the last
- */
-bool isSameObject(const long x, const long y)
-{
-  //Maximum deviance to be considered a new object
-  const float maxDeviance = 0.1;
-
-  //First call
-  if (iso_x == -1 || iso_y == -1)
-  {
-    return false;
-  }
-
-  bool out = (fabs(x - iso_x) < maxDeviance) ||
-             (fabs(y - iso_y) < maxDeviance);
-
-  iso_x = x;
-  iso_y = y;
-
-  return out;
-
-}
 
 //Drives the robot based on recieved commands
 task commandRobot()
@@ -56,11 +28,8 @@ task commandRobot()
       {
         case MPC_MSG_PICKUP_CLEAR:
         	writeDebugStreamLine("moving to point (%d,%d)", xDemand[0], yDemand[0]);
-          if (!isSameObject(xDemand[0], yDemand[0]))
-          {
-            moveToPoint(xDemand[0], yDemand[0]);
-            sendMPCMsg();
-          }
+          moveToPoint(xDemand[0], yDemand[0]);
+          sendMPCMsg();
           break;
 
         case MPC_MSG_PICKUP_STAR:
@@ -71,12 +40,34 @@ task commandRobot()
 
         case MPC_MSG_PICKUP_CUBE:
 					writeDebugStreamLine("getting cube at (%d,%d)", xDemand[0], yDemand[0]);
-          if (!isSameObject(xDemand[0], yDemand[0]))
-          {
-            pickUpCube(xDemand[0], yDemand[0]);
-            sendMPCMsg();
-          }
+          pickUpCube(xDemand[0], yDemand[0]);
+          sendMPCMsg();
           break;
+
+				case MPC_MSG_PICKUP_BACK:
+					writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[0], yDemand[0]);
+					moveToPoint(xDemand[0], yDemand[0], 0, true);
+					sendMPCMsg();
+					break;
+
+				case MPC_MSG_PICKUP_WALL:
+					writeDebugStreamLine("knocking stars off fence %d", xDemand[0]);
+					switch (xDemand[0])
+					{
+						case 1:
+							scoreFence(FENCE_LEFT);
+							break;
+
+						case 2:
+							scoreFence(FENCE_MIDDLE);
+							break;
+
+						default:
+							scoreFence(FENCE_RIGHT);
+							break;
+					}
+					sendMPCMsg();
+					break;
 
         default:
           break;

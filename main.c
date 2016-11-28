@@ -29,6 +29,11 @@
 
 //#define UARTHANDLER_DEBUG
 #include "uartHandler.c"
+#include "pointMath.c"
+#include "basicMotorControl.c"
+#include "drivingFunctions.c"
+#include "turningFunctions.c"
+#include "intakeAndLiftHandler.c"
 #include "motorControl.c"
 #include "decisionHandler.c"
 

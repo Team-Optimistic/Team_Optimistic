@@ -1,207 +1,18 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
-bool dumpIntake();
-bool driveStraight(const int distance);
-bool turn(const int angle);
-
-//Barely used type to return two values
-typedef struct distanceAndAngle_t
-{
-	float length;
-	float theta;
-} distanceAndAngle;
-
 void initSensors()
 {
 	SensorValue[leftQuad] = 0;
 	SensorValue[rightQuad] = 0;
 }
 
-void setLeftMotors(const int powerValue)
-{
-	motor[driveLFY] = powerValue;
-	motor[driveLB] = powerValue;
-}
-
-void setRightMotors(const int powerValue)
-{
-	motor[driveRFY] = powerValue;
-	motor[driveRB] = powerValue;
-}
-
-void setAllDriveMotors(const int power)
-{
-	setLeftMotors(power);
-	setRightMotors(power);
-}
-
-void setIntakeMotors(const int power)
-{
-	motor[intakeY] = power;
-}
-
-void setLiftMotors(const int power)
-{
-	motor[liftLO] = power;
-	motor[liftLI] = power;
-	motor[liftRO] = power;
-	motor[liftRI] = power;
-}
-
-/*
-Handles the intake and lift
+/**
+ * Scores whatever is in the intake
  */
-enum intakeState
+void dumpIntake()
 {
-	INTAKE_OPEN,
-	INTAKE_CLOSED,
-	INTAKE_REST,
-	INTAKE_WAIT
-};
-
-enum liftState
-{
-	LIFT_UP,
-	LIFT_DOWN,
-	LIFT_REST,
-	LIFT_WAIT
-};
-
-intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
-intakeState intakeAndLiftTask_liftState = LIFT_REST;
-
-task intakeAndLiftTask()
-{
-	pos_PID intakePID, liftPID;
-
-	pos_PID_InitController(&intakePID, intakePot, 0.2, 0.1, 0, 0);
-	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.04, -10);
-
-	while (true)
-	{
-		switch (intakeAndLiftTask_intakeState)
-		{
-			case INTAKE_OPEN:
-				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, 1900);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
-				break;
-
-			case INTAKE_CLOSED:
-				pos_PID_ChangeBias(&intakePID, -30);
-				pos_PID_SetTargetPosition(&intakePID, 500);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
-				break;
-
-			case INTAKE_REST:
-				setIntakeMotors(0);
-				break;
-
-			case INTAKE_WAIT:
-				break;
-		}
-
-		if (SensorValue[liftStopButton])
-		{
-			nMotorEncoder[liftRI] = 0;
-		}
-
-		switch (intakeAndLiftTask_liftState)
-		{
-			case LIFT_UP:
-				pos_PID_SetTargetPosition(&liftPID, 1350); //Up position
-				setLiftMotors(pos_PID_StepController(&liftPID));
-				break;
-
-			case LIFT_DOWN:
-				pos_PID_SetTargetPosition(&liftPID, 0);
-				setLiftMotors(pos_PID_StepController(&liftPID));
-				break;
-
-			case LIFT_REST:
-				setLiftMotors(0);
-				break;
-
-			case LIFT_WAIT:
-				break;
-		}
-
-		wait1Msec(15);
-	}
-}
-
-/*
-Dumps the intake over the fence
-@return bool Whether the operation was successful
- */
-// bool dumpIntake()
-// {
-// 	//Turn so our back faces the fence
-// 	short currentAngle;
-// 	BCI_lockSem(std_msgSem, "dumpIntake")
-// 	{
-// 		currentAngle = std_msg[STD_MSG_EST_THETA];
-// 		BCI_unlockSem(std_msgSem, "dumpIntake")
-// 	}
-//
-// 	turn(90 - currentAngle);
-//
-// 	//Communicate with pi and determine if there is anything blocking our way to
-// 	//the fence. If there is, drop what we have and intake whats in our way, and
-// 	//dump that. Then, take what we dropped and dump it as well. If there isn't,
-// 	//drive back and dump. Lastly, set currentStarTotal to 0.
-//
-// 	//Loop to clear what's behind us
-// 	bool keepGoing = true;
-// 	while (keepGoing)
-// 	{
-// 		sendSPCMsg();
-//
-// 		//Wait until reply
-// 		while (!mpcMsgFlag) { wait1Msec(15); }
-//
-// 		BCI_lockSem(mpc_msgSem, "dumpIntake")
-// 		{
-// 			short xDemand, yDemand, pickup;
-//
-// 			xDemand = mpc_msg[MPC_MSG_X_COORD];
-// 			yDemand = mpc_msg[MPC_MSG_Y_COORD];
-// 			pickup = mpc_msg[MPC_MSG_PICKUP];
-//
-// 			BCI_unlockSem(mpc_msgSem, "dumpIntake")
-//
-// 			switch (pickup)
-// 			{
-// 				case MPC_MSG_PICKUP_CLEAR:
-// 					//Nothing in our way, drive back and dump
-// 					keepGoing = false;
-// 					break;
-//
-// 				case MPC_MSG_PICKUP_STAR:
-// 					//Star in our way, drop what we have and intake it
-// 					//See if there are any other objects in our way
-// 					//Wait to score stars until we have a full intake
-// 					break;
-//
-// 				case MPC_MSG_PICKUP_CUBE:
-// 					//Cube in our way, drop what we have a score it
-// 					//See if there are any other objects in our way
-// 					break;
-//
-// 				default:
-// 					break;
-// 			}
-// 		}
-// 	}
-//
-// 	//Nothing else behind us, score what we put down
-//
-// 	return true;
-// }
-bool dumpIntake()
-{
-	//Turn so our back faces the fence
+	//Read our current angle
 	long currentAngle;
 	BCI_lockSem(std_msgSem, "dumpIntake")
 	{
@@ -209,13 +20,15 @@ bool dumpIntake()
 		BCI_unlockSem(std_msgSem, "dumpIntake")
 	}
 
-	//Pick up stars, drive back and dump
+	//Close intake and lift up while we move to the fence
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
 
+	//Turn so our back faces the fence
 	turn(180 - currentAngle);
 
+	//Run into the fence
 	setAllDriveMotors(-127);
 
 	bool keepGoing = true;
@@ -226,6 +39,7 @@ bool dumpIntake()
 			//Back up until we're close to the fence
 			keepGoing = std_msg[STD_MSG_EST_X] >= 600;//1828;
 
+			//Open the intake when the lift is partway up
 			if (nMotorEncoder[liftRI] >= 200)
 			{
 				intakeAndLiftTask_liftState = INTAKE_OPEN;
@@ -237,298 +51,25 @@ bool dumpIntake()
 	}
 
 	setAllDriveMotors(0);
-
-	return true;
 }
 
-/*
-Drives in a straight line for a distance
-@param distance Distance to drive for
-@param swingTheta Angle between left and right sides (make nonzero for a swing turn)
-@return Whether the operation was successful
-*/
-bool driveStraight(const long distance)
-{
-	//Save left and right quad values instead of setting them to zero
-	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
-
-	//Total distance elapsed since start and total angle change since start
-	float distanceElapsed = 0, angleChange = 0;
-	float lastDistance = 0;
-
-	//Target distance for the distance PID controller
-	//Angle PID controller's target is 0
-	const int targetDistance = distance;
-
-	pos_PID distancePID, anglePID;
-
-	if (distance <= 800)
-	{
-		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.1);
-		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
-	}
-	else
-	{
-		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.2);
-		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.5, 0);
-	}
-
-	pos_PID_SetTargetPosition(&distancePID, targetDistance);
-	pos_PID_SetTargetPosition(&anglePID, 0);
-
-	//If distance PID controller is at target
-	bool atTarget = false;
-
-	//Distance that is "close enough" to target
-	const int atTargetDistance = 15;
-
-	//Threshold for not moving
-	const int threshold = 2;
-
-	//Timer for being at target
-	timer atTargetTimer;
-	timer_Initialize(&atTargetTimer);
-
-	//Timeout period (ms)
-	const int timeoutPeriod = 250;
-
-	//Current left and right quad displacements
-	long currentLeft, currentRight;
-
-	//Distance and angle PID output
-	int distOutput, angleOutput;
-
-	while (!atTarget)
-	{
-		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
-
-		//Overall displacement is the average of left and right displacements
-		distanceElapsed = (currentLeft + currentRight) / 2.0;
-
-		//Angle change doesn't need to be a real angle, just the difference in
-		//displacements
-		angleChange = currentRight - currentLeft;
-
-		//Get output from both PID's
-		distOutput = pos_PID_StepController(&distancePID);
-		angleOutput = pos_PID_StepController(&anglePID);
-
-		//Set motors to distance PID output with correction from angle PID
-		setLeftMotors(distOutput + angleOutput);
-		setRightMotors(distOutput - angleOutput);
-
-		//Place mark if we're close enough to the target distance
-		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
-		{
-			timer_PlaceHardMarker(&atTargetTimer);
-		}
-		//Place mark if we haven't moved much
-		else if (fabs(distanceElapsed - lastDistance) <= threshold)
-		{
-			timer_PlaceHardMarker(&atTargetTimer);
-		}
-		else
-		{
-			timer_ClearHardMarker(&atTargetTimer);
-		}
-
-		lastDistance = distanceElapsed;
-
-		//If we've been close enough for long enough, we're there
-		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)
-		{
-			atTarget = true;
-		}
-
-		wait1Msec(15);
-	}
-
-	setAllDriveMotors(0);
-
-	return true;
-}
-
-/*
-Turns to an angle
-@param angle Angle to turn to
-@return Whether the operation was successful
-*/
-bool turn(const long angle)
-{
-	//Save left and right quad values instead of setting them to zero
-	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
-
-	//Total angle change since start
-	float angleChange = 0, lastAngle = 0;
-
-	//Radius of robot
-	const float thetaConv = 12.75993;
-
-	//Target angle
-	int targetAngle = angle * thetaConv;
-
-	pos_PID anglePID;
-	if (fabs(angle) <= 350)
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.1);
-	}
-	else
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.2);
-	}
-	pos_PID_SetTargetPosition(&anglePID, targetAngle);
-
-	//If angle PID controller is at target
-	bool atTarget = false;
-
-	//Angle that is "close enough" to target
-	const int atTargetAngle = 10;
-
-	//Threshold for not moving
-	const int threshold = 2;
-
-	//Timer for being at target
-	timer atTargetTimer;
-	timer_Initialize(&atTargetTimer);
-
-	//Timeout period (ms)
-	const int timeoutPeriod = 250;
-
-	//Current left and right quad displacements
-	long currentLeft, currentRight;
-
-	//Distance and angle PID output
-	int angleOutput;
-
-	while (!atTarget)
-	{
-		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
-
-		angleChange = currentLeft - currentRight;
-
-		//Get output from PID
-		angleOutput = pos_PID_StepController(&anglePID);
-
-		//Set motors to angle PID output
-		setLeftMotors(angleOutput);
-		setRightMotors(-1 * angleOutput);
-
-		//Place mark if we're close enough to the target angle
-		if (fabs(targetAngle - angleChange) <= atTargetAngle)
-		{
-			timer_PlaceHardMarker(&atTargetTimer);
-		}
-		//Place mark if we haven't moved much
-		else if (fabs(angleChange - lastAngle) <= threshold)
-		{
-			timer_PlaceHardMarker(&atTargetTimer);
-		}
-		else
-		{
-			timer_ClearHardMarker(&atTargetTimer);
-		}
-
-		lastAngle = angleChange;
-
-		//If we've been close enough for long enough, we're there
-		if (timer_GetDTFromHardMarker(&atTargetTimer) >= timeoutPeriod)
-		{
-			atTarget = true;
-		}
-
-		wait1Msec(15);
-	}
-
-	setAllDriveMotors(0);
-
-	return true;
-}
-
-/*
-Computes the distance to a point
-@param x X coordinate of other point
-@param y Y coordinate of other point
-@return distance to point
-*/
-float computeDistanceToPoint(const long x, const long y)
-{
-	BCI_lockSem(std_msgSem, "computeDistanceToPoint")
-	{
-		//Compute difference in distance
-		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
-		return sqrt((xDiff * xDiff) + (yDiff * yDiff));
-
-		BCI_unlockSem(std_msgSem, "computeDistanceToPoint")
-	}
-
-	//If no lock, return no distance
-	return 0;
-}
-
-/*
-Computes the angle to a point
-@param x X coordinate of other point
-@param y Y coordinate of other point
-@return angle to point
-*/
-float computeAngleToPoint(const long x, const long y)
-{
-	BCI_lockSem(std_msgSem, "computeAngleToPoint")
-	{
-		//Compute difference in distance
-		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
-
-		//Compute difference in angle
-		return (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
-
-		BCI_unlockSem(std_msgSem, "computeAngleToPoint")
-	}
-
-	//If no lock, return no angle
-	return 0;
-}
-
-/*
-Computes the distance and angle from current location to a point
-@param x   X coordinate of other point
-@param y   Y coordinate of other point
-@param out Struct to write result to
-*/
-void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle *out)
-{
-	//If no lock, return empty type
-	out->length = 0;
-	out->theta = 0;
-
-	BCI_lockSem(std_msgSem, "computeDistanceAndAngleToPoint")
-	{
-		//Compute difference in distance
-		writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
-		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
-		out->length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
-
-		//Compute difference in angle
-		out->theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
-
-		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
-	}
-}
-
-/*
-Turns and drives to a point
-@param x X coordinate to move to
-@param y Y coordinate to move to
-@param offset Backward offset from final distance to point
-@return Whether the operation was successful
-*/
-bool moveToPoint(const long x, const long y, long offset = 0)
+/**
+ * Turns and drives to a point
+ * @param x         X coordinate of point
+ * @param y         Y coordinate of point
+ * @param offset    Backward offset from final distance to point
+ * @param backwards Whether to move to the point backwards
+ */
+void moveToPoint(const long x, const long y, long offset = 0, bool backwards = false)
 {
 	distanceAndAngle temp;
 	computeDistanceAndAngleToPoint(x, y, &temp);
+
+	if (backwards)
+	{
+		temp.theta += 180;
+		temp.length *= -1;
+	}
 
 	writeDebugStreamLine("turning %1.2f", temp.theta);
 	turn(temp.theta);
@@ -536,17 +77,43 @@ bool moveToPoint(const long x, const long y, long offset = 0)
 	writeDebugStreamLine("driving %1.2f", temp.length - offset);
 	driveStraight(temp.length - offset);
 	writeDebugStreamLine("done");
-
-	return true;
 }
 
-/*
-Picks up multiple stars
-@param x X coordinates
-@param y Y coordinates
-@return Whether the operation was successful
+enum fenceTypes
+{
+	FENCE_LEFT,
+	FENCE_MIDDLE,
+	FENCE_RIGHT
+};
+
+/**
+ * Scores stars off of a fence section
+ * @param fence Section of fence to score
  */
-bool pickUpStars(const long *x, const long *y)
+void scoreFence(const fenceTypes fence)
+{
+	distanceAndAngle temp;
+
+	//Load in point in the center of the selected field section
+	switch (fence)
+	{
+		case FENCE_LEFT:
+			break;
+
+		case FENCE_MIDDLE:
+			break;
+
+		default:
+			break;
+	}
+}
+
+/**
+ * Picks up multiple stars
+ * @param x X coordinates
+ * @param y Y coordinates
+ */
+void pickUpStars(const long *x, const long *y)
 {
 	const int intakeLength = 18;
 
@@ -578,17 +145,14 @@ bool pickUpStars(const long *x, const long *y)
 
 	//Dump stars
 	dumpIntake();
-
-	return true;
 }
 
-/*
-Picks up a cube and scores it
-@param x X coordinate of cube
-@param y Y coordinate of cube
-@return Whether the operation was successful
+/**
+ * Picks up a cube and scores it
+ * @param x X coordinate of cube
+ * @param y Y coordinate of cube
  */
-bool pickUpCube(const long x, const long y)
+void pickUpCube(const long x, const long y)
 {
 	//Move to cube
 	moveToPoint(x, y, 100);
@@ -614,8 +178,6 @@ bool pickUpCube(const long x, const long y)
 
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-
-	return true;
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

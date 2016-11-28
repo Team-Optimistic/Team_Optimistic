@@ -100,6 +100,8 @@ bool mpcMsgFlag = false;
 #define MPC_MSG_PICKUP_CLEAR 0
 #define MPC_MSG_PICKUP_STAR  1
 #define MPC_MSG_PICKUP_CUBE  2
+#define MPC_MSG_PICKUP_BACK  3
+#define MPC_MSG_PICKUP_WALL  4
 
 //Message write semaphore, always get lock before reading
 //Only task readBuffer() may write to msg

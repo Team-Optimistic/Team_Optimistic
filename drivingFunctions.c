@@ -15,7 +15,7 @@ void driveStraight(const long distance)
 	float lastDistance = 0;
 
   //Conversion between encoder degrees and base_link mm
-  const int conv = 1;
+  const int conv = 4.360993;
 
 	//Target distance for the distance PID controller
 	//Angle PID controller's target is 0

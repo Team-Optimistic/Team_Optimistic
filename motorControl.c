@@ -115,26 +115,26 @@ void scoreFence(const fenceTypes fence)
  */
 void pickUpStars(const long *x, const long *y)
 {
-	const int intakeLength = 18;
+	const int intakeLength = 458;
 
 	//If the stars are along the wall, we need to swing turn in and drive along
 	//the wall to get them, then close the intake before we hit the wall
-	if (x[0] >= 144 - intakeLength ||
+	if (x[0] >= 3657 - intakeLength ||
 			x[0] <= intakeLength ||
 			y[0] <= intakeLength ||
-			y[0] >= 72 - intakeLength)
+			y[0] >= 1828 - intakeLength)
 	{
 		//Drive to a point in front of one end of the wall
 		//For the left and right walls, drive next to the fence
 		//For the south wall, pick the closest corner
-		//
 		//Turn to face the wall
-		//
 		//Swing turn into being parallel to the wall
-		//
 		//Drive along the length of the wall to pool objects
-		//
 		//Close intake
+		//
+		//Or, maybe we should approach the wall flat
+		//Close the intake and back up at set velocities
+		//Split up stars wider than 50" apart into multiple dumps
 	}
 	//Otherwise, we should drive around with our intake open to get them
 	else

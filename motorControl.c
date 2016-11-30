@@ -17,7 +17,7 @@ void dumpIntake()
 	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
 
-	//Turn so our back faces the fence
+	//Turn so our back faces the fence7
 	turnToAbsAngle(180);
 
 	//Run into the fence
@@ -29,7 +29,7 @@ void dumpIntake()
 		BCI_lockSem(std_msgSem, "dumpIntake")
 		{
 			//Back up until we're close to the fence
-			keepGoing = std_msg[STD_MSG_EST_X] >= 600;//1828;
+			keepGoing = std_msg[STD_MSG_EST_X] >= 1820; //Slightly less than the field height (1828)
 
 			//Open the intake when the lift is partway up
 			if (nMotorEncoder[liftRI] >= 200)

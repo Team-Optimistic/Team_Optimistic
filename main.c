@@ -53,10 +53,8 @@ task main()
 	//Start reading from pi
 	startTask(readBuffer);
 
-	//Let robot drive itself
-	startTask(commandRobot);
-
-	// int leftVal, rightVal;
+	bool isUserControlled = false, isUserControlled_last = false;
+	int leftVal, rightVal;
 
 	while (true)
 	{
@@ -66,17 +64,34 @@ task main()
 		//sprintf(voltageString, "Main: %1.2fV", nImmediateBatteryLevel / 1000.0);
 		//changeMessage(voltage, voltageString);
 
-		//Temporary driver control
-		// leftVal = vexRT[JOY_JOY_LV];
-		// rightVal = vexRT[JOY_JOY_RV];
-		// leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
-		// rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
-		//
-		// setLeftMotors(leftVal);
-		// setRightMotors(rightVal);
+		if (vexRT[JOY_BTN_RL])
+		{
+			isUserControlled = !isUserControlled;
+			waitForZero(vexRT[JOY_BTN_RL]);
+		}
 
-		//setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-		//setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+		if (isUserControlled)
+		{
+			leftVal = vexRT[JOY_JOY_LV];
+			rightVal = vexRT[JOY_JOY_RV];
+			leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
+			rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
+
+			setLeftMotors(leftVal);
+			setRightMotors(rightVal);
+
+			setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
+			setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+		}
+		else
+		{
+			if (isUserControlled != isUserControlled_last)
+			{
+				startTask(commandRobot);
+			}
+		}
+
+		isUserControlled_last = isUserControlled;
 
 		if (vexRT[JOY_BTN_RU])
 		{

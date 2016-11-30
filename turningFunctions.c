@@ -2,8 +2,8 @@
 #define TURNINGFUNCTIONS_C_INCLUDED
 
 /**
- * Turns to an angle in degrees
- * @param  angle Angle to turn to (deg)
+ * Turns clockwise for an angle in degrees
+ * @param  angle Angle to turn for (deg)
  */
 void turn(const long angle)
 {
@@ -94,6 +94,22 @@ void turn(const long angle)
 	}
 
 	setAllDriveMotors(0);
+}
+
+/**
+ * Turns to an angle in the field frame
+ * @param deg Degrees to turn to
+ */
+void turnToAbsAngle(const int deg)
+{
+	long theta = 0;
+	BCI_lockSem(std_msgSem, "turnToAbsAngle")
+	{
+		theta = std_msg[STD_MSG_EST_THETA];
+		BCI_unlockSem(std_msgSem, "turnToAbsAngle")
+	}
+
+	turn(deg - theta);
 }
 
 #endif //TURNINGFUNCTIONS_C_INCLUDED

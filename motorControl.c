@@ -12,21 +12,13 @@ void initSensors()
  */
 void dumpIntake()
 {
-	//Read our current angle
-	long currentAngle;
-	BCI_lockSem(std_msgSem, "dumpIntake")
-	{
-		currentAngle = std_msg[STD_MSG_EST_THETA];
-		BCI_unlockSem(std_msgSem, "dumpIntake")
-	}
-
 	//Close intake and lift up while we move to the fence
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
 	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
 
 	//Turn so our back faces the fence
-	turn(180 - currentAngle);
+	turnToAbsAngle(180);
 
 	//Run into the fence
 	setAllDriveMotors(-127);
@@ -98,6 +90,9 @@ void scoreFence(const fenceTypes fence)
 	switch (fence)
 	{
 		case FENCE_LEFT:
+			moveToPoint(3048, 1372); //Center of left segment
+			turnToAbsAngle(180);
+			//knock the stars off
 			break;
 
 		case FENCE_MIDDLE:

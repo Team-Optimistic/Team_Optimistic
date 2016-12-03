@@ -28,30 +28,62 @@ task commandRobot()
       {
         case MPC_MSG_PICKUP_CLEAR:
         	writeDebugStreamLine("moving to point (%d,%d)", xDemand[0], yDemand[0]);
+
+        	SensorValue[LED_Waiting] = LED_OFF;
+        	SensorValue[LED_Driving] = LED_ON;
+
           moveToPoint(xDemand[0], yDemand[0]);
+
+          SensorValue[LED_Driving] = LED_OFF;
+
           sendMPCMsg();
           break;
 
         case MPC_MSG_PICKUP_STAR:
 					writeDebugStreamLine("getting star at (%d,%d)", xDemand[0], yDemand[0]);
+
+        	SensorValue[LED_Waiting] = LED_OFF;
+					SensorValue[LED_Stars] = LED_ON;
+
           pickUpStars(xDemand, yDemand);
+
+					SensorValue[LED_Stars] = LED_OFF;
+
           sendMPCMsg();
           break;
 
         case MPC_MSG_PICKUP_CUBE:
 					writeDebugStreamLine("getting cube at (%d,%d)", xDemand[0], yDemand[0]);
+
+        	SensorValue[LED_Waiting] = LED_OFF;
+					SensorValue[LED_Cube] = LED_ON;
+
           pickUpCube(xDemand[0], yDemand[0]);
+
+					SensorValue[LED_Cube] = LED_OFF;
+
           sendMPCMsg();
           break;
 
 				case MPC_MSG_PICKUP_BACK:
 					writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[0], yDemand[0]);
+
+        	SensorValue[LED_Waiting] = LED_OFF;
+					SensorValue[LED_Driving] = LED_ON;
+
 					moveToPoint(xDemand[0], yDemand[0], 0, true);
+
+					SensorValue[LED_Driving] = LED_OFF;
+
 					sendMPCMsg();
 					break;
 
 				case MPC_MSG_PICKUP_WALL:
 					writeDebugStreamLine("knocking stars off fence %d", xDemand[0]);
+
+        	SensorValue[LED_Waiting] = LED_OFF;
+					SensorValue[LED_Fence] = LED_ON;
+
 					switch (xDemand[0])
 					{
 						case 1:
@@ -66,10 +98,14 @@ task commandRobot()
 							scoreFence(FENCE_RIGHT);
 							break;
 					}
+
+					SensorValue[LED_Fence] = LED_OFF;
+
 					sendMPCMsg();
 					break;
 
         default:
+        	SensorValue[LED_Waiting] = LED_ON;
           break;
       }
 

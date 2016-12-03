@@ -3,6 +3,12 @@
 #pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  rightQuad,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  leftQuad,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl5,  LED_ManualControl, sensorLEDtoVCC)
+#pragma config(Sensor, dgtl6,  LED_Waiting,    sensorLEDtoVCC)
+#pragma config(Sensor, dgtl7,  LED_Driving,    sensorLEDtoVCC)
+#pragma config(Sensor, dgtl8,  LED_Cube,       sensorLEDtoVCC)
+#pragma config(Sensor, dgtl9,  LED_Stars,      sensorLEDtoVCC)
+#pragma config(Sensor, dgtl10, LED_Fence,      sensorLEDtoVCC)
 #pragma config(Sensor, dgtl12, liftStopButton, sensorTouch)
 #pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           lidar,         tmotorVex393_HBridge, openLoop, reversed)
@@ -53,7 +59,7 @@ task main()
 	//Start reading from pi
 	startTask(readBuffer);
 
-	bool isUserControlled = false, isUserControlled_last = false;
+	bool isUserControlled = false, isUserControlled_last = true;
 	int leftVal, rightVal;
 
 	while (true)
@@ -64,6 +70,14 @@ task main()
 		//sprintf(voltageString, "Main: %1.2fV", nImmediateBatteryLevel / 1000.0);
 		//changeMessage(voltage, voltageString);
 
+		//Clear sensors and put us at (0,0)
+		if (vexRT[JOY_BTN_LU])
+		{
+			initSensors();
+			waitForZero(vexRT[JOY_BTN_LU]);
+		}
+
+		//Switch between driver control and autonomous
 		if (vexRT[JOY_BTN_RL])
 		{
 			isUserControlled = !isUserControlled;
@@ -72,6 +86,8 @@ task main()
 
 		if (isUserControlled)
 		{
+			SensorValue[LED_ManualControl] = LED_ON;
+
 			leftVal = vexRT[JOY_JOY_LV];
 			rightVal = vexRT[JOY_JOY_RV];
 			leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
@@ -85,6 +101,8 @@ task main()
 		}
 		else
 		{
+			SensorValue[LED_ManualControl] = LED_OFF;
+
 			if (isUserControlled != isUserControlled_last)
 			{
 				startTask(commandRobot);

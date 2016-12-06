@@ -70,10 +70,10 @@ task main()
 		//sprintf(voltageString, "Main: %1.2fV", nImmediateBatteryLevel / 1000.0);
 		//changeMessage(voltage, voltageString);
 
-		//Clear sensors and put us at (0,0)
+		//Runs skills
 		if (vexRT[JOY_BTN_LU])
 		{
-			initSensors();
+			runSKills();
 			waitForZero(vexRT[JOY_BTN_LU]);
 		}
 

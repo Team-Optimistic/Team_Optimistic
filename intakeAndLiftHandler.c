@@ -36,13 +36,13 @@ task intakeAndLiftTask()
 		{
 			case INTAKE_OPEN:
 				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, 1900);
+				pos_PID_SetTargetPosition(&intakePID, 1020);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_CLOSED:
 				pos_PID_ChangeBias(&intakePID, -30);
-				pos_PID_SetTargetPosition(&intakePID, 500);
+				pos_PID_SetTargetPosition(&intakePID, 2220);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 

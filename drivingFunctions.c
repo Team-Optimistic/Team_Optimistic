@@ -15,7 +15,7 @@ void driveStraight(const long distance)
 	float lastDistance = 0;
 
   //Conversion between encoder degrees and base_link mm
-  const int conv = 4.360993;
+  const float conv = 1.311250;
 
 	//Target distance for the distance PID controller
 	//Angle PID controller's target is 0
@@ -25,7 +25,7 @@ void driveStraight(const long distance)
 
 	if (distance <= 800)
 	{
-		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.1);
+		pos_PID_InitController(&distancePID, &distanceElapsed, 0.2, 0.2, 0.1);
 		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
 	}
 	else
@@ -70,7 +70,7 @@ void driveStraight(const long distance)
 
 		//Angle change doesn't need to be a real angle, just the difference in
 		//displacements
-		angleChange = currentRight - currentLeft;
+		angleChange = currentLeft - currentRight;
 
 		//Get output from both PID's
 		distOutput = pos_PID_StepController(&distancePID);
@@ -79,6 +79,8 @@ void driveStraight(const long distance)
 		//Set motors to distance PID output with correction from angle PID
 		setLeftMotors(distOutput + angleOutput);
 		setRightMotors(distOutput - angleOutput);
+
+		writeDebugStreamLine("%d",pos_PID_GetError(&distancePID));
 
 		//Place mark if we're close enough to the target distance
 		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
@@ -107,6 +109,7 @@ void driveStraight(const long distance)
 	}
 
 	setAllDriveMotors(0);
+	writeDebugStreamLine("target: %1.2f", targetDistance);
 }
 
 #endif //DRIVINGFUNCTIONS_C_INCLUDED

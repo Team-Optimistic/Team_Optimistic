@@ -7,7 +7,7 @@ void runSkills()
   intakeAndLiftTask_intakeState = INTAKE_REST;
   intakeAndLiftTask_liftState = LIFT_DOWN;
   startTask(intakeAndLiftTask);
-  driveStraight(610*3);
+  driveStraight(-1118);
 }
 
 #endif //SKILLS_C_INCLUDED

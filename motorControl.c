@@ -87,10 +87,11 @@ void scoreFence(const fenceTypes fence)
 	distanceAndAngle temp;
 
 	//Load in point in the center of the selected field section
+	//Each fence is 1181 mm wide
 	switch (fence)
 	{
 		case FENCE_LEFT:
-			moveToPoint(3048, 1372); //Center of left segment
+			moveToPoint(3543, 1118); //Center of left segment
 			turnToAbsAngle(180);
 			//knock the stars off
 			break;

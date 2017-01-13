@@ -1,6 +1,11 @@
 #ifndef COLLISIONHANDLER_C_INCLUDED
 #define COLLISIONHANDLER_C_INCLUDED
 
+typedef struct statePack_t
+{
+  long x, y, theta;
+} statePack;
+
 long doesDriveCollide(const int mm)
 {
   // Given our current state (x, y, theta, intake, lift),
@@ -8,6 +13,10 @@ long doesDriveCollide(const int mm)
   // Do we hit the field wall?
   // Do we hit the fence?
   // If we do hit something, where along our path do we hit it?
+}
+
+long doesDriveCollideSP(const statePack &sp, const int mm)
+{
 }
 
 long doesTurnCollide(const int deg)
@@ -19,6 +28,10 @@ long doesTurnCollide(const int deg)
   // If we do hit something, where in the turn do we hit it?
 }
 
+long doesTurnCollideSP(const statePack &sp, const int mm)
+{
+}
+
 long doesIntakeCollide(const int mm)
 {
   // Given our current state (x, y, theta, intake, lift),
@@ -26,6 +39,10 @@ long doesIntakeCollide(const int mm)
   // Do we hit the field wall?
   // Do we hit the fence?
   // If we do hit something, where along our path do we hit it?
+}
+
+long doesIntakeCollideSP(const statePack &sp, const int mm)
+{
 }
 
 #endif //COLLISIONHANDLER_C_INCLUDED

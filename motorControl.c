@@ -64,6 +64,13 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 	}
 
 	writeDebugStreamLine("turning %1.2f", temp.theta);
+	long limit;
+	if ((limit = doesTurnCollide(temp.theta)) != 0)
+	{
+		turn(limit);
+		driveStraight(100);
+		//use new SP functions
+	}
 	turn(temp.theta);
 
 	writeDebugStreamLine("driving %1.2f", temp.length - offset);

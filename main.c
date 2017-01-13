@@ -39,6 +39,7 @@
 #include "basicMotorControl.c"
 #include "drivingFunctions.c"
 #include "turningFunctions.c"
+#include "collisionHandler.c"
 #include "intakeAndLiftHandler.c"
 #include "motorControl.c"
 #include "decisionHandler.c"

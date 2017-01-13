@@ -413,7 +413,10 @@ task readBuffer()
 							conv.b[2] = mpc_msg[MPC_MSG_Y_COORD + 2 + (i * 9)];
 							conv.b[3] = mpc_msg[MPC_MSG_Y_COORD + 3 + (i * 9)];
 							mpc_msg[MPC_MSG_Y_COORD + (i * 9)] = conv.l;
-							writeDebugStreamLine("mpc got (%d,%d)", mpc_msg[MPC_MSG_X_COORD + (i * 9)], mpc_msg[MPC_MSG_Y_COORD + (i * 9)]);
+
+							#ifdef UARTHANDLER_DEBUG
+								writeDebugStreamLine("mpc got (%d,%d)", mpc_msg[MPC_MSG_X_COORD + (i * 9)], mpc_msg[MPC_MSG_Y_COORD + (i * 9)]);
+							#endif
 						}
 
 						BCI_unlockSem(mpc_msgSem, "readBuffer")

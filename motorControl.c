@@ -17,7 +17,7 @@ void dumpIntake()
 	intakeAndLiftTask_liftState = LIFT_UP;
 	startTask(intakeAndLiftTask);
 
-	//Turn so our back faces the fence7
+	//Turn so our back faces the fence
 	turnToAbsAngle(180);
 
 	//Run into the fence
@@ -63,19 +63,76 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 		temp.length *= -1;
 	}
 
-	writeDebugStreamLine("turning %1.2f", temp.theta);
 	long limit;
+	//If we hit something during the turn
 	if ((limit = doesTurnCollide(temp.theta)) != 0)
 	{
+		//Turn as far as we can without hitting anything
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("turning %1.2f", limit);
+		#endif
 		turn(limit);
-		driveStraight(100);
-		//use new SP functions
-	}
-	turn(temp.theta);
 
-	writeDebugStreamLine("driving %1.2f", temp.length - offset);
-	driveStraight(temp.length - offset);
-	writeDebugStreamLine("done");
+		//Figure out how far we have to drive until we can turn the rest of the way
+		long mmToDrive = 0;
+
+		statePack sp;
+		BCI_lockSem(std_msgSem, "moveToPoint")
+		{
+			sp.x = std_msg[STD_MSG_EST_X];
+			sp.y = std_msg[STD_MSG_EST_Y];
+			sp.theta = std_msg[STD_MSG_EST_THETA];
+		}
+		BCI_unlockSem(std_msgSem, "moveToPoint");
+
+		while (true)
+		{
+			mmToDrive += 10; //Add 10 mm to drive distance
+			sp_Translate(&sp, 10, sp.theta); //Move 10 mm into the future
+
+			//Check if we still collide
+			if (!doesTurnCollide(&sp, computeAngleToPoint(x, y)))
+			{
+				//Break if we don't collide
+				break;
+			}
+		}
+
+		//Drive the calculated distance
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("driving %1.2f", mmToDrive);
+		#endif
+		driveStraight(mmToDrive);
+
+		//Turn the rest of the angle
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("turning %1.2f", computeAngleToPoint(x, y));
+		#endif
+		turn(computeAngleToPoint(x, y));
+
+		//Drive to the point
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("driving %1.2f", computeDistanceToPoint(x, y));
+		#endif
+		driveStraight(computeDistanceToPoint(x, y));
+	}
+	//Else, we don't hit anything
+	else
+	{
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("turning %1.2f", temp.theta);
+		#endif
+		turn(temp.theta);
+
+		#ifdef MOVETOPOINT_DEBUG
+			writeDebugStreamLine("driving %1.2f", temp.length - offset);
+		#endif
+		driveStraight(temp.length - offset);
+	}
+
+	#ifdef MOVETOPOINT_DEBUG
+		writeDebugStreamLine("done");
+	#endif
 }
 
 enum fenceTypes

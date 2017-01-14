@@ -66,7 +66,10 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 	BCI_lockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	{
 		//Compute difference in distance
-		writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
+		#ifdef POINTMATH_DEBUG
+			writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
+		#endif
+		
 		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 		out->length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 

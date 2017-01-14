@@ -10,7 +10,7 @@ long doesDriveCollide(const int mm)
   // If we do hit something, where along our path do we hit it?
 }
 
-long doesDriveCollideSP(const statePack &sp, const int mm)
+long doesDriveCollideSP(const statePack *sp, const int mm)
 {
 }
 
@@ -23,7 +23,7 @@ long doesTurnCollide(const int deg)
   // If we do hit something, where in the turn do we hit it?
 }
 
-long doesTurnCollideSP(const statePack &sp, const int mm)
+long doesTurnCollideSP(const statePack *sp, const int mm)
 {
 }
 
@@ -36,7 +36,7 @@ long doesIntakeCollide(const int mm)
   // If we do hit something, where along our path do we hit it?
 }
 
-long doesIntakeCollideSP(const statePack &sp, const int mm)
+long doesIntakeCollideSP(const statePack *sp, const int mm)
 {
 }
 

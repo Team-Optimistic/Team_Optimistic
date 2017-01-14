@@ -91,7 +91,7 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 			sp_Translate(&sp, 10, sp.theta); //Move 10 mm into the future
 
 			//Check if we still collide
-			if (!doesTurnCollide(&sp, computeAngleToPoint(x, y)))
+			if (!doesTurnCollideSP(&sp, computeAngleToPoint(x, y)))
 			{
 				//Break if we don't collide
 				break;

@@ -36,7 +36,7 @@ void dumpIntake()
 			{
 				intakeAndLiftTask_liftState = INTAKE_OPEN;
 			}
-			BCI_unlockSem(std_msgSem, "dumpIntake");
+			BCI_unlockSem(std_msgSem, "dumpIntake")
 		}
 
 		wait1Msec(5);
@@ -82,8 +82,8 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 			sp.x = std_msg[STD_MSG_EST_X];
 			sp.y = std_msg[STD_MSG_EST_Y];
 			sp.theta = std_msg[STD_MSG_EST_THETA];
+			BCI_unlockSem(std_msgSem, "moveToPoint")
 		}
-		BCI_unlockSem(std_msgSem, "moveToPoint");
 
 		while (true)
 		{

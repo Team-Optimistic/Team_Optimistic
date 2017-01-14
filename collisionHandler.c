@@ -1,11 +1,6 @@
 #ifndef COLLISIONHANDLER_C_INCLUDED
 #define COLLISIONHANDLER_C_INCLUDED
 
-typedef struct statePack_t
-{
-  long x, y, theta;
-} statePack;
-
 long doesDriveCollide(const int mm)
 {
   // Given our current state (x, y, theta, intake, lift),

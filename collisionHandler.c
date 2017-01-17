@@ -67,9 +67,13 @@ long doesDriveCollideSP(const statePack *sp, const int mm)  //potential problem:
 long doesDriveCollide(const int mm)
 {
   statePack c_state;
-  c_state.x = 0;
-  c_state.y = 0;
-  c_state.theta = 0;
+  BCI_lockSem(std_msgSem, "doesDriveCollide")
+  {
+    c_state.x = std_msg[STD_MSG_EST_X];
+    c_state.y = std_msg[STD_MSG_EST_Y];
+    c_state.theta = std_msg[STD_MSG_EST_THETA];
+    BCI_unlockSem(std_msgSem, "doesDriveCollide")
+  }
   return doesDriveCollideSP(&c_state , mm);
 }
 
@@ -95,9 +99,13 @@ long doesTurnCollide(const int deg)
   // If we do hit something, where in the turn do we hit it?
 
   statePack c_state;
-  c_state.x = 0;
-  c_state.y = 0;
-  c_state.theta = 0;
+  BCI_lockSem(std_msgSem, "doesTurnCollide")
+  {
+    c_state.x = std_msg[STD_MSG_EST_X];
+    c_state.y = std_msg[STD_MSG_EST_Y];
+    c_state.theta = std_msg[STD_MSG_EST_THETA];
+    BCI_unlockSem(std_msgSem, "doesTurnCollide")
+  }
   return doesTurnCollideSP(&c_state, deg);
 }
 

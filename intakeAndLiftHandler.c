@@ -1,6 +1,11 @@
 #ifndef INTAKEANDLIFTHANDLER_C_INCLUDED
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
+#define INTAKE_OPEN_VAL   1020
+#define INTAKE_CLOSED_VAL 2220
+#define LIFT_UP_VAL       1350
+#define LIFT_DOWN_VAL     0
+
 enum intakeState
 {
 	INTAKE_OPEN,
@@ -18,7 +23,10 @@ enum liftState
 };
 
 intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
+intakeState intakeAndLiftTask_intakeStateRead = INTAKE_REST;
+
 intakeState intakeAndLiftTask_liftState = LIFT_REST;
+intakeState intakeAndLiftTask_liftStateRead = LIFT_REST;
 
 /**
  * Maintains different states for the intake and lift
@@ -36,7 +44,7 @@ task intakeAndLiftTask()
 		{
 			case INTAKE_OPEN:
 				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, 1020);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_OPEN_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
@@ -54,6 +62,18 @@ task intakeAndLiftTask()
 				break;
 		}
 
+		//This is where the intake actually is
+		if (SensorValue[intakePot] <= INTAKE_OPEN_VAL + 5 &&
+			  SensorValue[intakePot] >= INTAKE_OPEN_VAL - 5)
+		{
+			intakeAndLiftTask_intakeStateRead = INTAKE_OPEN;
+		}
+		else if (SensorValue[intakePot] <= INTAKE_CLOSED + 5 &&
+		         SensorValue[intakePot] >= INTAKE_CLOSED - 5)
+	  {
+			intakeAndLiftTask_intakeStateRead = INTAKE_CLOSED;
+	  }
+
 		if (SensorValue[liftStopButton])
 		{
 			nMotorEncoder[liftRI] = 0;
@@ -62,12 +82,12 @@ task intakeAndLiftTask()
 		switch (intakeAndLiftTask_liftState)
 		{
 			case LIFT_UP:
-				pos_PID_SetTargetPosition(&liftPID, 1350); //Up position
+				pos_PID_SetTargetPosition(&liftPID, LIFT_UP_VAL); //Up position
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
 			case LIFT_DOWN:
-				pos_PID_SetTargetPosition(&liftPID, 0);
+				pos_PID_SetTargetPosition(&liftPID, LIFT_DOWN_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
@@ -80,6 +100,18 @@ task intakeAndLiftTask()
 		}
 
 		wait1Msec(15);
+	}
+
+	//This is where the lift actually is
+	if (nMotorEncoder[liftRI] <= LIFT_UP_VAL + 5 &&
+	    nMotorEncoder[liftRI] >= LIFT_UP_VAL - 5)
+	{
+		intakeAndLiftTask_liftStateRead = LIFT_UP;
+	}
+	else if (nMotorEncoder[liftRI] <= LIFT_DOWN_VAL + 5 &&
+	         nMotorEncode[liftRI] >= LIFT_DOWN_VAL - 5)
+	{
+		intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 	}
 }
 

@@ -31,6 +31,7 @@
 #define BCI_USE_UART
 #define BCI_USE_TIMER
 #define BCI_USE_POS_PID
+#define BCI_USE_VEL_PID
 #include "BCI\BCI.h"
 
 //#define UARTHANDLER_DEBUG

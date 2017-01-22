@@ -80,8 +80,6 @@ void driveStraight(const long distance)
 		setLeftMotors(distOutput + angleOutput);
 		setRightMotors(distOutput - angleOutput);
 
-		writeDebugStreamLine("%d",pos_PID_GetError(&distancePID));
-
 		//Place mark if we're close enough to the target distance
 		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
 		{

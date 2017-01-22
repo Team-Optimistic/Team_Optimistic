@@ -68,8 +68,8 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_OPEN;
 		}
-		else if (SensorValue[intakePot] <= INTAKE_CLOSED + 5 &&
-		         SensorValue[intakePot] >= INTAKE_CLOSED - 5)
+		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + 5 &&
+		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - 5)
 	  {
 			intakeAndLiftTask_intakeStateRead = INTAKE_CLOSED;
 	  }
@@ -109,7 +109,7 @@ task intakeAndLiftTask()
 		intakeAndLiftTask_liftStateRead = LIFT_UP;
 	}
 	else if (nMotorEncoder[liftRI] <= LIFT_DOWN_VAL + 5 &&
-	         nMotorEncode[liftRI] >= LIFT_DOWN_VAL - 5)
+	         nMotorEncoder[liftRI] >= LIFT_DOWN_VAL - 5)
 	{
 		intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 	}

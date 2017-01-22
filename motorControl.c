@@ -248,29 +248,29 @@ void pickUpCube(const long x, const long y)
  */
 void cheeseThoseStars()
 {
-	vel_PID intakePID, drivePID;
+	pos_PID intakePPID, drivePPID;
+	vel_PID intakeVPID, driveVPID;
+
+	float distanceElapsed = 0, lastDistance = 0;
+	const int targetDistance = -610;
+
+	float intakeOutput = 0, driveOutput = 0;
+
+	//We need control of the intake
+	intakeAndLiftTask_intakeState = INTAKE_WAIT;
+
+	pos_PID_InitController(&intakePPID, intakePot, 0.2, 0.1, 0, 0);
+	pos_PID_SetTargetPosition(&intakePPID, INTAKE_CLOSED_VAL);
+	vel_PID_InitController(&intakeVPID, &intakeOutput, 0.2, 0.1);
+	vel_PID_SetTargetVelocity(&intakeVPID, -10);
+
+	pos_PID_InitController(&drivePPID, &distanceElapsed, 0.2, 0.2, 0.1);
+	pos_PID_SetTargetPosition(&drivePPID, targetDistance);
+	vel_PID_InitController(&driveVPID, &driveOutput, 0.2, 0.1);
+	vel_PID_SetTargetVelocity(&driveVPID, -10);
 
 	//Save left and right quad values instead of setting them to zero
 	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
-
-	//Total distance elapsed since start and total angle change since start
-	float distanceElapsed = 0, angleChange = 0;
-	float lastDistance = 0;
-
-  //Conversion between encoder degrees and base_link mm
-  const float conv = 1.311250;
-
-	//Target distance for the distance PID controller
-	//Angle PID controller's target is 0
-	int targetDistance = -610 * conv;
-
-	pos_PID distancePID, anglePID;
-
-	pos_PID_InitController(&distancePID, &distanceElapsed, 0.2, 0.2, 0.1);
-	pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
-
-	pos_PID_SetTargetPosition(&distancePID, targetDistance);
-	pos_PID_SetTargetPosition(&anglePID, 0);
 
 	//If distance PID controller is at target
 	bool atTarget = false;
@@ -291,8 +291,8 @@ void cheeseThoseStars()
 	//Current left and right quad displacements
 	long currentLeft, currentRight;
 
-	//Distance and angle PID output
-	int distOutput, angleOutput;
+	//Final control signal
+	int intakeSignal, driveSignal;
 
 	while (!atTarget)
 	{
@@ -303,19 +303,16 @@ void cheeseThoseStars()
 		//Overall displacement is the average of left and right displacements
 		distanceElapsed = (currentLeft + currentRight) / 2.0;
 
-		//Angle change doesn't need to be a real angle, just the difference in
-		//displacements
-		angleChange = currentLeft - currentRight;
+		//Get output
+		intakeOutput = pos_PID_StepController(&intakePPID);
+		intakeSignal = vel_PID_StepController(&intakeVPID);
+		driveOutput = pos_PID_StepController(&drivePPID);
+		driveSignal = vel_PID_StepController(&driveVPID);
 
-		//Get output from both PID's
-		distOutput = pos_PID_StepController(&distancePID);
-		angleOutput = pos_PID_StepController(&anglePID);
-
-		//Set motors to distance PID output with correction from angle PID
-		setLeftMotors(distOutput + angleOutput);
-		setRightMotors(distOutput - angleOutput);
-
-		writeDebugStreamLine("%d",pos_PID_GetError(&distancePID));
+		//Set motors
+		setIntakeMotors(intakeSignal);
+		setLeftMotors(driveSignal);
+		setRightMotors(driveSignal);
 
 		//Place mark if we're close enough to the target distance
 		if (fabs(targetDistance - distanceElapsed) <= atTargetDistance)
@@ -342,9 +339,6 @@ void cheeseThoseStars()
 
 		wait1Msec(15);
 	}
-
-	setAllDriveMotors(0);
-	writeDebugStreamLine("target: %1.2f", targetDistance);
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

@@ -8,8 +8,24 @@ void runSkills()
   intakeAndLiftTask_liftState = LIFT_DOWN; //Put the lift down
   startTask(intakeAndLiftTask);
 
-  intakeAndLiftTask_intakeState = INTAKE_OPEN;
-  cheeseThoseStars();
+  intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
+  while(intakeAndLiftTask_intakeStateRead != INTAKE_OPEN) { wait1Msec(5); }
+
+  cheeseThoseStars(); //Get the two stars and preloads
+  dumpIntake(); //Score
+
+  moveToPoint(FENCE_RIGHT_X, FENCE_RIGHT_Y - 200); //Move a little forward
+  turnToAbsAngle(-90); //Face west
+
+  intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
+  while(intakeAndLiftTask_intakeStateRead != INTAKE_OPEN) { wait1Msec(5); }
+
+  moveToPoint(FENCE_LEFT_X - 200, FENCE_RIGHT_Y - 200); //Move to the end
+
+  intakeAndLiftTask_intakeState = INTAKE_CLOSED; //Close the intake
+  while(intakeAndLiftTask_intakeStateRead != INTAKE_CLOSED) { wait1Msec(5); }
+
+  dumpIntake(); //Score
 
   // driveStraight(-610); //Drive back off the tile
   // intakeAndLiftTask_intakeState = INTAKE_CLOSED; //Close the intake

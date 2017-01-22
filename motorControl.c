@@ -1,6 +1,9 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
+#define FENCE_RIGHT_X 3100
+#define FENCE_RIGHT_Y 1118
+
 void initSensors()
 {
 	SensorValue[leftQuad] = 0;
@@ -161,7 +164,7 @@ void scoreFence(const fenceTypes fence)
 			break;
 
 	  case FENCE_RIGHT:
-			moveToPoint(3100, 1118); //Center of right segment
+			moveToPoint(FENCE_RIGHT_X, FENCE_RIGHT_Y); //Center of right segment
 			turnToAbsAngle(180);
 			//knock the stars off
 			break;

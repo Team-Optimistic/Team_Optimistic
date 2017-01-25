@@ -50,7 +50,7 @@ task intakeAndLiftTask()
 
 			case INTAKE_CLOSED:
 				pos_PID_ChangeBias(&intakePID, -30);
-				pos_PID_SetTargetPosition(&intakePID, 2220);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_CLOSED_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 

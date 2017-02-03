@@ -69,73 +69,73 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 
 	long limit;
 	//If we hit something during the turn
-	if ((limit = doesTurnCollide(temp.theta)) != 0)
+	//if ((limit = doesTurnCollide(temp.theta)) != 0)
+	//{
+	//	//Turn as far as we can without hitting anything
+	//	#ifdef MOVETOPOINT_DEBUG
+	//		writeDebugStreamLine("movetopoint: turning to limit: %1.2f", limit);
+	//	#endif
+	//	turn(limit);
+
+	//	//Figure out how far we have to drive until we can turn the rest of the way
+	//	long mmToDrive = 0;
+
+	//	statePack sp;
+	//	BCI_lockSem(std_msgSem, "moveToPoint")
+	//	{
+	//		sp.x = std_msg[STD_MSG_EST_X];
+	//		sp.y = std_msg[STD_MSG_EST_Y];
+	//		sp.theta = std_msg[STD_MSG_EST_THETA];
+	//		BCI_unlockSem(std_msgSem, "moveToPoint")
+	//	}
+
+	//	while (true)
+	//	{
+	//		mmToDrive += 10; //Add 10 mm to drive distance
+	//		sp_Translate(&sp, 10, sp.theta); //Move 10 mm into the future
+
+	//		//Check if we still collide
+	//		if (!doesTurnCollideSP(&sp, computeAngleToPoint(x, y)))
+	//		{
+	//			//Break if we don't collide
+	//			break;
+	//		}
+	//	}
+
+	//	//Drive the calculated distance
+	//	#ifdef MOVETOPOINT_DEBUG
+	//		writeDebugStreamLine("movetopoint: driving to limit: %1.2f", mmToDrive);
+	//	#endif
+	//	driveStraight(mmToDrive);
+
+	//	//Turn the rest of the angle
+	//	#ifdef MOVETOPOINT_DEBUG
+	//		writeDebugStreamLine("movetopoint: turning to point: %1.2f", computeAngleToPoint(x, y));
+	//	#endif
+	//	turn(computeAngleToPoint(x, y));
+
+	//	//Drive to the point
+	//	#ifdef MOVETOPOINT_DEBUG
+	//		writeDebugStreamLine("movetopoint: driving to point: %1.2f", computeDistanceToPoint(x, y));
+	//	#endif
+	//	driveStraight(computeDistanceToPoint(x, y));
+	//}
+	////Else, we don't hit anything
+	//else
 	{
-		//Turn as far as we can without hitting anything
 		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("turning %1.2f", limit);
-		#endif
-		turn(limit);
-
-		//Figure out how far we have to drive until we can turn the rest of the way
-		long mmToDrive = 0;
-
-		statePack sp;
-		BCI_lockSem(std_msgSem, "moveToPoint")
-		{
-			sp.x = std_msg[STD_MSG_EST_X];
-			sp.y = std_msg[STD_MSG_EST_Y];
-			sp.theta = std_msg[STD_MSG_EST_THETA];
-			BCI_unlockSem(std_msgSem, "moveToPoint")
-		}
-
-		while (true)
-		{
-			mmToDrive += 10; //Add 10 mm to drive distance
-			sp_Translate(&sp, 10, sp.theta); //Move 10 mm into the future
-
-			//Check if we still collide
-			if (!doesTurnCollideSP(&sp, computeAngleToPoint(x, y)))
-			{
-				//Break if we don't collide
-				break;
-			}
-		}
-
-		//Drive the calculated distance
-		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("driving %1.2f", mmToDrive);
-		#endif
-		driveStraight(mmToDrive);
-
-		//Turn the rest of the angle
-		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("turning %1.2f", computeAngleToPoint(x, y));
-		#endif
-		turn(computeAngleToPoint(x, y));
-
-		//Drive to the point
-		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("driving %1.2f", computeDistanceToPoint(x, y));
-		#endif
-		driveStraight(computeDistanceToPoint(x, y));
-	}
-	//Else, we don't hit anything
-	else
-	{
-		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("turning %1.2f", temp.theta);
+			writeDebugStreamLine("movetopoint: turning all the way: %1.2f", temp.theta);
 		#endif
 		turn(temp.theta);
 
 		#ifdef MOVETOPOINT_DEBUG
-			writeDebugStreamLine("driving %1.2f", temp.length - offset);
+			writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);
 		#endif
 		driveStraight(temp.length - offset);
 	}
 
 	#ifdef MOVETOPOINT_DEBUG
-		writeDebugStreamLine("done");
+		writeDebugStreamLine("movetopoint: done");
 	#endif
 }
 

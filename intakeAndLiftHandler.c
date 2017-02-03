@@ -3,6 +3,8 @@
 
 #define INTAKE_OPEN_VAL   1020
 #define INTAKE_CLOSED_VAL 2220
+#define INTAKE_BANDWITH   100
+
 #define LIFT_UP_VAL       1350
 #define LIFT_DOWN_VAL     0
 
@@ -63,13 +65,13 @@ task intakeAndLiftTask()
 		}
 
 		//This is where the intake actually is
-		if (SensorValue[intakePot] <= INTAKE_OPEN_VAL + 5 &&
-			  SensorValue[intakePot] >= INTAKE_OPEN_VAL - 5)
+		if (SensorValue[intakePot] <= INTAKE_OPEN_VAL + INTAKE_BANDWITH &&
+			  SensorValue[intakePot] >= INTAKE_OPEN_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_OPEN;
 		}
-		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + 5 &&
-		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - 5)
+		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + INTAKE_BANDWITH &&
+		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - INTAKE_BANDWITH)
 	  {
 			intakeAndLiftTask_intakeStateRead = INTAKE_CLOSED;
 	  }

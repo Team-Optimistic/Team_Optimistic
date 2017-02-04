@@ -135,6 +135,11 @@ void initUART()
 		msgCount[i] = 0;
 	}
 
+	std_msg[STD_MSG_EST_X] = 0;
+	std_msg[STD_MSG_EST_Y] = 0;
+	std_msg[STD_MSG_EST_THETA] = 0;
+	std_msg[STD_MSG_LIDAR_RPM] = 250;
+
 	//Initialize semaphores
 	semaphoreInitialize(std_msgSem);
 	semaphoreInitialize(spc_msgSem);
@@ -313,10 +318,22 @@ Reads in a message
  */
 void uart_readMsg(long *msg, const unsigned int length)
 {
+	#ifdef UARTHANDLER_DEBUG_READ
+		writeDebugStream("uart: read: ");
+	#endif
+
 	for (unsigned int index = 0; index < length; index++)
 	{
 		BCI_UART_ReadNextData(msg[index], UART1);
+
+		#ifdef UARTHANDLER_DEBUG_READ
+			writeDebugStream("%d,", msg[index]);
+		#endif
 	}
+
+	#ifdef UARTHANDLER_DEBUG_READ
+		writeDebugStreamLine("");
+	#endif
 }
 
 /*
@@ -371,6 +388,10 @@ task readBuffer()
 						conv.b[2] = std_msg[STD_MSG_EST_Y + 2];
 						conv.b[3] = std_msg[STD_MSG_EST_Y + 3];
 						std_msg[STD_MSG_EST_Y] = conv.l;
+
+						#ifdef UARTHANDLER_DEBUG_READ
+							writeDebugStreamLine("decoded: %d, %d", std_msg[STD_MSG_EST_X], std_msg[STD_MSG_EST_Y]);
+						#endif
 
 						BCI_unlockSem(std_msgSem, "readBuffer")
 					}

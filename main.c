@@ -30,6 +30,7 @@
 #include "BCI\BCI.h"
 
 //#define UARTHANDLER_DEBUG
+#define UARTHANDLER_DEBUG_READ
 #define MOVETOPOINT_DEBUG
 #define POINTMATH_DEBUG
 

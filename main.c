@@ -30,6 +30,9 @@
 #include "BCI\BCI.h"
 
 //#define UARTHANDLER_DEBUG
+#define MOVETOPOINT_DEBUG
+#define POINTMATH_DEBUG
+
 #include "uartHandler.c"
 #include "pointMath.c"
 #include "basicMotorControl.c"

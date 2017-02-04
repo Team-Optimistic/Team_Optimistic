@@ -107,7 +107,7 @@ void driveStraight(const long distance)
 	}
 
 	setAllDriveMotors(0);
-	writeDebugStreamLine("target: %1.2f", targetDistance);
+	//writeDebugStreamLine("target: %1.2f", targetDistance);
 }
 
 #endif //DRIVINGFUNCTIONS_C_INCLUDED

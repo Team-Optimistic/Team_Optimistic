@@ -2,13 +2,7 @@
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  rightQuad,      sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  LED_Waiting,    sensorLEDtoVCC)
-#pragma config(Sensor, dgtl4,  LED_Driving,    sensorLEDtoVCC)
-#pragma config(Sensor, dgtl5,  LED_ManualControl, sensorLEDtoVCC)
 #pragma config(Sensor, dgtl6,  leftQuad,       sensorQuadEncoder)
-#pragma config(Sensor, dgtl8,  LED_Cube,       sensorLEDtoVCC)
-#pragma config(Sensor, dgtl9,  LED_Stars,      sensorLEDtoVCC)
-#pragma config(Sensor, dgtl10, LED_Fence,      sensorLEDtoVCC)
 #pragma config(Sensor, dgtl12, liftStopButton, sensorTouch)
 #pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           lidar,         tmotorVex393_HBridge, openLoop, reversed)
@@ -89,9 +83,6 @@ task main()
 			lcd_changeMessage(rpm, rpmString);
 		}
 
-		//sprintf(voltageString, "Main: %1.2fV", nImmediateBatteryLevel / 1000.0);
-		//changeMessage(voltage, voltageString);
-
 		//Runs skills
 		if (vexRT[JOY_BTN_LU])
 		{
@@ -99,50 +90,46 @@ task main()
 			waitForZero(vexRT[JOY_BTN_LU]);
 		}
 
-		////Switch between driver control and autonomous
-		//if (vexRT[JOY_BTN_RL])
-		//{
-		//	isUserControlled = !isUserControlled;
-		//	waitForZero(vexRT[JOY_BTN_RL]);
-		//}
+		//Switch between driver control and autonomous
+		if (vexRT[JOY_BTN_RL])
+		{
+			isUserControlled = !isUserControlled;
+			waitForZero(vexRT[JOY_BTN_RL]);
+		}
 
-		//if (isUserControlled)
-		//{
-		//	SensorValue[LED_ManualControl] = LED_ON;
+		if (isUserControlled)
+		{
+			leftVal = vexRT[JOY_JOY_LV];
+			rightVal = vexRT[JOY_JOY_RV];
+			leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
+			rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
 
-		//	leftVal = vexRT[JOY_JOY_LV];
-		//	rightVal = vexRT[JOY_JOY_RV];
-		//	leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
-		//	rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
+			setLeftMotors(leftVal);
+			setRightMotors(rightVal);
 
-		//	setLeftMotors(leftVal);
-		//	setRightMotors(rightVal);
+			setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
+			setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+		}
+		else
+		{
+			if (isUserControlled != isUserControlled_last)
+			{
+				startTask(commandRobot);
+			}
+		}
 
-		//	setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-		//	setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
-		//}
-		//else
-		//{
-		//	SensorValue[LED_ManualControl] = LED_OFF;
+		isUserControlled_last = isUserControlled;
 
-		//	if (isUserControlled != isUserControlled_last)
-		//	{
-		//		startTask(commandRobot);
-		//	}
-		//}
-
-		//isUserControlled_last = isUserControlled;
-
-		//if (vexRT[JOY_BTN_RU])
-		//{
-		//	motor[lidar] += 1;
-		//	waitForZero(vexRT[JOY_BTN_RU]);
-		//}
-		//else if (vexRT[JOY_BTN_RD])
-		//{
-		//	motor[lidar] -= 1;
-		//	waitForZero(vexRT[JOY_BTN_RD]);
-		//}
+		if (vexRT[JOY_BTN_RU])
+		{
+			motor[lidar] += 1;
+			waitForZero(vexRT[JOY_BTN_RU]);
+		}
+		else if (vexRT[JOY_BTN_RD])
+		{
+			motor[lidar] -= 1;
+			waitForZero(vexRT[JOY_BTN_RD]);
+		}
 
 		//Task wait
 		wait1Msec(15);

@@ -45,6 +45,12 @@
 #include "decisionHandler.c"
 #include "skills.c"
 
+task testDrive()
+{
+	wait1Msec(500);
+	driveStraight(200);
+}
+
 task main()
 {
 	clearDebugStream();
@@ -67,6 +73,8 @@ task main()
 
 	bool isUserControlled = false, isUserControlled_last = true;
 	int leftVal, rightVal;
+
+	startTask(testDrive);
 
 	while (true)
 	{

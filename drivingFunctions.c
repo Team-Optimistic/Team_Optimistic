@@ -75,8 +75,6 @@ void driveStraight(const long distance)
 
 		//Get output from both PID's
 		distOutput = pos_PID_StepController(&distancePID);
-		distOutput = distOutput > 100 ? 100 : distOutput;
-		distOutput = distOutput < -100 ? -100 : distOutput;
 		angleOutput = pos_PID_StepController(&anglePID);
 
 		//Set motors to distance PID output with correction from angle PID

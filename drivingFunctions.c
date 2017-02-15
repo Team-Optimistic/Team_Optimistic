@@ -15,7 +15,7 @@ void driveStraight(const long distance)
 	float lastDistance = 0;
 
   //Conversion between encoder degrees and base_link mm
-  const float conv = 1.311250;
+  const float conv = 1.345;
 
 	//Target distance for the distance PID controller
 	//Angle PID controller's target is 0
@@ -25,8 +25,8 @@ void driveStraight(const long distance)
 
 	if (distance <= 800)
 	{
-		pos_PID_InitController(&distancePID, &distanceElapsed, 0.2, 0.2, 0.1);
-		//pos_PID_InitController(&distancePID, &distanceElapsed, 1.4*0.33, 0.5/2, 0.5/3);
+		//pos_PID_InitController(&distancePID, &distanceElapsed, 0.2, 0.2, 0.1);
+		pos_PID_InitController(&distancePID, &distanceElapsed, 0.4, 0.25, 0.167);
 		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
 	}
 	else

@@ -48,11 +48,7 @@
 task testDrive()
 {
 	wait1Msec(500);
-	driveStraight(500);
-	turn(90);
-	driveStraight(300);
-	turn(-45);
-	driveStraight(200);
+	driveStraight(2434/4);
 }
 
 task testLift()
@@ -91,7 +87,7 @@ task main()
 	bool isUserControlled = false, isUserControlled_last = true;
 	int leftVal, rightVal;
 
-	//startTask(testDrive);
+	startTask(testDrive);
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
 

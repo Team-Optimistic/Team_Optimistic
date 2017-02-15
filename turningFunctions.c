@@ -22,7 +22,7 @@ void turn(const long angle)
 	pos_PID anglePID;
 	if (fabs(angle) <= 350)
 	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.12);
+		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.1);
 	}
 	else
 	{

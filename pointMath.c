@@ -1,6 +1,12 @@
 #ifndef POINTMATH_C_INCLUDED
 #define POINTMATH_C_INCLUDED
 
+#define ONE_TILE_MM   610
+#define TWO_TILE_MM   1219
+#define THREE_TILE_MM 1829
+#define FOUR_TILE_MM  2438
+#define FIVE_TILE_MM  3048
+
 typedef struct distanceAndAngle_t
 {
 	float length;
@@ -69,7 +75,7 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 		#ifdef POINTMATH_DEBUG
 			writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
 		#endif
-		
+
 		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 		out->length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 

@@ -87,9 +87,11 @@ task main()
 	bool isUserControlled = false, isUserControlled_last = true;
 	int leftVal, rightVal;
 
-	startTask(testDrive);
+	//startTask(testDrive);
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
+	wait1Msec(6000);
+	runSkills();
 
 	while (true)
 	{

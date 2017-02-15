@@ -4,17 +4,44 @@
 void runSkills()
 {
   //Close claw and drive back
-	writeDebugStreamLine("close claw and drive back");
   intakeAndLiftTask_intakeState = INTAKE_REST; //Let the intake chill
   intakeAndLiftTask_liftState = LIFT_DOWN; //Put the lift down
   startTask(intakeAndLiftTask);
 
-  writeDebugStreamLine("open the intake");
+  //Drive back a tile and open the intake
+  driveStraight(-ONE_TILE_MM);
   intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
   while(intakeAndLiftTask_intakeStateRead != INTAKE_OPEN) { wait1Msec(5); }
 
-  writeDebugStreamLine("drive to 100,0");
-  moveToPoint(FENCE_LEFT_X, FENCE_RIGHT_Y);
+  //Wait for match loads
+  wait1Msec(1000);
+
+  //Close the intake
+  intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+  wait1Msec(500);
+
+  //Drive back and lift to hold stars
+  intakeAndLiftTask_liftState = LIFT_UP;
+  wait1Msec(250);
+  driveStraight(-ONE_TILE_MM*0.8);
+  wait1Msec(500);
+
+  //Lift up
+  while(intakeAndLiftTask_liftStateRead != LIFT_UP){ wait1Msec(5); }
+
+  //Open intake and lower lift
+  intakeAndLiftTask_intakeState = INTAKE_OPEN;
+  wait1Msec(100);
+  intakeAndLiftTask_liftState = LIFT_DOWN;
+
+  //Turn to score star
+  while(intakeAndLiftTask_liftStateRead != LIFT_DOWN){wait1Msec(5);}
+  turn(-90);
+  wait1Msec(125);
+  turn(90);
+
+  //writeDebugStreamLine("drive to 100,0");
+  //moveToPoint(FENCE_LEFT_X, FENCE_RIGHT_Y);
 
   //cheeseThoseStars(); //Get the two stars and preloads
   //dumpIntake(); //Score

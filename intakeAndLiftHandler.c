@@ -2,12 +2,13 @@
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
 #define INTAKE_OPEN_VAL   1020
-#define INTAKE_CLOSED_VAL 2220
+#define INTAKE_CLOSED_VAL 2400
 #define INTAKE_BANDWITH   100
 
 #define LIFT_UP_VAL       1350
 #define LIFT_DOWN_VAL     0
 #define LIFT_FENCE_VAL    1540
+#define LIFT_BANDWITH     30
 
 enum intakeState
 {
@@ -42,7 +43,7 @@ task intakeAndLiftTask()
 	float imeCountWithOffset = 0;
 	pos_PID intakePID, liftPID;
 
-	pos_PID_InitController(&intakePID, intakePot, 0.2, 0.1, 0, 0);
+	pos_PID_InitController(&intakePID, intakePot, 0.15, 0.2, 0, 0);
 	pos_PID_InitController(&liftPID, &imeCountWithOffset, 0.3, 0.2, 0.1, -10);
 
 	while (true)
@@ -123,18 +124,18 @@ task intakeAndLiftTask()
 				break;
 		}
 
-		wait1Msec(15);
-	}
+		//This is where the lift actually is
+		if (imeCountWithOffset <= LIFT_UP_VAL + LIFT_BANDWITH &&
+		    imeCountWithOffset >= LIFT_UP_VAL - LIFT_BANDWITH)
+		{
+			intakeAndLiftTask_liftStateRead = LIFT_UP;
+		}
+		else if (imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
+		{
+			intakeAndLiftTask_liftStateRead = LIFT_DOWN;
+		}
 
-	//This is where the lift actually is
-	if (nMotorEncoder[liftRI] <= LIFT_UP_VAL + 10 &&
-	    nMotorEncoder[liftRI] >= LIFT_UP_VAL - 10)
-	{
-		intakeAndLiftTask_liftStateRead = LIFT_UP;
-	}
-	else if (nMotorEncoder[liftRI] <= LIFT_DOWN_VAL + 5)
-	{
-		intakeAndLiftTask_liftStateRead = LIFT_DOWN;
+		wait1Msec(15);
 	}
 }
 

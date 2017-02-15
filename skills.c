@@ -45,6 +45,8 @@ void runSkills()
   //Close intake a raise lift so we can turn and not hit stars
   intakeAndLiftTask_intakeState = INTAKE_CLOSED;
   waitForIntake(INTAKE_CLOSED);
+  intakeAndLiftTask_liftState = LIFT_HALF;
+  waitForLift(LIFT_HALF);
 
   //Turn to be parallel to fence
   turn(90);

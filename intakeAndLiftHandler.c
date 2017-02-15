@@ -7,6 +7,7 @@
 #define INTAKE_BANDWITH   100
 
 #define LIFT_UP_VAL       1350
+#define LIFT_HALF_VAL     500
 #define LIFT_DOWN_VAL     0
 #define LIFT_FENCE_VAL    1540
 #define LIFT_BANDWITH     30
@@ -26,6 +27,7 @@ enum intakeState
 enum liftState
 {
 	LIFT_UP,
+	LIFT_HALF,
 	LIFT_DOWN,
 	LIFT_FENCE,
 	LIFT_REST,
@@ -114,6 +116,11 @@ task intakeAndLiftTask()
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
+			case LIFT_HALF_VAL:
+				pos_PID_SetTargetPosition(&liftPID, LIFT_HALF_VAL);
+				setLiftMotors(pos_PID_StepController(&liftPID));
+				break;
+
 			case LIFT_DOWN:
 				if (!SensorValue[liftStopButton])
 				{
@@ -127,7 +134,6 @@ task intakeAndLiftTask()
 				break;
 
 			case LIFT_FENCE:
-				//liftPID.kD = 0.25;
 				pos_PID_SetTargetPosition(&liftPID, LIFT_FENCE_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;

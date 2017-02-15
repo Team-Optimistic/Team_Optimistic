@@ -2,6 +2,7 @@
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
 #define INTAKE_OPEN_VAL   1020
+#define INTAKE_HALF_VAL   2000
 #define INTAKE_CLOSED_VAL 2400
 #define INTAKE_BANDWITH   100
 
@@ -10,9 +11,13 @@
 #define LIFT_FENCE_VAL    1540
 #define LIFT_BANDWITH     30
 
+#define waitForIntake(val) while(intakeAndLiftTask_intakeStateRead != val){wait1Msec(5);}
+#define waitForLift(val) while(intakeAndLiftTask_liftStateRead != val){wait1Msec(5);}
+
 enum intakeState
 {
 	INTAKE_OPEN,
+	INTAKE_HALF,
 	INTAKE_CLOSED,
 	INTAKE_REST,
 	INTAKE_WAIT
@@ -56,6 +61,12 @@ task intakeAndLiftTask()
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
+			case INTAKE_HALF:
+				pos_PID_ChangeBias(&intakePID, 0);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_HALF_VAL);
+				setIntakeMotors(pos_PID_StepController(&intakePID));
+				break;
+
 			case INTAKE_CLOSED:
 				pos_PID_ChangeBias(&intakePID, -30);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_CLOSED_VAL);
@@ -75,6 +86,11 @@ task intakeAndLiftTask()
 			  SensorValue[intakePot] >= INTAKE_OPEN_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_OPEN;
+		}
+		else if (SensorValue[intakePot] <= INTAKE_HALF_VAL + INTAKE_BANDWITH &&
+			  		 SensorValue[intakePot] >= INTAKE_HALF_VAL - INTAKE_BANDWITH)
+		{
+			intakeAndLiftTask_intakeStateRead = INTAKE_HALF;
 		}
 		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + INTAKE_BANDWITH &&
 		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - INTAKE_BANDWITH)

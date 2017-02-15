@@ -11,7 +11,7 @@ void runSkills()
   //Drive back a tile and open the intake
   driveStraight(-ONE_TILE_MM);
   intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
-  while(intakeAndLiftTask_intakeStateRead != INTAKE_OPEN) { wait1Msec(5); }
+  waitForIntake(INTAKE_OPEN);
 
   //Wait for match loads
   wait1Msec(1000);
@@ -27,49 +27,51 @@ void runSkills()
   wait1Msec(500);
 
   //Lift up
-  while(intakeAndLiftTask_liftStateRead != LIFT_UP){ wait1Msec(5); }
+  waitForLift(LIFT_UP);
 
-  //Open intake and lower lift
+  //Dump stars and lower lift
   intakeAndLiftTask_intakeState = INTAKE_OPEN;
   wait1Msec(100);
   intakeAndLiftTask_liftState = LIFT_DOWN;
 
   //Turn to score star
-  while(intakeAndLiftTask_liftStateRead != LIFT_DOWN){wait1Msec(5);}
+  waitForLift(LIFT_DOWN);
   turn(-90);
+
+  //Turn back
   wait1Msec(125);
   turn(90);
 
-  //writeDebugStreamLine("drive to 100,0");
-  //moveToPoint(FENCE_LEFT_X, FENCE_RIGHT_Y);
+  //Close intake a raise lift so we can turn and not hit stars
+  intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+  waitForIntake(INTAKE_CLOSED);
 
-  //cheeseThoseStars(); //Get the two stars and preloads
-  //dumpIntake(); //Score
+  //Turn to be parallel to fence
+  turn(90);
 
-  //moveToPoint(FENCE_RIGHT_X, FENCE_RIGHT_Y - 200); //Move a little forward
-  //turnToAbsAngle(-90); //Face west
+  //Open intake halfway and lower lift
+  intakeAndLiftTask_intakeState = INTAKE_HALF;
+  waitForIntake(INTAKE_HALF);
+  intakeAndLiftTask_liftState = LIFT_DOWN;
+  waitForLift(LIFT_DOWN);
 
-  //intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
-  //while(intakeAndLiftTask_intakeStateRead != INTAKE_OPEN) { wait1Msec(5); }
+  //Drive to get 4 stars
+  driveStraight(THREE_TILE_MM);
 
-  //moveToPoint(FENCE_LEFT_X - 200, FENCE_RIGHT_Y - 200); //Move to the end
+  //Close intake and lift
+  intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+  waitForIntake(INTAKE_CLOSED);
+  intakeAndLiftTask_liftState = LIFT_UP;
 
-  //intakeAndLiftTask_intakeState = INTAKE_CLOSED; //Close the intake
-  //while(intakeAndLiftTask_intakeStateRead != INTAKE_CLOSED) { wait1Msec(5); }
+  //Drive back a bit and turn
+  driveStraight(-ONE_TILE_MM / 2);
+  turn(-90);
 
-  //dumpIntake(); //Score
-
-  // driveStraight(-610); //Drive back off the tile
-  // intakeAndLiftTask_intakeState = INTAKE_CLOSED; //Close the intake
-  //
-  // //Wait until intake is closed
-  // while (intakeAndLiftTask_intakeStateRead != INTAKE_CLOSED) { wait1Msec(5); }
-  //
-  // dumpIntake(); //Score what we picked up from the starting tile
-  //
-  // scoreFence(FENCE_RIGHT); //Knock the stars off the rightmost fence segment
-  //
-  // moveToPoint();
+  //Dump stars and lower lift
+  waitForLift(LIFT_UP);
+  intakeAndLiftTask_intakeState = INTAKE_OPEN;
+  wait1Msec(100);
+  intakeAndLiftTask_liftState = LIFT_DOWN;
 }
 
 #endif //SKILLS_C_INCLUDED

@@ -26,12 +26,13 @@ void driveStraight(const long distance)
 	if (distance <= 800)
 	{
 		pos_PID_InitController(&distancePID, &distanceElapsed, 0.2, 0.2, 0.1);
+		//pos_PID_InitController(&distancePID, &distanceElapsed, 1.4*0.33, 0.5/2, 0.5/3);
 		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.25, 0);
 	}
 	else
 	{
 		pos_PID_InitController(&distancePID, &distanceElapsed, 0.3, 0.2, 0.2);
-		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.5, 0);
+		pos_PID_InitController(&anglePID, &angleChange, 0.5, 0.7, 0);
 	}
 
 	pos_PID_SetTargetPosition(&distancePID, targetDistance);
@@ -74,6 +75,8 @@ void driveStraight(const long distance)
 
 		//Get output from both PID's
 		distOutput = pos_PID_StepController(&distancePID);
+		distOutput = distOutput > 100 ? 100 : distOutput;
+		distOutput = distOutput < -100 ? -100 : distOutput;
 		angleOutput = pos_PID_StepController(&anglePID);
 
 		//Set motors to distance PID output with correction from angle PID

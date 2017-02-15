@@ -48,7 +48,24 @@
 task testDrive()
 {
 	wait1Msec(500);
+	driveStraight(500);
+	turn(90);
+	driveStraight(300);
+	turn(-45);
 	driveStraight(200);
+}
+
+task testLift()
+{
+	wait1Msec(1000);
+	startTask(intakeAndLiftTask);
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	intakeAndLiftTask_liftState = LIFT_FENCE;
+	wait1Msec(3000);
+	intakeAndLiftTask_liftState = LIFT_DOWN;
+	while(intakeAndLiftTask_liftStateRead != LIFT_DOWN) { wait1Msec(5); }
+	wait1Msec(500);
+	intakeAndLiftTask_liftState = LIFT_UP;
 }
 
 task main()
@@ -74,7 +91,9 @@ task main()
 	bool isUserControlled = false, isUserControlled_last = true;
 	int leftVal, rightVal;
 
-	startTask(testDrive);
+	//startTask(testDrive);
+	//startTask(testLift);
+	//startTask(intakeAndLiftTask);
 
 	while (true)
 	{

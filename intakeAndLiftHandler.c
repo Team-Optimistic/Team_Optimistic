@@ -7,6 +7,7 @@
 
 #define LIFT_UP_VAL       1350
 #define LIFT_DOWN_VAL     0
+#define LIFT_FENCE_VAL    1540
 
 enum intakeState
 {
@@ -20,6 +21,7 @@ enum liftState
 {
 	LIFT_UP,
 	LIFT_DOWN,
+	LIFT_FENCE,
 	LIFT_REST,
 	LIFT_WAIT
 };
@@ -30,15 +32,18 @@ intakeState intakeAndLiftTask_intakeStateRead = INTAKE_REST;
 intakeState intakeAndLiftTask_liftState = LIFT_REST;
 intakeState intakeAndLiftTask_liftStateRead = LIFT_REST;
 
+long intakeAndLiftTask_imeOffset = 0;
+
 /**
  * Maintains different states for the intake and lift
  */
 task intakeAndLiftTask()
 {
+	float imeCountWithOffset = 0;
 	pos_PID intakePID, liftPID;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.2, 0.1, 0, 0);
-	pos_PID_InitController(&liftPID, liftRI, 0.3, 0.2, 0.04, -10);
+	pos_PID_InitController(&liftPID, &imeCountWithOffset, 0.3, 0.2, 0.1, -10);
 
 	while (true)
 	{
@@ -76,20 +81,37 @@ task intakeAndLiftTask()
 			intakeAndLiftTask_intakeStateRead = INTAKE_CLOSED;
 	  }
 
+	 	//Reset offset if we hit the bottom
 		if (SensorValue[liftStopButton])
 		{
-			nMotorEncoder[liftRI] = 0;
+			intakeAndLiftTask_imeOffset = nMotorEncoder[liftRI];
 		}
+
+		//Update count with offset
+		imeCountWithOffset = nMotorEncoder[liftRI] - intakeAndLiftTask_imeOffset;
 
 		switch (intakeAndLiftTask_liftState)
 		{
 			case LIFT_UP:
-				pos_PID_SetTargetPosition(&liftPID, LIFT_UP_VAL); //Up position
+				pos_PID_SetTargetPosition(&liftPID, LIFT_UP_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
 			case LIFT_DOWN:
-				pos_PID_SetTargetPosition(&liftPID, LIFT_DOWN_VAL);
+				if (!SensorValue[liftStopButton])
+				{
+					setLiftMotors(-100);
+				}
+				else
+				{
+					pos_PID_SetTargetPosition(&liftPID, LIFT_DOWN_VAL);
+					setLiftMotors(pos_PID_StepController(&liftPID));
+				}
+				break;
+
+			case LIFT_FENCE:
+				//liftPID.kD = 0.25;
+				pos_PID_SetTargetPosition(&liftPID, LIFT_FENCE_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
@@ -105,13 +127,12 @@ task intakeAndLiftTask()
 	}
 
 	//This is where the lift actually is
-	if (nMotorEncoder[liftRI] <= LIFT_UP_VAL + 5 &&
-	    nMotorEncoder[liftRI] >= LIFT_UP_VAL - 5)
+	if (nMotorEncoder[liftRI] <= LIFT_UP_VAL + 10 &&
+	    nMotorEncoder[liftRI] >= LIFT_UP_VAL - 10)
 	{
 		intakeAndLiftTask_liftStateRead = LIFT_UP;
 	}
-	else if (nMotorEncoder[liftRI] <= LIFT_DOWN_VAL + 5 &&
-	         nMotorEncoder[liftRI] >= LIFT_DOWN_VAL - 5)
+	else if (nMotorEncoder[liftRI] <= LIFT_DOWN_VAL + 5)
 	{
 		intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 	}

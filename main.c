@@ -3,6 +3,7 @@
 #pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  rightQuad,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl6,  leftQuad,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl11, skillsBtn,      sensorTouch)
 #pragma config(Sensor, dgtl12, liftStopButton, sensorTouch)
 #pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           lidar,         tmotorVex393_HBridge, openLoop, reversed)
@@ -90,13 +91,17 @@ task main()
 	//startTask(testDrive);
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
-	wait1Msec(6000);
-	runSkills();
 
 	while (true)
 	{
 		//Send data to pi
 		sendSTDMsg();
+
+		if (SensorValue[skillsBtn])
+		{
+			wait1Msec(5000);
+			runSkills();
+		}
 
 		if (timer_Repeat(&lcdTimer, 250))
 		{

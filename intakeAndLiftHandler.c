@@ -70,9 +70,16 @@ task intakeAndLiftTask()
 				break;
 
 			case INTAKE_CLOSED:
-				pos_PID_ChangeBias(&intakePID, -30);
-				pos_PID_SetTargetPosition(&intakePID, INTAKE_CLOSED_VAL);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
+				if (SensorValue[intakePot] >= 2320)
+				{
+					setIntakeMotors(0);
+				}
+				else
+				{
+					pos_PID_ChangeBias(&intakePID, -30);
+					pos_PID_SetTargetPosition(&intakePID, INTAKE_CLOSED_VAL);
+					setIntakeMotors(pos_PID_StepController(&intakePID));
+				}
 				break;
 
 			case INTAKE_REST:

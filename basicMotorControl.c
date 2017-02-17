@@ -15,8 +15,10 @@ void setRightMotors(const int powerValue)
 
 void setAllDriveMotors(const int power)
 {
-	setLeftMotors(power);
-	setRightMotors(power);
+	motor[driveLFY] = power;
+	motor[driveLB] = power;
+	motor[driveRFY] = power;
+	motor[driveRB] = power;
 }
 
 void setIntakeMotors(const int power)

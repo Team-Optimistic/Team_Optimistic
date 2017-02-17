@@ -58,6 +58,7 @@ void runSkills()
   waitForLift(LIFT_DOWN);
 
   //Drive to get 4 stars
+  intakeAndLiftTask_intakeState = INTAKE_QUARTER;
   driveStraight(THREE_TILE_MM);
 
   //Close intake and lift

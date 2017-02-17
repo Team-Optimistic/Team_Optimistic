@@ -1,10 +1,11 @@
 #ifndef INTAKEANDLIFTHANDLER_C_INCLUDED
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
-#define INTAKE_OPEN_VAL   1020
-#define INTAKE_HALF_VAL   2000
-#define INTAKE_CLOSED_VAL 2400
-#define INTAKE_BANDWITH   100
+#define INTAKE_OPEN_VAL    1020
+#define INTAKE_HALF_VAL    2000
+#define INTAKE_QUARTER_VAL 2200
+#define INTAKE_CLOSED_VAL  2400
+#define INTAKE_BANDWITH    100
 
 #define LIFT_UP_VAL       1350
 #define LIFT_HALF_VAL     300
@@ -19,6 +20,7 @@ enum intakeState
 {
 	INTAKE_OPEN,
 	INTAKE_HALF,
+	INTAKE_QUARTER,
 	INTAKE_CLOSED,
 	INTAKE_REST,
 	INTAKE_WAIT
@@ -71,6 +73,12 @@ task intakeAndLiftTask()
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
+			case INTAKE_QUARTER:
+				pos_PID_ChangeBias(&intakePID, 0);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_QUARTER_VAL);
+				setIntakeMotors(pos_PID_StepController(&intakePID));
+				break;
+
 			case INTAKE_CLOSED:
 				if (SensorValue[intakePot] >= 2320)
 				{
@@ -102,6 +110,11 @@ task intakeAndLiftTask()
 			  		 SensorValue[intakePot] >= INTAKE_HALF_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_HALF;
+		}
+		else if (SensorValue[intakePot] <= INTAKE_QUARTER_VAL + INTAKE_BANDWITH &&
+			  		 SensorValue[intakePot] >= INTAKE_QUARTER_VAL - INTAKE_BANDWITH)
+		{
+			intakeAndLiftTask_intakeStateRead = INTAKE_QUARTER;
 		}
 		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + INTAKE_BANDWITH &&
 		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - INTAKE_BANDWITH)

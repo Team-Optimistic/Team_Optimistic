@@ -7,7 +7,7 @@
 #define INTAKE_BANDWITH   100
 
 #define LIFT_UP_VAL       1350
-#define LIFT_HALF_VAL     500
+#define LIFT_HALF_VAL     300
 #define LIFT_DOWN_VAL     0
 #define LIFT_FENCE_VAL    1540
 #define LIFT_BANDWITH     30
@@ -48,6 +48,8 @@ long intakeAndLiftTask_imeOffset = 0;
 task intakeAndLiftTask()
 {
 	float imeCountWithOffset = 0;
+	bool liftHasGoneDownBefore = false;
+
 	pos_PID intakePID, liftPID;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.15, 0.2, 0, 0);
@@ -111,6 +113,7 @@ task intakeAndLiftTask()
 		if (SensorValue[liftStopButton])
 		{
 			intakeAndLiftTask_imeOffset = nMotorEncoder[liftRI];
+			liftHasGoneDownBefore = true;
 		}
 
 		//Update count with offset
@@ -123,7 +126,7 @@ task intakeAndLiftTask()
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
-			case LIFT_HALF_VAL:
+			case LIFT_HALF:
 				pos_PID_SetTargetPosition(&liftPID, LIFT_HALF_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
@@ -159,7 +162,12 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_UP;
 		}
-		else if (imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
+		else if (imeCountWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
+			       imeCountWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)
+     {
+       intakeAndLiftTask_liftStateRead = LIFT_HALF;
+     }
+		else if (liftHasGoneDownBefore && imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 		}

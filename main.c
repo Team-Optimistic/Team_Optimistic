@@ -3,6 +3,7 @@
 #pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  rightQuad,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl6,  leftQuad,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl10, stopBtn,        sensorTouch)
 #pragma config(Sensor, dgtl11, skillsBtn,      sensorTouch)
 #pragma config(Sensor, dgtl12, liftStopButton, sensorTouch)
 #pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
@@ -65,8 +66,27 @@ task testLift()
 	intakeAndLiftTask_liftState = LIFT_UP;
 }
 
+task monitorStop()
+{
+	while (true)
+	{
+		if (SensorValue[stopBtn])
+		{
+			stopAllTasks();
+			for (int i = 0; i < 10; i++)
+			{
+				motor[i] = 0;
+			}
+		}
+
+		EndTimeSlice();
+	}
+}
+
 task main()
 {
+	startTask(monitorStop);
+
 	clearDebugStream();
 
 	motor[lidar] = 80; //64 at 7.51V, 48 at 8.27V
@@ -115,13 +135,6 @@ task main()
 
 			sprintf(rpmString, "RPM: %d, M: %d", lidarRPM, motor[lidar]);
 			lcd_changeMessage(rpm, rpmString);
-		}
-
-		//Runs skills
-		if (vexRT[JOY_BTN_LU])
-		{
-			runSkills();
-			waitForZero(vexRT[JOY_BTN_LU]);
 		}
 
 		//Switch between driver control and autonomous

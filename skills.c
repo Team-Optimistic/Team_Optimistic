@@ -42,8 +42,11 @@ void runSkills()
   wait1Msec(125);
   turn(90);
 
+  //Drive forward a bit to avoid hitting the fence base
+  driveStraight(100);
+
   //Close intake a raise lift so we can turn and not hit stars
-  intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+  intakeAndLiftTask_intakeState = INTAKE_HALF;
   intakeAndLiftTask_liftState = LIFT_HALF;
   waitForLift(LIFT_HALF);
 
@@ -51,8 +54,6 @@ void runSkills()
   turn(90);
 
   //Open intake halfway and lower lift
-  intakeAndLiftTask_intakeState = INTAKE_HALF;
-  waitForIntake(INTAKE_HALF);
   intakeAndLiftTask_liftState = LIFT_DOWN;
   waitForLift(LIFT_DOWN);
 

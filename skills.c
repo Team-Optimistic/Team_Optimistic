@@ -37,44 +37,25 @@ void runSkills()
   //Turn to score star
   waitForLift(LIFT_DOWN);
   turn(-90);
-
-  //Turn back
-  wait1Msec(125);
   turn(90);
 
-  //Drive forward a bit to avoid hitting the fence base
-  driveStraight(100);
+  //Drive forward a bit to align with the cube
+  driveStraight((ONE_TILE_MM*0.8));
 
-  //Close intake a raise lift so we can turn and not hit stars
-  intakeAndLiftTask_intakeState = INTAKE_HALF;
-  intakeAndLiftTask_liftState = LIFT_HALF;
-  waitForLift(LIFT_HALF);
+  //Open intake far to avoid cube
+  intakeAndLiftTask_intakeState = INTAKE_POPEN;
 
-  //Turn to be parallel to fence
+  //Turn to face cube
   turn(90);
 
-  //Open intake halfway and lower lift
-  intakeAndLiftTask_liftState = LIFT_DOWN;
-  waitForLift(LIFT_DOWN);
-
-  //Drive to get 4 stars
+  //Lightly close intake around cube
   intakeAndLiftTask_intakeState = INTAKE_QUARTER;
-  driveStraight(THREE_TILE_MM);
+  waitForIntake(INTAKE_QUARTER);
 
-  //Close intake and lift
-  intakeAndLiftTask_intakeState = INTAKE_CLOSED;
-  waitForIntake(INTAKE_CLOSED);
-  intakeAndLiftTask_liftState = LIFT_UP;
+  //Drive forward a bit to be in the middle of the middle fence segment
+  driveStraight(ONE_TILE_MM * 1.5);
 
-  //Drive back a bit and turn
-  driveStraight(-ONE_TILE_MM / 2);
-  turn(-90);
-
-  //Dump stars and lower lift
-  waitForLift(LIFT_UP);
-  intakeAndLiftTask_intakeState = INTAKE_OPEN;
-  wait1Msec(100);
-  intakeAndLiftTask_liftState = LIFT_DOWN;
+  //Turn and score cube
 }
 
 #endif //SKILLS_C_INCLUDED

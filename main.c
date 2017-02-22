@@ -122,18 +122,17 @@ task main()
 			wait1Msec(5000);
 			runSkills();
 
-			//intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+			//intakeAndLiftTask_intakeState = INTAKE_ACUBE;
 			//intakeAndLiftTask_liftState = LIFT_DOWN;
 			//startTask(intakeAndLiftTask);
-			//waitForLift(LIFT_DOWN);
+			//waitForIntake(INTAKE_ACUBE);
+			//driveStraight(ONE_TILE_MM);
+			//intakeAndLiftTask_intakeState = INTAKE_CUBE;
+			//wait1Msec(250);
 			//intakeAndLiftTask_liftState = LIFT_UP;
-			//waitForLift(LIFT_UP);
-			////intakeAndLiftTask_liftState = LIFT_DOWN;
-			//intakeAndLiftTask_intakeState = INTAKE_OPEN;
 			//while (true)
 			//{
-			//	writeDebugStreamLine("%d",nMotorEncoder[liftRI]-intakeAndLiftTask_imeOffset);
-			//	wait1Msec(250);
+			//	EndTimeSlice();
 			//}
 		}
 

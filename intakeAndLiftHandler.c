@@ -1,17 +1,20 @@
 #ifndef INTAKEANDLIFTHANDLER_C_INCLUDED
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
-#define INTAKE_POPEN_VAL   500
-#define INTAKE_OPEN_VAL    1020
 #define INTAKE_HALF_VAL    2000
+#define INTAKE_CUBE_VAL    2150
 #define INTAKE_QUARTER_VAL 2100
 #define INTAKE_CLOSED_VAL  2400
-#define INTAKE_BANDWITH    100
+#define INTAKE_ACUBE_VAL   1750
+#define INTAKE_OPEN_VAL    1020
+#define INTAKE_POPEN_VAL   800
 
-#define LIFT_UP_VAL       1250
-#define LIFT_HALF_VAL     300
-#define LIFT_DOWN_VAL     0
-#define LIFT_FENCE_VAL    1540
+#define LIFT_FENCE_VAL     1540
+#define LIFT_UP_VAL        1225
+#define LIFT_HALF_VAL      300
+#define LIFT_DOWN_VAL      0
+
+#define INTAKE_BANDWITH    100
 #define LIFT_BANDWITH     30
 
 #define waitForIntake(val) while(intakeAndLiftTask_intakeStateRead != val){wait1Msec(5);}
@@ -19,8 +22,10 @@
 
 enum intakeState
 {
-	INTAKE_POPEN,
+	INTAKE_CUBE,
+	INTAKE_ACUBE,
 	INTAKE_OPEN,
+	INTAKE_POPEN,
 	INTAKE_HALF,
 	INTAKE_QUARTER,
 	INTAKE_CLOSED,
@@ -63,15 +68,27 @@ task intakeAndLiftTask()
 	{
 		switch (intakeAndLiftTask_intakeState)
 		{
-			case INTAKE_POPEN:
+			case INTAKE_CUBE:
 				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, INTAKE_POPEN_VAL);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_CUBE_VAL);
+				setIntakeMotors(pos_PID_StepController(&intakePID));
+				break;
+
+			case INTAKE_ACUBE:
+				pos_PID_ChangeBias(&intakePID, 0);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_ACUBE_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_OPEN:
 				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_OPEN_VAL);
+				setIntakeMotors(pos_PID_StepController(&intakePID));
+				break;
+
+			case INTAKE_POPEN:
+				pos_PID_ChangeBias(&intakePID, 0);
+				pos_PID_SetTargetPosition(&intakePID, INTAKE_POPEN_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
@@ -109,26 +126,43 @@ task intakeAndLiftTask()
 		}
 
 		//This is where the intake actually is
-		if (SensorValue[intakePot] <= INTAKE_POPEN_VAL + INTAKE_BANDWITH &&
-			  SensorValue[intakePot] >= INTAKE_POPEN_VAL - INTAKE_BANDWITH)
+		//INTAKE_CUBE
+		if (SensorValue[intakePot] <= INTAKE_CUBE_VAL + INTAKE_BANDWITH &&
+			  SensorValue[intakePot] >= INTAKE_CUBE_VAL - INTAKE_BANDWITH)
 		{
-			intakeAndLiftTask_intakeStateRead = INTAKE_POPEN;
+			intakeAndLiftTask_intakeStateRead = INTAKE_CUBE;
 		}
+		//INTAKE_ACUBE
+		else if (SensorValue[intakePot] <= INTAKE_ACUBE_VAL + INTAKE_BANDWITH &&
+			 			 SensorValue[intakePot] >= INTAKE_ACUBE_VAL - INTAKE_BANDWITH)
+		{
+			intakeAndLiftTask_intakeStateRead = INTAKE_ACUBE;
+		}
+		//INTAKE_OPEN
 		else if (SensorValue[intakePot] <= INTAKE_OPEN_VAL + INTAKE_BANDWITH &&
-			  SensorValue[intakePot] >= INTAKE_OPEN_VAL - INTAKE_BANDWITH)
+			  		 SensorValue[intakePot] >= INTAKE_OPEN_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_OPEN;
 		}
+		//INTAKE_POPEN
+		else if (SensorValue[intakePot] <= INTAKE_POPEN_VAL + INTAKE_BANDWITH &&
+			  		 SensorValue[intakePot] >= INTAKE_POPEN_VAL - INTAKE_BANDWITH)
+		{
+			intakeAndLiftTask_intakeStateRead = INTAKE_POPEN;
+		}
+		//INTAKE_HALF
 		else if (SensorValue[intakePot] <= INTAKE_HALF_VAL + INTAKE_BANDWITH &&
 			  		 SensorValue[intakePot] >= INTAKE_HALF_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_HALF;
 		}
+		//INTAKE_QUARTER
 		else if (SensorValue[intakePot] <= INTAKE_QUARTER_VAL + INTAKE_BANDWITH &&
 			  		 SensorValue[intakePot] >= INTAKE_QUARTER_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_QUARTER;
 		}
+		//INTAKE_CLOSED
 		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + INTAKE_BANDWITH &&
 		         SensorValue[intakePot] >= INTAKE_CLOSED_VAL - INTAKE_BANDWITH)
 	  {
@@ -183,16 +217,19 @@ task intakeAndLiftTask()
 		}
 
 		//This is where the lift actually is
+		//LIFT_UP
 		if (imeCountWithOffset <= LIFT_UP_VAL + LIFT_BANDWITH &&
 		    imeCountWithOffset >= LIFT_UP_VAL - LIFT_BANDWITH)
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_UP;
 		}
+		//LIFT_HALF
 		else if (imeCountWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
 			       imeCountWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)
-     {
-       intakeAndLiftTask_liftStateRead = LIFT_HALF;
-     }
+		{
+		  intakeAndLiftTask_liftStateRead = LIFT_HALF;
+		}
+		//LIFT_DOWN
 		else if (liftHasGoneDownBefore && imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_DOWN;

@@ -37,8 +37,8 @@ void runSkills()
 
   //Turn to score star
   waitForLift(LIFT_DOWN);
-  turn(-90);
-  turn(90);
+  turnToAbsAngle(-90);
+  turnToAbsAngle(90);
 
   //CUBE------------------------------------
   //Drive forward a bit to align with the cube
@@ -48,7 +48,7 @@ void runSkills()
   intakeAndLiftTask_intakeState = INTAKE_POPEN;
 
   //Turn to face cube
-  turn(90);
+  turnToAbsAngle(90);
 
   //Close intake to avoid stars
   intakeAndLiftTask_intakeState = INTAKE_ACUBE;
@@ -68,7 +68,7 @@ void runSkills()
   driveStraight(ONE_TILE_MM*0.5);
 
   //Turn to field wall
-  turn(-90);
+  turnToAbsAngle(-90);
 
   //Drive back and score
   driveStraight(-ONE_TILE_MM*0.5);

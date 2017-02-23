@@ -53,7 +53,7 @@ task commandRobot()
 		//		case MPC_MSG_PICKUP_BACK:
 		//			writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[0], yDemand[0]);
 
-		//			moveToPoint(xDemand[0], yDemand[0], 0, true);
+		//			moveToPoint(xDemand[0], yDemand[0], true, 0);
 
 		//			sendMPCMsg();
 		//			break;

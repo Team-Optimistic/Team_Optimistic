@@ -12,6 +12,19 @@ void initSensors()
 }
 
 /**
+ * Basic movement of scoring
+ */
+void dumpIntakeBasic()
+{
+	turnToAbsAngle(180);
+	intakeAndLiftTask_liftState = LIFT_UP;
+	waitForLift(LIFT_UP);
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	wait1Msec(100);
+	intakeAndLiftTask_liftState = LIFT_DOWN;
+}
+
+/**
  * Scores whatever is in the intake
  */
 void dumpIntake()
@@ -53,10 +66,10 @@ void dumpIntake()
  * Turns and drives to a point
  * @param x         X coordinate of point
  * @param y         Y coordinate of point
- * @param offset    Backward offset from final distance to point
  * @param backwards Whether to move to the point backwards
+ * @param offset    Backward offset from final distance to point
  */
-void moveToPoint(const long x, const long y, long offset = 0, bool backwards = false)
+void moveToPoint(const long x, const long y, bool backwards = false, long offset = 0)
 {
 	distanceAndAngle temp;
 	computeDistanceAndAngleToPoint(x, y, &temp);
@@ -137,6 +150,20 @@ void moveToPoint(const long x, const long y, long offset = 0, bool backwards = f
 	#ifdef MOVETOPOINT_DEBUG
 		writeDebugStreamLine("movetopoint: done");
 	#endif
+}
+
+void moveToPoint_Translate(const int x, const int y, bool backwards = false)
+{
+	long currentX = 0, currentY = 0;
+
+	BCI_lockSem(std_msgSem, "moveToPoint_Translate")
+	{
+		currentX = std_msg[STD_MSG_EST_X];
+		currentY = std_msg[STD_MSG_EST_Y];
+		BCI_unlockSem(std_msgSem, "moveToPoint_Translate")
+	}
+	writeDebugStreamLine("moving x: %d, y: %d", currentX + x, currentY + y);
+	moveToPoint(currentX + x, currentY + y, backwards, 0);
 }
 
 enum fenceTypes

@@ -32,7 +32,7 @@
 #include "BCI\BCI.h"
 
 //#define UARTHANDLER_DEBUG
-#define UARTHANDLER_DEBUG_READ
+//#define UARTHANDLER_DEBUG_READ
 #define MOVETOPOINT_DEBUG
 #define POINTMATH_DEBUG
 
@@ -46,25 +46,6 @@
 #include "motorControl.c"
 #include "decisionHandler.c"
 #include "skills.c"
-
-task testDrive()
-{
-	wait1Msec(500);
-	driveStraight(2434/4);
-}
-
-task testLift()
-{
-	wait1Msec(1000);
-	startTask(intakeAndLiftTask);
-	intakeAndLiftTask_intakeState = INTAKE_OPEN;
-	intakeAndLiftTask_liftState = LIFT_FENCE;
-	wait1Msec(3000);
-	intakeAndLiftTask_liftState = LIFT_DOWN;
-	while(intakeAndLiftTask_liftStateRead != LIFT_DOWN) { wait1Msec(5); }
-	wait1Msec(500);
-	intakeAndLiftTask_liftState = LIFT_UP;
-}
 
 task monitorStop()
 {
@@ -114,13 +95,12 @@ task main()
 
 	while (true)
 	{
-		//Send data to pi
-		sendSTDMsg();
-
 		if (SensorValue[skillsBtn])
 		{
 			wait1Msec(5000);
 			runSkills();
+
+			//moveToPoint(609, 304 + ONE_TILE_MM, true);
 
 			//intakeAndLiftTask_intakeState = INTAKE_ACUBE;
 			//intakeAndLiftTask_liftState = LIFT_DOWN;
@@ -134,6 +114,11 @@ task main()
 			//{
 			//	EndTimeSlice();
 			//}
+
+			//turnToAbsAngle(0);
+
+		  //turnToAbsAngle(190);
+		  //turnToAbsAngle(270);
 		}
 
 		if (timer_Repeat(&lcdTimer, 250))

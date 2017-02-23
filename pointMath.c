@@ -79,8 +79,34 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 		const float xDiff = x - std_msg[STD_MSG_EST_X], yDiff = y - std_msg[STD_MSG_EST_Y];
 		out->length = sqrt((xDiff * xDiff) + (yDiff * yDiff));
 
-		//Compute difference in angle
-		out->theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
+		//Dont divide by 0
+		if (xDiff < 0.0001 && xDiff > -0.0001)
+		{
+			const int ySgn = sgn(yDiff);
+
+			if (ySgn == 1)
+			{
+				out->theta = -1 * std_msg[STD_MSG_EST_THETA];
+			}
+			else if (ySgn == -1)
+			{
+				out->theta = -180 - std_msg[STD_MSG_EST_THETA];
+
+				if (out->theta <= -360)
+					out->theta = out->theta + 360;
+				else if (out->theta >= 360)
+					out->theta = out->theta - 360;
+			}
+			else
+			{
+				out->theta = 0;
+			}
+		}
+		else
+		{
+			//Compute difference in angle
+			out->theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
+		}
 
 		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	}

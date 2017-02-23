@@ -73,12 +73,12 @@
  */
 
 //Standard message
-#define STD_MSG_LENGTH 10
+#define STD_MSG_LENGTH 13
 long std_msg[STD_MSG_LENGTH];
 #define STD_MSG_EST_X     0
 #define STD_MSG_EST_Y     4
 #define STD_MSG_EST_THETA 8
-#define STD_MSG_LIDAR_RPM 9
+#define STD_MSG_LIDAR_RPM 12
 
 //Message to get objects behind us
 #define SPC_MSG_LENGTH 3
@@ -347,6 +347,9 @@ task readBuffer()
 
 	while (true)
 	{
+		//Send data to pi
+		sendSTDMsg();
+
 		//Load start byte into temp variable
 		msgFlagHolder = getChar(UART1);
 
@@ -389,8 +392,14 @@ task readBuffer()
 						conv.b[3] = std_msg[STD_MSG_EST_Y + 3];
 						std_msg[STD_MSG_EST_Y] = conv.l;
 
+						conv.b[0] = std_msg[STD_MSG_EST_THETA];
+						conv.b[1] = std_msg[STD_MSG_EST_THETA + 1];
+						conv.b[2] = std_msg[STD_MSG_EST_THETA + 2];
+						conv.b[3] = std_msg[STD_MSG_EST_THETA + 3];
+						std_msg[STD_MSG_EST_THETA] = conv.l;
+
 						#ifdef UARTHANDLER_DEBUG_READ
-							writeDebugStreamLine("decoded: %d, %d", std_msg[STD_MSG_EST_X], std_msg[STD_MSG_EST_Y]);
+							writeDebugStreamLine("decoded: %d, %d, %d", std_msg[STD_MSG_EST_X], std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
 						#endif
 
 						BCI_unlockSem(std_msgSem, "readBuffer")

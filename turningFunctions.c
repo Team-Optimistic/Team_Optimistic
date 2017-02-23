@@ -100,7 +100,7 @@ void turn(const long angle)
  * Turns to an angle in the field frame
  * @param deg Degrees to turn to
  */
-void turnToAbsAngle(const int deg)
+void turnToAbsAngle(const long deg)
 {
 	long theta = 0;
 	BCI_lockSem(std_msgSem, "turnToAbsAngle")
@@ -109,7 +109,20 @@ void turnToAbsAngle(const int deg)
 		BCI_unlockSem(std_msgSem, "turnToAbsAngle")
 	}
 
-	turn(deg - theta);
+	const long turnAmt = deg - theta;
+
+	if (turnAmt > 180)
+	{
+		turn(360 - turnAmt);
+	}
+	else if (turnAmt < -180)
+	{
+		turn(360 + turnAmt);
+	}
+	else
+	{
+		turn(turnAmt);
+	}
 }
 
 #endif //TURNINGFUNCTIONS_C_INCLUDED

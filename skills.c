@@ -3,6 +3,8 @@
 
 void runSkills()
 {
+	startTask(readBuffer);
+
 	//PRELOAD AND STARS------------------------------------
   //Close claw and drive back
   intakeAndLiftTask_intakeState = INTAKE_REST; //Let the intake chill
@@ -10,7 +12,7 @@ void runSkills()
   startTask(intakeAndLiftTask);
 
   //Drive back a tile and open the intake
-  moveToPoint_Translate(0, ONE_TILE_MM, true);
+  moveToPoint(609, 304 + ONE_TILE_MM, true);
   intakeAndLiftTask_intakeState = INTAKE_OPEN; //Open the intake
   waitForIntake(INTAKE_OPEN);
 
@@ -24,7 +26,7 @@ void runSkills()
   //Drive back and lift to hold stars
   intakeAndLiftTask_liftState = LIFT_UP;
   wait1Msec(250);
-  moveToPoint_Translate(0, ONE_TILE_MM*0.8, true);
+  moveToPoint(609, 304 + ONE_TILE_MM*1.8, true);
 
   //Dump
   dumpIntakeBasic();
@@ -35,37 +37,36 @@ void runSkills()
 
   //CUBE MATCH LOADS------------------------
   //First cube
-  //Drive back at an offset
-  turnToAbsAngle(200);
-  moveToPoint_Translate(0, -ONE_TILE_MM*0.8);
+  //Drive back to wall at an offset
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
  	turnToAbsAngle(180);
+ 	driveStraight(150);
 
  	//Grab first cube and star
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
- 	moveToPoint_Translate(0, 200, true); //Move intake out of way of field wall while it closes
- 	intakeAndLiftTask_liftState = LIFT_UP;
  	wait1Msec(100);
+ 	driveStraight(-150); //Move intake out of way of wall
+ 	intakeAndLiftTask_liftState = LIFT_UP;
 
  	//Drive back to fence
- 	moveToPoint_Translate(0, ONE_TILE_MM*0.8, true);
+ 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.8, true);
 
  	//Dump
  	turnToAbsAngle(180);
  	dumpIntakeBasic();
 
  	//Second cube
- 	//Drive back
- 	turnToAbsAngle(180);
- 	moveToPoint_Translate(0, -ONE_TILE_MM*0.8);
+ 	//Drive back to wall
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
  	turnToAbsAngle(180);
 
  	//Grab second cube
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
- 	intakeAndLiftTask_liftState = LIFT_UP;
  	wait1Msec(250);
+ 	intakeAndLiftTask_liftState = LIFT_UP;
 
  	//Drive back to fence
- 	moveToPoint_Translate(0, ONE_TILE_MM*0.8, true);
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.8, true);
 
  	//Dump
  	dumpIntakeBasic();

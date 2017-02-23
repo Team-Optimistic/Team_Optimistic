@@ -105,7 +105,7 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 		else
 		{
 			//Compute difference in angle
-			out->theta = (atan2(yDiff, xDiff) * (180 / PI)) - std_msg[STD_MSG_EST_THETA];
+			out->theta = (90 - (atan2(yDiff, xDiff) * (180 / PI))) - std_msg[STD_MSG_EST_THETA];
 		}
 
 		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")

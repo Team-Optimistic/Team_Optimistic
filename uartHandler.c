@@ -135,9 +135,9 @@ void initUART()
 		msgCount[i] = 0;
 	}
 
-	std_msg[STD_MSG_EST_X] = 0;
-	std_msg[STD_MSG_EST_Y] = 0;
-	std_msg[STD_MSG_EST_THETA] = 0;
+	std_msg[STD_MSG_EST_X] = 609;
+	std_msg[STD_MSG_EST_Y] = 304;
+	std_msg[STD_MSG_EST_THETA] = 180;
 	std_msg[STD_MSG_LIDAR_RPM] = 250;
 
 	//Initialize semaphores

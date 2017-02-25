@@ -18,9 +18,11 @@ void dumpIntakeBasic()
 {
 	turnToAbsAngle(180);
 	intakeAndLiftTask_liftState = LIFT_UP;
-	waitForLift(LIFT_UP);
+	waitForLift(LIFT_DUMP_VAL);
+	setAllDriveMotors(-127);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	wait1Msec(100);
+	setAllDriveMotors(0);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 }
 

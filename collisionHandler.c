@@ -67,8 +67,8 @@ long doesDriveCollideSP(const statePack *sp, const int mm)  //potential problem:
 	// Do we hit the fence?
 	// If we do hit something, where along our path do we hit it?
 	long s_dist;
-	int goal_x = sp->x + (mm * sindegrees(sp->theta));
-	int goal_y = sp->y + (mm * cosdegrees(sp->theta));
+	int goal_x = sp->x + (mm * sinDegrees(sp->theta));
+	int goal_y = sp->y + (mm * cosDegrees(sp->theta));
 	int x_dist = 0; //therefore return 0 if path was successful
 	int y_dist = 0;
 
@@ -123,10 +123,10 @@ long doesTurnCollideSP(const statePack *sp, const int deg)
 	switch (intakeAndLiftTask_liftState)
 	{
 	case LIFT_UP:
-		front_right.x_val = sp->x + (ft_to_mm * cosdegrees(sp->theta));
-		front_left.x_val = sp->x - (ft_to_mm * cosdegrees(sp->theta));
-		front_right.y_val = sp->y + (ft_to_mm * sindegrees(sp->theta));
-		front_left.y_val = sp->y - (ft_to_mm * sindegrees(sp->theta));
+		front_right.x_val = sp->x + (ft_to_mm * cosDegrees(sp->theta));
+		front_left.x_val = sp->x - (ft_to_mm * cosDegrees(sp->theta));
+		front_right.y_val = sp->y + (ft_to_mm * sinDegrees(sp->theta));
+		front_left.y_val = sp->y - (ft_to_mm * sinDegrees(sp->theta));
 		f_rad = dist_cent_to_corner;
 		break;
 	case LIFT_DOWN:

@@ -11,6 +11,7 @@
 
 #define LIFT_FENCE_VAL     1540
 #define LIFT_UP_VAL        1225
+#define LIFT_DUMP_VAL      750
 #define LIFT_HALF_VAL      300
 #define LIFT_DOWN_VAL      0
 
@@ -22,25 +23,26 @@
 
 enum intakeState
 {
-	INTAKE_CUBE,
-	INTAKE_ACUBE,
-	INTAKE_OPEN,
-	INTAKE_POPEN,
-	INTAKE_HALF,
-	INTAKE_QUARTER,
-	INTAKE_CLOSED,
-	INTAKE_REST,
-	INTAKE_WAIT
+	INTAKE_CUBE    = 1,
+	INTAKE_ACUBE   = 2,
+	INTAKE_OPEN    = 3,
+	INTAKE_POPEN   = 4,
+	INTAKE_HALF    = 5,
+	INTAKE_QUARTER = 6,
+	INTAKE_CLOSED  = 7,
+	INTAKE_REST    = 8,
+	INTAKE_WAIT    = 9
 };
 
 enum liftState
 {
-	LIFT_UP,
-	LIFT_HALF,
-	LIFT_DOWN,
-	LIFT_FENCE,
-	LIFT_REST,
-	LIFT_WAIT
+	LIFT_UP    = 93,
+	LIFT_DUMP  = 94,
+	LIFT_HALF  = 95,
+	LIFT_DOWN  = 96,
+	LIFT_FENCE = 97,
+	LIFT_REST  = 98,
+	LIFT_WAIT  = 99
 };
 
 intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
@@ -49,6 +51,7 @@ intakeState intakeAndLiftTask_intakeStateRead = INTAKE_REST;
 intakeState intakeAndLiftTask_liftState = LIFT_REST;
 intakeState intakeAndLiftTask_liftStateRead = LIFT_REST;
 
+float imeCountWithOffset = 0;
 long intakeAndLiftTask_imeOffset = 0;
 
 /**
@@ -56,7 +59,6 @@ long intakeAndLiftTask_imeOffset = 0;
  */
 task intakeAndLiftTask()
 {
-	float imeCountWithOffset = 0;
 	bool liftHasGoneDownBefore = false;
 
 	pos_PID intakePID, liftPID;
@@ -186,6 +188,11 @@ task intakeAndLiftTask()
 				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
+			case LIFT_DUMP:
+				pos_PID_SetTargetPosition(&liftPID, LIFT_DUMP_VAL);
+				setLiftMotors(pos_PID_StepController(&liftPID));
+				break;
+
 			case LIFT_HALF:
 				pos_PID_SetTargetPosition(&liftPID, LIFT_HALF_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
@@ -194,7 +201,7 @@ task intakeAndLiftTask()
 			case LIFT_DOWN:
 				if (!SensorValue[liftStopButton])
 				{
-					setLiftMotors(-100);
+					setLiftMotors(-127);
 				}
 				else
 				{
@@ -223,6 +230,12 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_UP;
 		}
+		//LIFT_DUMP
+		else if (imeCountWithOffset <= LIFT_DUMP_VAL + LIFT_BANDWITH &&
+			       imeCountWithOffset >= LIFT_DUMP_VAL - LIFT_BANDWITH)
+    {
+    	intakeAndLiftTask_liftStateRead = LIFT_DUMP;
+    }
 		//LIFT_HALF
 		else if (imeCountWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
 			       imeCountWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)

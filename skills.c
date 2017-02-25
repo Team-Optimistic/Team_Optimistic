@@ -4,6 +4,7 @@
 void runSkills()
 {
 	startTask(readBuffer);
+	wait1Msec(250);
 
 	//PRELOAD AND STARS------------------------------------
   //Close claw and drive back
@@ -26,7 +27,7 @@ void runSkills()
   //Drive back and lift to hold stars
   intakeAndLiftTask_liftState = LIFT_UP;
   wait1Msec(250);
-  moveToPoint(609, 304 + ONE_TILE_MM*1.8, true);
+  moveToPoint(609, 304 + ONE_TILE_MM*1.3, true);
 
   //Dump
   dumpIntakeBasic();
@@ -40,16 +41,15 @@ void runSkills()
   //Drive back to wall at an offset
   moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
  	turnToAbsAngle(180);
- 	driveStraight(150);
 
  	//Grab first cube and star
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
  	wait1Msec(100);
- 	driveStraight(-150); //Move intake out of way of wall
+ 	driveStraight(-200); //Move intake out of way of wall
  	intakeAndLiftTask_liftState = LIFT_UP;
 
  	//Drive back to fence
- 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.8, true);
+ 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.3, true);
 
  	//Dump
  	turnToAbsAngle(180);
@@ -66,9 +66,10 @@ void runSkills()
  	intakeAndLiftTask_liftState = LIFT_UP;
 
  	//Drive back to fence
-  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.8, true);
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.3, true);
 
  	//Dump
+  turnToAbsAngle(180);
  	dumpIntakeBasic();
 
   ////CENTER CUBE------------------------------------

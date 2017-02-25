@@ -430,22 +430,24 @@ task readBuffer()
 
 						mpcMsgFlag = true;
 
+						int j;
 						for (int i = 0; i < 4; i++)
 						{
-							conv.b[0] = mpc_msg[MPC_MSG_X_COORD + (i * 9)];
-							conv.b[1] = mpc_msg[MPC_MSG_X_COORD + 1 + (i * 9)];
-							conv.b[2] = mpc_msg[MPC_MSG_X_COORD + 2 + (i * 9)];
-							conv.b[3] = mpc_msg[MPC_MSG_X_COORD + 3 + (i * 9)];
-							mpc_msg[MPC_MSG_X_COORD + (i * 9)] = conv.l;
+							j = i * 9;
+							conv.b[0] = mpc_msg[MPC_MSG_X_COORD + j];
+							conv.b[1] = mpc_msg[MPC_MSG_X_COORD + 1 + j];
+							conv.b[2] = mpc_msg[MPC_MSG_X_COORD + 2 + j];
+							conv.b[3] = mpc_msg[MPC_MSG_X_COORD + 3 + j];
+							mpc_msg[MPC_MSG_X_COORD + j] = conv.l;
 
-							conv.b[0] = mpc_msg[MPC_MSG_Y_COORD + (i * 9)];
-							conv.b[1] = mpc_msg[MPC_MSG_Y_COORD + 1 + (i * 9)];
-							conv.b[2] = mpc_msg[MPC_MSG_Y_COORD + 2 + (i * 9)];
-							conv.b[3] = mpc_msg[MPC_MSG_Y_COORD + 3 + (i * 9)];
-							mpc_msg[MPC_MSG_Y_COORD + (i * 9)] = conv.l;
+							conv.b[0] = mpc_msg[MPC_MSG_Y_COORD + j];
+							conv.b[1] = mpc_msg[MPC_MSG_Y_COORD + 1 + j];
+							conv.b[2] = mpc_msg[MPC_MSG_Y_COORD + 2 + j];
+							conv.b[3] = mpc_msg[MPC_MSG_Y_COORD + 3 + j];
+							mpc_msg[MPC_MSG_Y_COORD + j] = conv.l;
 
 							#ifdef UARTHANDLER_DEBUG
-								writeDebugStreamLine("mpc got (%d,%d)", mpc_msg[MPC_MSG_X_COORD + (i * 9)], mpc_msg[MPC_MSG_Y_COORD + (i * 9)]);
+								writeDebugStreamLine("mpc got (%d,%d)", mpc_msg[MPC_MSG_X_COORD + j], mpc_msg[MPC_MSG_Y_COORD + j]);
 							#endif
 						}
 

@@ -11,6 +11,7 @@
 
 #define LIFT_FENCE_VAL     1540
 #define LIFT_UP_VAL        1225
+#define LIFT_ALMOST_UP_VAL 1000 //defined as value at which to begin driving last foot of distance
 #define LIFT_HALF_VAL      300
 #define LIFT_DOWN_VAL      0
 
@@ -36,6 +37,7 @@ enum intakeState
 enum liftState
 {
 	LIFT_UP,
+	LIFT_ALMOST_UP,
 	LIFT_HALF,
 	LIFT_DOWN,
 	LIFT_FENCE,
@@ -223,6 +225,12 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_UP;
 		}
+		//ALMOST UP
+		else if (imeCountWithOffset >= LIFT_ALMOST_UP_VAL - LIFT_BANDWITH &&
+						 imeCountWithOffset <= LIFT_ALMOST_UP_VAL + LIFT_BANDWITH)
+		{
+			intakeAndLiftTask_liftStateRead = LIFT_ALMOST_UP;
+		}
 		//LIFT_HALF
 		else if (imeCountWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
 			       imeCountWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)
@@ -234,6 +242,7 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 		}
+
 
 		wait1Msec(15);
 	}

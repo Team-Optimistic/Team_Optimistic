@@ -26,7 +26,8 @@ void runSkills()
   //Drive back and lift to hold stars
   intakeAndLiftTask_liftState = LIFT_UP;
   wait1Msec(250);
-  moveToPoint(609, 304 + ONE_TILE_MM*1.8, true);
+  moveToPoint(609, 304 + ONE_TILE_MM*1.3, true);
+  //1 ft away from where you wanted
 
   //Dump
   dumpIntakeBasic();
@@ -49,7 +50,7 @@ void runSkills()
  	intakeAndLiftTask_liftState = LIFT_UP;
 
  	//Drive back to fence
- 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.8, true);
+ 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.3, true);
 
  	//Dump
  	turnToAbsAngle(180);

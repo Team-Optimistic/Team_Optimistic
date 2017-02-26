@@ -67,8 +67,9 @@ long doesDriveCollideSP(const statePack *sp, const int mm)  //potential problem:
 	// Do we hit the fence?
 	// If we do hit something, where along our path do we hit it?
 	long s_dist;
-	int goal_x = sp->x + (mm * sinDegrees(sp->theta));
-	int goal_y = sp->y + (mm * cosDegrees(sp->theta));
+	//int goal_x = sp->x + (mm * sinDegrees(sp->theta));
+	//int goal_y = sp->y + (mm * cosDegrees(sp->theta));
+	//commented out because never read
 	int x_dist = 0; //therefore return 0 if path was successful
 	int y_dist = 0;
 

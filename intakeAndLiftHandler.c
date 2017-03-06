@@ -11,15 +11,17 @@
 
 #define LIFT_FENCE_VAL     1540
 #define LIFT_UP_VAL        1225
-#define LIFT_DUMP_VAL      750
+#define LIFT_DUMP_VAL      950
 #define LIFT_HALF_VAL      300
 #define LIFT_DOWN_VAL      0
 
 #define INTAKE_BANDWITH    100
-#define LIFT_BANDWITH     30
+#define LIFT_BANDWITH      30
+#define LIFT_PID_BIAS      -10
 
-#define waitForIntake(val) while(intakeAndLiftTask_intakeStateRead != val){wait1Msec(5);}
-#define waitForLift(val) while(intakeAndLiftTask_liftStateRead != val){wait1Msec(5);}
+long waitStartTime = 0;
+#define waitForIntake(val) waitStartTime=nSysTime;while(intakeAndLiftTask_intakeStateRead != val){if(nSysTime-waitStartTime>1000){break;}wait1Msec(15);}
+#define waitForLift(val) waitStartTime=nSysTime;while(intakeAndLiftTask_liftStateRead != val){if(nSysTime-waitStartTime>1500){break;}wait1Msec(15);}
 
 enum intakeState
 {
@@ -36,13 +38,14 @@ enum intakeState
 
 enum liftState
 {
-	LIFT_UP    = 93,
-	LIFT_DUMP  = 94,
-	LIFT_HALF  = 95,
-	LIFT_DOWN  = 96,
-	LIFT_FENCE = 97,
-	LIFT_REST  = 98,
-	LIFT_WAIT  = 99
+	LIFT_CUSTOM = 92,
+	LIFT_UP     = 93,
+	LIFT_DUMP   = 94,
+	LIFT_HALF   = 95,
+	LIFT_DOWN   = 96,
+	LIFT_FENCE  = 97,
+	LIFT_REST   = 98,
+	LIFT_WAIT   = 99
 };
 
 intakeState intakeAndLiftTask_intakeState = INTAKE_REST;
@@ -53,6 +56,7 @@ intakeState intakeAndLiftTask_liftStateRead = LIFT_REST;
 
 float imeCountWithOffset = 0;
 long intakeAndLiftTask_imeOffset = 0;
+int intakeAndLiftTask_liftCustomVal = LIFT_DOWN_VAL;
 
 /**
  * Maintains different states for the intake and lift
@@ -64,7 +68,7 @@ task intakeAndLiftTask()
 	pos_PID intakePID, liftPID;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.15, 0.2, 0, 0);
-	pos_PID_InitController(&liftPID, &imeCountWithOffset, 0.3, 0.2, 0.2, -10);
+	pos_PID_InitController(&liftPID, &imeCountWithOffset, 0.3, 0.2, 0.2, LIFT_PID_BIAS);
 
 	while (true)
 	{
@@ -183,6 +187,11 @@ task intakeAndLiftTask()
 
 		switch (intakeAndLiftTask_liftState)
 		{
+			case LIFT_CUSTOM:
+				pos_PID_SetTargetPosition(&liftPID, intakeAndLiftTask_liftCustomVal);
+				setLiftMotors(pos_PID_GetOutput(&liftPID));
+				break;
+
 			case LIFT_UP:
 				pos_PID_SetTargetPosition(&liftPID, LIFT_UP_VAL);
 				setLiftMotors(pos_PID_StepController(&liftPID));
@@ -205,8 +214,7 @@ task intakeAndLiftTask()
 				}
 				else
 				{
-					pos_PID_SetTargetPosition(&liftPID, LIFT_DOWN_VAL);
-					setLiftMotors(pos_PID_StepController(&liftPID));
+					setLiftMotors(LIFT_PID_BIAS);
 				}
 				break;
 

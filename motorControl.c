@@ -83,7 +83,7 @@ void moveToPoint(const long x, const long y, bool backwards = false, long offset
 		temp.length *= -1;
 	}
 
-	long limit;
+	//long limit;
 	//If we hit something during the turn
 	//if ((limit = doesTurnCollide(temp.theta)) != 0)
 	//{
@@ -182,7 +182,7 @@ enum fenceTypes
  */
 void scoreFence(const fenceTypes fence)
 {
-	distanceAndAngle temp;
+	//distanceAndAngle temp;
 
 	//Load in point in the center of the selected field section
 	//Each fence is 1181 mm wide

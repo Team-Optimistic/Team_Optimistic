@@ -42,6 +42,7 @@
 #include "decisionHandler.c"
 #include "skills.c"
 #include "noWarning.c"
+
 task monitorStop()
 {
 	while (true)

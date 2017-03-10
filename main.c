@@ -81,7 +81,7 @@ task main()
 	{
 		if (SensorValue[skillsBtn])
 		{
-			wait1Msec(4000);
+			wait1Msec(400);
 			runSkills();
 
 			//moveToPoint(609, 304 + ONE_TILE_MM, true);

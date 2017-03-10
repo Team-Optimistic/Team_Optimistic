@@ -5,7 +5,7 @@
  * Turns clockwise for an angle in degrees
  * @param  angle Angle to turn for (deg)
  */
-void turn(const long angle)
+void turn(long angle)
 {
 	//Save left and right quad values instead of setting them to zero
 	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
@@ -15,8 +15,13 @@ void turn(const long angle)
 
 	//Conversion between encoder degrees and base_link degrees
 	const float conv = 12.75993;
-
+	//writeDebugStreamLine("original angle %d",angle);
 	//Target angle
+	while(angle>180)
+      angle-=360;
+  while(angle<=-180)
+      angle+=360;
+  //writeDebugStreamLine("corrected theta %d",angle);
 	int targetAngle = angle * conv;
 
 	pos_PID anglePID;
@@ -58,14 +63,14 @@ void turn(const long angle)
 		currentLeft = SensorValue[leftQuad] - encoderLeft;
 		currentRight = SensorValue[rightQuad] - encoderRight;
 
-		angleChange = currentLeft - currentRight;
+		angleChange = currentRight - currentLeft;
 
 		//Get output from PID
 		angleOutput = pos_PID_StepController(&anglePID);
 
 		//Set motors to angle PID output
-		setLeftMotors(angleOutput);
-		setRightMotors(-1 * angleOutput);
+		setLeftMotors(-1 * angleOutput);
+		setRightMotors(angleOutput);
 
 		//Place mark if we're close enough to the target angle
 		if (fabs(targetAngle - angleChange) <= atTargetAngle)
@@ -110,19 +115,7 @@ void turnToAbsAngle(const long deg)
 	}
 
 	const long turnAmt = deg - theta;
-
-	if (turnAmt > 180)
-	{
-		turn(360 - turnAmt);
-	}
-	else if (turnAmt < -180)
-	{
-		turn(360 + turnAmt);
-	}
-	else
-	{
-		turn(turnAmt);
-	}
+	turn(turnAmt);
 }
 
 #endif //TURNINGFUNCTIONS_C_INCLUDED

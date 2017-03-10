@@ -7,21 +7,21 @@
 #define INTAKE_CLOSED_VAL  2400
 #define INTAKE_ACUBE_VAL   1750
 #define INTAKE_OPEN_VAL    1020
-#define INTAKE_POPEN_VAL   800
+#define INTAKE_POPEN_VAL   500
 
 #define LIFT_FENCE_VAL     1540
-#define LIFT_UP_VAL        1225
-#define LIFT_DUMP_VAL      950
+#define LIFT_UP_VAL        1200
+#define LIFT_DUMP_VAL      1100
 #define LIFT_HALF_VAL      300
 #define LIFT_DOWN_VAL      0
 
-#define INTAKE_BANDWITH    100
+#define INTAKE_BANDWITH    20
 #define LIFT_BANDWITH      30
 #define LIFT_PID_BIAS      -10
 
 long waitStartTime = 0;
 #define waitForIntake(val) waitStartTime=nSysTime;while(intakeAndLiftTask_intakeStateRead != val){if(nSysTime-waitStartTime>1000){break;}wait1Msec(15);}
-#define waitForLift(val) waitStartTime=nSysTime;while(intakeAndLiftTask_liftStateRead != val){if(nSysTime-waitStartTime>1500){break;}wait1Msec(15);}
+#define waitForLift(val) waitStartTime=nSysTime;while(intakeAndLiftTask_liftStateRead != val){if(nSysTime-waitStartTime>3000){break;}wait1Msec(15);}
 
 enum intakeState
 {
@@ -38,6 +38,7 @@ enum intakeState
 
 enum liftState
 {
+	LIFT_NOTHING = 0,
 	LIFT_CUSTOM = 92,
 	LIFT_UP     = 93,
 	LIFT_DUMP   = 94,
@@ -189,7 +190,7 @@ task intakeAndLiftTask()
 		{
 			case LIFT_CUSTOM:
 				pos_PID_SetTargetPosition(&liftPID, intakeAndLiftTask_liftCustomVal);
-				setLiftMotors(pos_PID_GetOutput(&liftPID));
+				setLiftMotors(pos_PID_StepController(&liftPID));
 				break;
 
 			case LIFT_UP:
@@ -251,11 +252,17 @@ task intakeAndLiftTask()
 		  intakeAndLiftTask_liftStateRead = LIFT_HALF;
 		}
 		//LIFT_DOWN
-		else if (liftHasGoneDownBefore && imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
+		//else if (liftHasGoneDownBefore && imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
+		else if(SensorValue[liftStopButton])
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 		}
-
+		else
+		{
+			intakeAndLiftTask_liftStateRead = LIFT_NOTHING;
+		}
+		if(intakeAndLiftTask_liftStateRead!= 0)
+			writeDebugStreamLine("lift state  %d",intakeAndLiftTask_liftStateRead);
 		wait1Msec(15);
 	}
 }

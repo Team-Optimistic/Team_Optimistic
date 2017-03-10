@@ -27,66 +27,59 @@ void runSkills()
   //Drive back and lift to hold stars
   intakeAndLiftTask_liftState = LIFT_UP;
   wait1Msec(250);
-  moveToPoint(609, 304 + ONE_TILE_MM*1.4, true);
-
+  //moveToPoint(609, 304 + ONE_TILE_MM*1.2, true);
+	writeDebugStreamLine("pre dump");
   //Dump
   dumpIntakeBasic();
-
+	writeDebugStreamLine("post dump");
   //Turn to score star
   waitForLift(LIFT_DOWN);
-  intakeAndLiftTask_liftCustomVal = 50;
-  intakeAndLiftTask_liftState = LIFT_CUSTOM;
-  turnToAbsAngle(270);
-  intakeAndLiftTask_liftState = LIFT_DOWN;
+  turnToAbsAngle(180);
+  intakeAndLiftTask_intakeState = INTAKE_POPEN;
+	writeDebugStreamLine("star");
 
   //CUBE MATCH LOADS------------------------
   //First cube
   //Drive back to wall at an offset
-  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
- 	turnToAbsAngle(180);
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM *0.7);
+ 	turnToAbsAngle(-90);
 
  	//Grab first cube and star
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
- 	wait1Msec(100);
- 	driveStraight(-200); //Move intake out of way of wall
+ 	wait1Msec(300);
+ 	driveStraight(-700); //Move intake out of way of wall
  	intakeAndLiftTask_intakeState = INTAKE_OPEN;
- 	setAllDriveMotors(127);
- 	wait1Msec(150);
- 	setAllDriveMotors(0);
+ 	driveStraight(500);
+
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
- 	wait1Msec(100);
- 	setAllDriveMotors(-127);
- 	wait1Msec(150);
- 	setAllDriveMotors(0);
- 	intakeAndLiftTask_liftState = LIFT_UP;
+ 	wait1Msec(600);
+
+ 	driveStraight(-150);
 
  	//Drive back to fence
- 	//moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.4, true);
- 	driveStraight(-ONE_TILE_MM*0.5);
+ 	//driveStraight(-ONE_TILE_MM*0.5);
 
  	//Dump
- 	turnToAbsAngle(180);
  	dumpIntakeBasic();
 
  	//Second cube
  	//Drive back to wall
   moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.1);
- 	turnToAbsAngle(180);
 
  	//Grab second cube
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
- 	wait1Msec(250);
- 	intakeAndLiftTask_liftState = LIFT_UP;
+ 	wait1Msec(500);
 
  	//Drive back to fence
-  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.4, true);
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.1, true);
 
  	//Dump
-  turnToAbsAngle(180);
  	dumpIntakeBasic();
 
   //CENTER CUBE------------------------------------
- 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.1);
+ 	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
+ 	intakeAndLiftTask_intakeState = INTAKE_HALF;
+ 	moveToPoint(609 + 3 * ONE_TILE_MM,304 + ONE_TILE_MM);
 }
 
 #endif //SKILLS_C_INCLUDED

@@ -16,14 +16,17 @@ void initSensors()
  */
 void dumpIntakeBasic()
 {
-	turnToAbsAngle(180);
+	turnToAbsAngle(-90);
 	intakeAndLiftTask_liftState = LIFT_UP;
 	waitForLift(LIFT_DUMP);
+	writeDebugStreamLine("saw at dump");
 	setAllDriveMotors(-127);
 	wait1Msec(200);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	wait1Msec(100);
 	setAllDriveMotors(0);
+	wait1Msec(100);
+	waitForLift(LIFT_UP);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 }
 
@@ -142,7 +145,8 @@ void moveToPoint(const long x, const long y, bool backwards = false, long offset
 		#ifdef MOVETOPOINT_DEBUG
 			writeDebugStreamLine("movetopoint: turning all the way: %1.2f", temp.theta);
 		#endif
-		turn(temp.theta);
+		if(!backwards)
+			turn(temp.theta);
 
 		#ifdef MOVETOPOINT_DEBUG
 			writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);

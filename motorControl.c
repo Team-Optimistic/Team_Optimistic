@@ -27,6 +27,7 @@ void dumpIntakeBasic()
 	setAllDriveMotors(0);
 	wait1Msec(100);
 	waitForLift(LIFT_UP);
+	wait1Msec(100);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 }
 

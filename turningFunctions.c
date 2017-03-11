@@ -114,8 +114,7 @@ void turnToAbsAngle(const long deg)
 		BCI_unlockSem(std_msgSem, "turnToAbsAngle")
 	}
 
-	const long turnAmt = deg - theta;
-	turn(turnAmt);
+	turn(deg - theta);
 }
 
 #endif //TURNINGFUNCTIONS_C_INCLUDED

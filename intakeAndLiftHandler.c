@@ -10,7 +10,7 @@
 #define INTAKE_POPEN_VAL   500
 
 #define LIFT_FENCE_VAL     1540
-#define LIFT_UP_VAL        1200
+#define LIFT_UP_VAL        1300
 #define LIFT_DUMP_VAL      1100
 #define LIFT_HALF_VAL      300
 #define LIFT_DOWN_VAL      0

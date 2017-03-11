@@ -49,7 +49,7 @@ void runSkills()
  	wait1Msec(300);
  	driveStraight(-700); //Move intake out of way of wall
  	intakeAndLiftTask_intakeState = INTAKE_OPEN;
- 	driveStraight(500);
+ 	driveStraight(600);
 
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
  	wait1Msec(600);
@@ -64,7 +64,7 @@ void runSkills()
 
  	//Second cube
  	//Drive back to wall
-  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.1);
+  moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.2);
 
  	//Grab second cube
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
@@ -79,7 +79,12 @@ void runSkills()
   //CENTER CUBE------------------------------------
  	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
  	intakeAndLiftTask_intakeState = INTAKE_HALF;
- 	moveToPoint(609 + 3 * ONE_TILE_MM,304 + ONE_TILE_MM);
+ 	moveToPoint(609 + 0.9* ONE_TILE_MM,304 + ONE_TILE_MM);
+ 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+ 	wait1Msec(250);
+ 	intakeAndLiftTask_liftState = LIFT_HALF;
+ 	moveToPoint(609 + 3.25* ONE_TILE_MM,304 + ONE_TILE_MM);
+ 	dumpIntakeBasic();
 }
 
 #endif //SKILLS_C_INCLUDED

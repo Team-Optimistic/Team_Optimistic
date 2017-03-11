@@ -87,22 +87,43 @@ task autonomous()
 	//Fence stars
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	driveStraight(-ONE_TILE_MM*1.6);
+	driveStraight(-ONE_TILE_MM*1.5);
 	dumpIntakeBasic();
+	waitForLift(LIFT_DOWN);
 
 	//Cube in center
 	driveStraight(200);
-	moveToPoint(609 + ONE_TILE_MM - 100, 304 + ONE_TILE_MM*1.3);
-	intakeAndLiftTask_intakeState = INTAKE_CUBE;
+	moveToPoint(609 + ONE_TILE_MM - 200, 304 + ONE_TILE_MM);
 	turnToAbsAngle(0);
-	intakeAndLiftTask_liftState = LIFT_HALF;
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	wait1Msec(500);
+	intakeAndLiftTask_liftCustomVal = 700;
+	intakeAndLiftTask_liftState = LIFT_CUSTOM;
 	turnToAbsAngle(-90);
+	dumpIntakeBasic();
+	waitForLift(LIFT_DOWN);
+
+	//Wall stars
+	moveToPoint(609 + ONE_TILE_MM*1.5, 304 + ONE_TILE_MM);
+	turnToAbsAngle(-90);
+	driveStraight(550);
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	wait1Msec(100);
+	driveStraight(-700);
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	driveStraight(200);
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	wait1Msec(500);
+	driveStraight(-200);
+	intakeAndLiftTask_liftCustomVal = 700;
+	intakeAndLiftTask_liftState = LIFT_CUSTOM;
+	driveStraight(-200);
 	dumpIntakeBasic();
 }
 
 task usercontrol()
 {
-	//while (!vexRT[skillsBtn]) { wait1Msec(5); }
+	while (!vexRT[skillsBtn]) { wait1Msec(5); }
 
 	startTask(autonomous);
 	wait1Msec(60000);

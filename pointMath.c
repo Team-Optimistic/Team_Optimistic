@@ -92,6 +92,7 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 			{
 				out->theta = -180 - std_msg[STD_MSG_EST_THETA];
 
+				//Fix theta
 				if (out->theta <= -360)
 					out->theta = out->theta + 360;
 				else if (out->theta >= 360)
@@ -107,12 +108,7 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 			//Compute difference in angle
 			out->theta = ((atan2(yDiff, xDiff) * (180 / PI))) - std_msg[STD_MSG_EST_THETA];
 		}
-		//writeDebugStreamLine("ydiff %d   xdiff %d   goal   %d   theta  %d  EST  %d",yDiff,xDiff,((atan2(yDiff, xDiff) * (180 / PI))),out->theta,std_msg[STD_MSG_EST_THETA]);
-		/*while(out->theta>180)
-      out->theta-=360;
-	  while(out->theta<=-180)
-	      out->theta+=360;
-		*/
+		
 		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	}
 }

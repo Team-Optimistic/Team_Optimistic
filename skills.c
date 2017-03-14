@@ -30,7 +30,7 @@ void runSkills()
   //moveToPoint(609, 304 + ONE_TILE_MM*1.2, true);
 	writeDebugStreamLine("pre dump");
   //Dump
-  dumpIntakeBasic();
+  dumpIntake();
 	writeDebugStreamLine("post dump");
   //Turn to score star
   waitForLift(LIFT_DOWN);
@@ -60,7 +60,7 @@ void runSkills()
  	//driveStraight(-ONE_TILE_MM*0.5);
 
  	//Dump
- 	dumpIntakeBasic();
+ 	dumpIntake();
 
  	//Second cube
  	//Drive back to wall
@@ -74,7 +74,7 @@ void runSkills()
   moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM*1.1, true);
 
  	//Dump
- 	dumpIntakeBasic();
+ 	dumpIntake();
 
   //CENTER CUBE------------------------------------
  	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);

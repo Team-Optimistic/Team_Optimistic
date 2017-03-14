@@ -29,7 +29,8 @@
 //#define UARTHANDLER_DEBUG
 //#define UARTHANDLER_DEBUG_READ
 //#define MOVETOPOINT_DEBUG
-#define POINTMATH_DEBUG
+//#define POINTMATH_DEBUG
+#define MPC_DEBUG
 
 #include "uartHandler.c"
 #include "pointMath.c"
@@ -77,77 +78,78 @@ task main()
 	//startTask(testDrive);
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
+	startTask(readBuffer);
 
-	while (true)
-	{
-		if (SensorValue[skillsBtn])
-		{
-			wait1Msec(400);
-			runSkills();
-
-			//moveToPoint(609, 304 + ONE_TILE_MM, true);
-
-			//intakeAndLiftTask_intakeState = INTAKE_ACUBE;
-			//intakeAndLiftTask_liftState = LIFT_DOWN;
-			//startTask(intakeAndLiftTask);
-			//waitForIntake(INTAKE_ACUBE);
-			//driveStraight(ONE_TILE_MM);
-			//intakeAndLiftTask_intakeState = INTAKE_CUBE;
-			//wait1Msec(250);
-			//intakeAndLiftTask_liftState = LIFT_UP;
-			//while (true)
-			//{
-			//	EndTimeSlice();
-			//}
-
-			//turnToAbsAngle(0);
-
-		  //turnToAbsAngle(190);
-		  //turnToAbsAngle(270);
-		}
-
-		//Switch between driver control and autonomous
-		if (vexRT[JOY_BTN_RL])
-		{
-			isUserControlled = !isUserControlled;
-			waitForZero(vexRT[JOY_BTN_RL]);
-		}
-
-		if (isUserControlled)
-		{
-			leftVal = vexRT[JOY_JOY_LV];
-			rightVal = vexRT[JOY_JOY_RV];
-			leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
-			rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
-
-			setLeftMotors(leftVal);
-			setRightMotors(rightVal);
-
-			setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-			setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
-		}
-		else
-		{
-			if (isUserControlled != isUserControlled_last)
-			{
-				startTask(commandRobot);
-			}
-		}
-
-		isUserControlled_last = isUserControlled;
-
-		if (vexRT[JOY_BTN_RU])
-		{
-			motor[lidar] += 1;
-			waitForZero(vexRT[JOY_BTN_RU]);
-		}
-		else if (vexRT[JOY_BTN_RD])
-		{
-			motor[lidar] -= 1;
-			waitForZero(vexRT[JOY_BTN_RD]);
-		}
-
-		//Task wait
-		wait1Msec(15);
-	}
+	// while (true)
+	// {
+	// 	if (SensorValue[skillsBtn])
+	// 	{
+	// 		wait1Msec(400);
+	// 		runSkills();
+	//
+	// 		//moveToPoint(609, 304 + ONE_TILE_MM, true);
+	//
+	// 		//intakeAndLiftTask_intakeState = INTAKE_ACUBE;
+	// 		//intakeAndLiftTask_liftState = LIFT_DOWN;
+	// 		//startTask(intakeAndLiftTask);
+	// 		//waitForIntake(INTAKE_ACUBE);
+	// 		//driveStraight(ONE_TILE_MM);
+	// 		//intakeAndLiftTask_intakeState = INTAKE_CUBE;
+	// 		//wait1Msec(250);
+	// 		//intakeAndLiftTask_liftState = LIFT_UP;
+	// 		//while (true)
+	// 		//{
+	// 		//	EndTimeSlice();
+	// 		//}
+	//
+	// 		//turnToAbsAngle(0);
+	//
+	// 	  //turnToAbsAngle(190);
+	// 	  //turnToAbsAngle(270);
+	// 	}
+	//
+	// 	//Switch between driver control and autonomous
+	// 	if (vexRT[JOY_BTN_RL])
+	// 	{
+	// 		isUserControlled = !isUserControlled;
+	// 		waitForZero(vexRT[JOY_BTN_RL]);
+	// 	}
+	//
+	// 	if (isUserControlled)
+	// 	{
+	// 		leftVal = vexRT[JOY_JOY_LV];
+	// 		rightVal = vexRT[JOY_JOY_RV];
+	// 		leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
+	// 		rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
+	//
+	// 		setLeftMotors(leftVal);
+	// 		setRightMotors(rightVal);
+	//
+	// 		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
+	// 		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
+	// 	}
+	// 	else
+	// 	{
+	// 		if (isUserControlled != isUserControlled_last)
+	// 		{
+	// 			startTask(commandRobot);
+	// 		}
+	// 	}
+	//
+	// 	isUserControlled_last = isUserControlled;
+	//
+	// 	if (vexRT[JOY_BTN_RU])
+	// 	{
+	// 		motor[lidar] += 1;
+	// 		waitForZero(vexRT[JOY_BTN_RU]);
+	// 	}
+	// 	else if (vexRT[JOY_BTN_RD])
+	// 	{
+	// 		motor[lidar] -= 1;
+	// 		waitForZero(vexRT[JOY_BTN_RD]);
+	// 	}
+	//
+	// 	//Task wait
+	// 	wait1Msec(15);
+	// }
 }

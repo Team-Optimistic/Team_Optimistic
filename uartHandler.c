@@ -99,14 +99,12 @@ void initUART()
 {
 	//Initialize counts
 	for (unsigned int i = 0; i < MSG_COUNT_LENGTH; i++)
-	{
 		msgCount[i] = 0;
-	}
 
 	std_msg[STD_MSG_EST_X] = 609;
 	std_msg[STD_MSG_EST_Y] = 304;
 	std_msg[STD_MSG_EST_THETA] = -90;
-	std_msg[STD_MSG_LIDAR_RPM] = 250;
+	std_msg[STD_MSG_LIDAR_RPM] = 125;
 
 	//Initialize semaphores
 	semaphoreInitialize(std_msgSem);
@@ -396,13 +394,9 @@ task readBuffer()
 			if (std_msg[STD_MSG_LIDAR_RPM] != 0)
 			{
 				if (std_msg[STD_MSG_LIDAR_RPM] > 125)
-				{
 					motor[lidar] = motor[lidar] - 1;
-				}
 				else if (std_msg[STD_MSG_LIDAR_RPM] < 125)
-				{
 					motor[lidar] = motor[lidar] + 1;
-				}
 			}
 
 			BCI_unlockSem(std_msgSem, "readBuffer")

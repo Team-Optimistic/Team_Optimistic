@@ -67,7 +67,7 @@ task main()
 
 	clearDebugStream();
 
-	motor[lidar] = 80; //64 at 7.51V, 48 at 8.27V
+	motor[lidar] = 55; //64 at 7.51V, 48 at 8.27V
 
 	initUART();
 	initSensors();

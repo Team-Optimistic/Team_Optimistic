@@ -58,7 +58,7 @@ task commandRobot()
 
           case MPC_MSG_PICKUP_BACK:
             #ifdef MPC_DEBUG
-              writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[i`], yDemand[i]);
+              writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[i], yDemand[i]);
             #endif
 
             moveToPoint(xDemand[i], yDemand[i], true);

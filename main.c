@@ -72,8 +72,8 @@ task main()
 	initUART();
 	initSensors();
 
-	bool isUserControlled = false, isUserControlled_last = true;
-	int leftVal, rightVal;
+	//bool isUserControlled = false, isUserControlled_last = true;
+	//int leftVal, rightVal;
 
 	//startTask(testDrive);
 	//startTask(testLift);

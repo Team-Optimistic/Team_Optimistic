@@ -80,6 +80,8 @@ task main()
 	//startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 
+	while (true) { wait1Msec(15); }
+
 	// while (true)
 	// {
 	// 	if (SensorValue[skillsBtn])

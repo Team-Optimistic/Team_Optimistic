@@ -15,13 +15,13 @@ void turn(long angle)
 
 	//Conversion between encoder degrees and base_link degrees
 	const float conv = 12.75993;
-	//writeDebugStreamLine("original angle %d",angle);
-	//Target angle
+
+	//Fix angle
 	while(angle>180)
       angle-=360;
   while(angle<=-180)
       angle+=360;
-  //writeDebugStreamLine("corrected theta %d",angle);
+
 	int targetAngle = angle * conv;
 
 	pos_PID anglePID;

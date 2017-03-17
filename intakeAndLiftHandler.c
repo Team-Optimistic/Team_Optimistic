@@ -1,13 +1,13 @@
 #ifndef INTAKEANDLIFTHANDLER_C_INCLUDED
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
-#define INTAKE_HALF_VAL    2000
-#define INTAKE_CUBE_VAL    2150
+#define INTAKE_CLOSED_VAL  3800
+#define INTAKE_ACUBE_VAL   3500
+#define INTAKE_CUBE_VAL    3300
+#define INTAKE_HALF_VAL    3000
+#define INTAKE_OPEN_VAL    2300
 #define INTAKE_QUARTER_VAL 2100
-#define INTAKE_CLOSED_VAL  2400
-#define INTAKE_ACUBE_VAL   1750
-#define INTAKE_OPEN_VAL    1020
-#define INTAKE_POPEN_VAL   500
+#define INTAKE_POPEN_VAL   1670
 
 #define LIFT_FENCE_VAL     1540
 #define LIFT_UP_VAL        1300
@@ -252,8 +252,7 @@ task intakeAndLiftTask()
 		  intakeAndLiftTask_liftStateRead = LIFT_HALF;
 		}
 		//LIFT_DOWN
-		//else if (liftHasGoneDownBefore && imeCountWithOffset <= LIFT_DOWN_VAL + LIFT_BANDWITH)
-		else if(SensorValue[liftStopButton])
+		else if (SensorValue[liftStopButton])
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_DOWN;
 		}
@@ -261,8 +260,7 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_NOTHING;
 		}
-		if(intakeAndLiftTask_liftStateRead!= 0)
-			writeDebugStreamLine("lift state  %d",intakeAndLiftTask_liftStateRead);
+
 		wait1Msec(15);
 	}
 }

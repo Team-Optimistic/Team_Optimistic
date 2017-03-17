@@ -84,7 +84,7 @@ void runSkills()
  	wait1Msec(250);
  	intakeAndLiftTask_liftState = LIFT_HALF;
  	moveToPoint(609 + 3.25* ONE_TILE_MM,304 + ONE_TILE_MM);
- 	dumpIntakeBasic();
+ 	dumpIntake();
 }
 
 #endif //SKILLS_C_INCLUDED

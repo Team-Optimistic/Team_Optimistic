@@ -236,14 +236,7 @@ void sendMPCMsg()
 {
 	BCI_lockSem(uartSem, "sendMPCMsg")
 	{
-		//Send start byte
-		sendChar(UART1, 0xFA);
-
-		//Send msg type
-		sendChar(UART1, MPC_MSG_TYPE);
-
-		//Send msg count
-		sendChar(UART1, msgCount[MSG_COUNT_MPC]);
+		uart_sendMessageHeader(MPC_MSG_TYPE);
 
 		while (!bXmitComplete(UART1)) { wait1Msec(1); }
 

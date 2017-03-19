@@ -79,6 +79,10 @@ task main()
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
 	startTask(readBuffer);
+	wait1Msec(250);
+	while(!vexRT[Btn8D]){}
+	driveStraight(-300);
+	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }
 

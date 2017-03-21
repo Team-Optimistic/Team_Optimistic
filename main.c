@@ -80,6 +80,11 @@ task main()
 	//startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 	wait1Msec(250);
+
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	intakeAndLiftTask_liftState = LIFT_REST;
+	startTask(intakeAndLiftTask);
+
 	while(!vexRT[Btn8D]){}
 	driveStraight(-300);
 	startTask(commandRobot);

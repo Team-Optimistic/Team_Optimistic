@@ -49,8 +49,8 @@ intakeState intakeAndLiftTask_intakeStateRead = INTAKE_REST;
 intakeState intakeAndLiftTask_liftState = LIFT_REST;
 intakeState intakeAndLiftTask_liftStateRead = LIFT_REST;
 
-float imeCountWithOffset = 0;
-long intakeAndLiftTask_imeOffset = 0;
+float liftPosWithOffset = 0;
+long intakeAndLiftTask_liftOffset = 0;
 int intakeAndLiftTask_liftCustomVal = LIFT_DOWN_VAL;
 
 /**
@@ -63,7 +63,7 @@ task intakeAndLiftTask()
 	pos_PID intakePID, liftPID;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.15, 0.2, 0, 0);
-	pos_PID_InitController(&liftPID, &imeCountWithOffset, 0.3, 0.2, 0.2, LIFT_PID_BIAS);
+	pos_PID_InitController(&liftPID, &liftPosWithOffset, 0.3, 0.2, 0.2, LIFT_PID_BIAS);
 
 	while (true)
 	{
@@ -137,12 +137,12 @@ task intakeAndLiftTask()
 	 	//Reset offset if we hit the bottom
 		if (SensorValue[liftStopButton])
 		{
-			intakeAndLiftTask_imeOffset = nMotorEncoder[liftRI];
+			intakeAndLiftTask_liftOffset = SensorValue[liftPot];
 			liftHasGoneDownBefore = true;
 		}
 
 		//Update count with offset
-		imeCountWithOffset = nMotorEncoder[liftRI] - intakeAndLiftTask_imeOffset;
+		liftPosWithOffset = SensorValue[liftPot] - intakeAndLiftTask_liftOffset;
 
 		switch (intakeAndLiftTask_liftState)
 		{
@@ -192,20 +192,20 @@ task intakeAndLiftTask()
 
 		//This is where the lift actually is
 		//LIFT_UP
-		if (imeCountWithOffset <= LIFT_UP_VAL + LIFT_BANDWITH &&
-		    imeCountWithOffset >= LIFT_UP_VAL - LIFT_BANDWITH)
+		if (liftPosWithOffset <= LIFT_UP_VAL + LIFT_BANDWITH &&
+		    liftPosWithOffset >= LIFT_UP_VAL - LIFT_BANDWITH)
 		{
 			intakeAndLiftTask_liftStateRead = LIFT_UP;
 		}
 		//LIFT_DUMP
-		else if (imeCountWithOffset <= LIFT_DUMP_VAL + LIFT_BANDWITH &&
-			       imeCountWithOffset >= LIFT_DUMP_VAL - LIFT_BANDWITH)
+		else if (liftPosWithOffset <= LIFT_DUMP_VAL + LIFT_BANDWITH &&
+			       liftPosWithOffset >= LIFT_DUMP_VAL - LIFT_BANDWITH)
     {
     	intakeAndLiftTask_liftStateRead = LIFT_DUMP;
     }
 		//LIFT_HALF
-		else if (imeCountWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
-			       imeCountWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)
+		else if (liftPosWithOffset <= LIFT_HALF_VAL + LIFT_BANDWITH &&
+			       liftPosWithOffset >= LIFT_HALF_VAL - LIFT_BANDWITH)
 		{
 		  intakeAndLiftTask_liftStateRead = LIFT_HALF;
 		}

@@ -1,9 +1,10 @@
 #ifndef MOTORCONTROL_C_INCLUDED
 #define MOTORCONTROL_C_INCLUDED
 
-#define FENCE_LEFT_X  300
-#define FENCE_RIGHT_X 3100
-#define FENCE_RIGHT_Y 1118
+#define FENCE_LEFT_X   610
+#define FENCE_MIDDLE_X 914
+#define FENCE_RIGHT_X  1524
+#define FENCE_ANY_Y    610
 
 void initSensors()
 {
@@ -20,7 +21,6 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 		turnToAbsAngle(-90);
 	intakeAndLiftTask_liftState = LIFT_UP;
 	waitForLift(LIFT_DUMP);
-	writeDebugStreamLine("saw at dump");
 	setAllDriveMotors(-127);
 	wait1Msec(200);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
@@ -147,9 +147,6 @@ void scoreFence(const fenceTypes fence)
 			break;
 
 	  case FENCE_RIGHT:
-			moveToPoint(FENCE_RIGHT_X, FENCE_RIGHT_Y); //Center of right segment
-			turnToAbsAngle(180);
-			//knock the stars off
 			break;
 
 		default:

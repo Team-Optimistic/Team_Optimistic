@@ -1,13 +1,10 @@
 #ifndef INTAKEANDLIFTHANDLER_C_INCLUDED
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
-#define INTAKE_CLOSED_VAL  3800
-#define INTAKE_ACUBE_VAL   3500
-#define INTAKE_CUBE_VAL    3300
-#define INTAKE_HALF_VAL    3000
-#define INTAKE_OPEN_VAL    2300
-#define INTAKE_QUARTER_VAL 2100
-#define INTAKE_POPEN_VAL   1670
+#define INTAKE_CLOSED_VAL  680
+#define INTAKE_CUBE_VAL    800
+#define INTAKE_OPEN_VAL    1400
+#define INTAKE_POPEN_VAL   3627
 
 #define LIFT_FENCE_VAL     1540
 #define LIFT_UP_VAL        1300
@@ -26,11 +23,8 @@ long waitStartTime = 0;
 enum intakeState
 {
 	INTAKE_CUBE    = 1,
-	INTAKE_ACUBE   = 2,
 	INTAKE_OPEN    = 3,
 	INTAKE_POPEN   = 4,
-	INTAKE_HALF    = 5,
-	INTAKE_QUARTER = 6,
 	INTAKE_CLOSED  = 7,
 	INTAKE_REST    = 8,
 	INTAKE_WAIT    = 9
@@ -81,12 +75,6 @@ task intakeAndLiftTask()
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
-			case INTAKE_ACUBE:
-				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, INTAKE_ACUBE_VAL);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
-				break;
-
 			case INTAKE_OPEN:
 				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_OPEN_VAL);
@@ -99,20 +87,8 @@ task intakeAndLiftTask()
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
-			case INTAKE_HALF:
-				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, INTAKE_HALF_VAL);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
-				break;
-
-			case INTAKE_QUARTER:
-				pos_PID_ChangeBias(&intakePID, 0);
-				pos_PID_SetTargetPosition(&intakePID, INTAKE_QUARTER_VAL);
-				setIntakeMotors(pos_PID_StepController(&intakePID));
-				break;
-
 			case INTAKE_CLOSED:
-				if (SensorValue[intakePot] >= 2320)
+				if (SensorValue[intakePot] <= 650)
 				{
 					setIntakeMotors(0);
 				}
@@ -139,12 +115,6 @@ task intakeAndLiftTask()
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_CUBE;
 		}
-		//INTAKE_ACUBE
-		else if (SensorValue[intakePot] <= INTAKE_ACUBE_VAL + INTAKE_BANDWITH &&
-			 			 SensorValue[intakePot] >= INTAKE_ACUBE_VAL - INTAKE_BANDWITH)
-		{
-			intakeAndLiftTask_intakeStateRead = INTAKE_ACUBE;
-		}
 		//INTAKE_OPEN
 		else if (SensorValue[intakePot] <= INTAKE_OPEN_VAL + INTAKE_BANDWITH &&
 			  		 SensorValue[intakePot] >= INTAKE_OPEN_VAL - INTAKE_BANDWITH)
@@ -156,18 +126,6 @@ task intakeAndLiftTask()
 			  		 SensorValue[intakePot] >= INTAKE_POPEN_VAL - INTAKE_BANDWITH)
 		{
 			intakeAndLiftTask_intakeStateRead = INTAKE_POPEN;
-		}
-		//INTAKE_HALF
-		else if (SensorValue[intakePot] <= INTAKE_HALF_VAL + INTAKE_BANDWITH &&
-			  		 SensorValue[intakePot] >= INTAKE_HALF_VAL - INTAKE_BANDWITH)
-		{
-			intakeAndLiftTask_intakeStateRead = INTAKE_HALF;
-		}
-		//INTAKE_QUARTER
-		else if (SensorValue[intakePot] <= INTAKE_QUARTER_VAL + INTAKE_BANDWITH &&
-			  		 SensorValue[intakePot] >= INTAKE_QUARTER_VAL - INTAKE_BANDWITH)
-		{
-			intakeAndLiftTask_intakeStateRead = INTAKE_QUARTER;
 		}
 		//INTAKE_CLOSED
 		else if (SensorValue[intakePot] <= INTAKE_CLOSED_VAL + INTAKE_BANDWITH &&

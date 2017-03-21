@@ -62,7 +62,7 @@ task intakeAndLiftTask()
 
 	pos_PID intakePID, liftPID;
 
-	pos_PID_InitController(&intakePID, intakePot, 0.15, 0.2, 0, 0);
+	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0, 55);
 	pos_PID_InitController(&liftPID, &liftPosWithOffset, 0.3, 0.2, 0.2, LIFT_PID_BIAS);
 
 	while (true)
@@ -70,19 +70,16 @@ task intakeAndLiftTask()
 		switch (intakeAndLiftTask_intakeState)
 		{
 			case INTAKE_CUBE:
-				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_CUBE_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_OPEN:
-				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_OPEN_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
 
 			case INTAKE_POPEN:
-				pos_PID_ChangeBias(&intakePID, 0);
 				pos_PID_SetTargetPosition(&intakePID, INTAKE_POPEN_VAL);
 				setIntakeMotors(pos_PID_StepController(&intakePID));
 				break;
@@ -94,7 +91,6 @@ task intakeAndLiftTask()
 				}
 				else
 				{
-					pos_PID_ChangeBias(&intakePID, -30);
 					pos_PID_SetTargetPosition(&intakePID, INTAKE_CLOSED_VAL);
 					setIntakeMotors(pos_PID_StepController(&intakePID));
 				}

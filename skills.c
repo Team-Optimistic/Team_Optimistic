@@ -78,7 +78,6 @@ void runSkills()
 
   //CENTER CUBE------------------------------------
  	moveToPoint(609 - ONE_TILE_MM/4, 304 + ONE_TILE_MM);
- 	intakeAndLiftTask_intakeState = INTAKE_HALF;
  	moveToPoint(609 + 0.9* ONE_TILE_MM,304 + ONE_TILE_MM);
  	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
  	wait1Msec(250);

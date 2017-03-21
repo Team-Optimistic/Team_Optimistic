@@ -392,8 +392,8 @@ task readBuffer()
 					motor[lidar] = motor[lidar] + 1;
 			}
 
-			if (motor[lidar] > 100)
-				motor[lidar] = 100;
+			if (motor[lidar] > 70)
+				motor[lidar] = 70;
 			else if (motor[lidar] < 0)
 				motor[lidar] = 0;
 

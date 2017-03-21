@@ -6,11 +6,11 @@
 #define INTAKE_OPEN_VAL    1400
 #define INTAKE_POPEN_VAL   3627
 
-#define LIFT_FENCE_VAL     2550
-#define LIFT_UP_VAL        1100
-#define LIFT_DUMP_VAL      1900
-#define LIFT_HALF_VAL      2750
-#define LIFT_DOWN_VAL      3550
+#define LIFT_FENCE_VAL     1550
+#define LIFT_UP_VAL        3000
+#define LIFT_DUMP_VAL      2200
+#define LIFT_HALF_VAL      1350
+#define LIFT_DOWN_VAL      550
 
 #define INTAKE_BANDWITH    20
 #define LIFT_BANDWITH      30
@@ -63,7 +63,7 @@ task intakeAndLiftTask()
 	pos_PID intakePID, liftPID;
 
 	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0, 55);
-	pos_PID_InitController(&liftPID, &liftPosWithOffset, 0.3, 0.2, 0.2, LIFT_PID_BIAS);
+	pos_PID_InitController(&liftPID, &liftPosWithOffset, 0.1, 0.2, 0.04, LIFT_PID_BIAS);
 
 	while (true)
 	{
@@ -138,7 +138,7 @@ task intakeAndLiftTask()
 		}
 
 		//Update count with offset
-		liftPosWithOffset = SensorValue[liftPot] - intakeAndLiftTask_liftOffset;
+		liftPosWithOffset = 4096 - SensorValue[liftPot];
 
 		switch (intakeAndLiftTask_liftState)
 		{

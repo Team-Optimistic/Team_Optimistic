@@ -399,6 +399,11 @@ task readBuffer()
 					motor[lidar] = motor[lidar] + 1;
 			}
 
+			if (motor[lidar] > 100)
+				motor[lidar] = 100;
+			else if (motor[lidar] < 0)
+				motor[lidar] = 0;
+
 			BCI_unlockSem(std_msgSem, "readBuffer")
 		}
 

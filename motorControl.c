@@ -68,6 +68,41 @@ void moveToPoint(const long x, const long y, bool backwards = false, long offset
 	#endif
 }
 
+/**
+ * Turns and drives to a point recklessly
+ * @param x         X coordinate of point
+ * @param y         Y coordinate of point
+ * @param backwards Whether to move to the point backwards
+ * @param offset    Backward offset from final distance to point
+ */
+void moveToPoint_Ballsy(const long x, const long y, bool backwards = false, long offset = 0)
+{
+	distanceAndAngle temp;
+	computeDistanceAndAngleToPoint(x, y, &temp);
+
+	if (backwards)
+	{
+		temp.theta += 180;
+		temp.length *= -1;
+	}
+
+	#ifdef MOVETOPOINT_DEBUG
+		writeDebugStreamLine("movetopoint: turning all the way: %1.2f", temp.theta);
+	#endif
+
+	turn_Ballsy(temp.theta);
+
+	#ifdef MOVETOPOINT_DEBUG
+		writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);
+	#endif
+
+	driveStraight_Ballsy(temp.length - offset);
+
+	#ifdef MOVETOPOINT_DEBUG
+		writeDebugStreamLine("movetopoint: done");
+	#endif
+}
+
 void moveToPoint_Translate(const int x, const int y, bool backwards = false)
 {
 	long currentX = 0, currentY = 0;
@@ -131,7 +166,7 @@ void pickUpStar(const long x, const long y)
 {
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint(x, y);
+	moveToPoint_Ballsy(x, y);
 }
 
 /**
@@ -143,7 +178,7 @@ void pickUpCube(const long x, const long y)
 {
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint(x, y);
+	moveToPoint_Ballsy(x, y);
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

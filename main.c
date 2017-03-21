@@ -1,12 +1,12 @@
 #pragma config(UART_Usage, UART1, uartUserControl, baudRate115200, IOPins, None, None)
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    intakePot,      sensorPotentiometer)
+#pragma config(Sensor, in2,    liftPot,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  rightQuad,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl6,  leftQuad,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl10, stopBtn,        sensorTouch)
 #pragma config(Sensor, dgtl11, skillsBtn,      sensorTouch)
 #pragma config(Sensor, dgtl12, liftStopButton, sensorTouch)
-#pragma config(Sensor, I2C_1,  liftIME,        sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           lidar,         tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           liftRO,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           liftLI,        tmotorVex393_MC29, openLoop, reversed)
@@ -79,6 +79,10 @@ task main()
 	//startTask(testLift);
 	//startTask(intakeAndLiftTask);
 	startTask(readBuffer);
+	wait1Msec(250);
+	while(!vexRT[Btn8D]){}
+	driveStraight(-300);
+	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }
 

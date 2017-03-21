@@ -5,11 +5,12 @@
 task commandRobot()
 {
   long xDemand[MPC_MSG_OBJ_COUNT], yDemand[MPC_MSG_OBJ_COUNT], pickup[MPC_MSG_OBJ_COUNT];
-
+	sendMPCMsg();
   while (true)
   {
     if (mpcMsgFlag)
     {
+    	writeDebugStream("MPC : Flag ");
       BCI_lockSem(mpc_msgSem, "commandRobot")
       {
         int j;

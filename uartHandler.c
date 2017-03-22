@@ -277,6 +277,8 @@ Polls uart for a message and records it into msg[]
 task readBuffer()
 {
 	short msgFlagHolder, msgTypeFlagHolder, msgCountFlagHolder;
+	timer lidarTimer;
+	timer_Initialize(&lidarTimer);
 
 	long2Bytes conv;
 
@@ -384,7 +386,7 @@ task readBuffer()
 
 		BCI_lockSem(std_msgSem, "readBuffer")
 		{
-			if (std_msg[STD_MSG_LIDAR_RPM] != 0)
+			if (timer_Repeat(&lidarTimer, 100) && std_msg[STD_MSG_LIDAR_RPM] != 0)
 			{
 				if (std_msg[STD_MSG_LIDAR_RPM] > 125)
 					motor[lidar] = motor[lidar] - 1;

@@ -163,7 +163,7 @@ void pickUpStar(const long x, const long y)
 {
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint_Ballsy(x, y);
+	moveToPoint_Ballsy(x, y ,false ,315);
 }
 
 /**
@@ -175,7 +175,7 @@ void pickUpCube(const long x, const long y)
 {
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint_Ballsy(x, y);
+	moveToPoint_Ballsy(x, y, false, 315);
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

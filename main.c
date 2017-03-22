@@ -76,16 +76,17 @@ task main()
 
 	//startTask(testDrive);
 	//startTask(testLift);
-	//startTask(intakeAndLiftTask);
+	intakeAndLiftTask_intakeState = INTAKE_REST;
+  intakeAndLiftTask_liftState = LIFT_REST;
+	startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 	wait1Msec(250);
 
-	intakeAndLiftTask_intakeState = INTAKE_CUBE;
-	intakeAndLiftTask_liftState = LIFT_REST;
-	startTask(intakeAndLiftTask);
 
 	while(!vexRT[Btn8D]){wait1Msec(15);}
-	driveStraight(-300);
+	driveStraight(-550);
+	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	intakeAndLiftTask_liftState = LIFT_DOWN;
 	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }

@@ -10,13 +10,13 @@ task commandRobot()
   {
     if (mpcMsgFlag)
     {
-    	writeDebugStream("MPC : Flag ");
+    	writeDebugStreamLine("MPC : Flag ");
       BCI_lockSem(mpc_msgSem, "commandRobot")
       {
         int j;
         for (int i = 0; i < MPC_MSG_OBJ_COUNT; i++)
         {
-          j = i * 5;
+          j = i * 9;
           xDemand[i] = mpc_msg[MPC_MSG_X_COORD + j];
           yDemand[i] = mpc_msg[MPC_MSG_Y_COORD + j];
           pickup[i] = mpc_msg[MPC_MSG_PICKUP + j];
@@ -36,7 +36,6 @@ task commandRobot()
             #endif
 
             moveToPoint(xDemand[i], yDemand[i]);
-            sendMPCMsg();
             break;
 
           case MPC_MSG_PICKUP_STAR:
@@ -45,7 +44,6 @@ task commandRobot()
             #endif
 
             pickUpStar(xDemand[i], yDemand[i]);
-            sendMPCMsg();
             break;
 
           case MPC_MSG_PICKUP_CUBE:
@@ -54,7 +52,7 @@ task commandRobot()
             #endif
 
             pickUpCube(xDemand[i], yDemand[i]);
-            sendMPCMsg();
+            i = MPC_MSG_OBJ_COUNT;//totally done
             break;
 
           case MPC_MSG_PICKUP_BACK:
@@ -63,7 +61,6 @@ task commandRobot()
             #endif
 
             moveToPoint(xDemand[i], yDemand[i], true);
-            sendMPCMsg();
             break;
 
           case MPC_MSG_PICKUP_WALL:
@@ -101,9 +98,12 @@ task commandRobot()
       intakeAndLiftTask_intakeState = INTAKE_CLOSED;
       intakeAndLiftTask_liftState = LIFT_DOWN;
       wait1Msec(500);
+      intakeAndLiftTask_liftState = LIFT_HALF;
+      wait1Msec(250);
       dumpIntake();
 
       mpcMsgFlag = false;
+      sendMPCMsg();
     }
 
     wait1Msec(15);

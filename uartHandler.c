@@ -204,13 +204,13 @@ void sendSTDMsg()
 		sendChar(UART1, SensorValue[intakePot]);
 
 		//Send digital data
-		stdMsgUnion.l = SensorValue[leftQuad];
+		stdMsgUnion.l = nMotorEncoder[driveLFY];
 		sendChar(UART1, stdMsgUnion.b[0]);
 		sendChar(UART1, stdMsgUnion.b[1]);
 		sendChar(UART1, stdMsgUnion.b[2]);
 		sendChar(UART1, stdMsgUnion.b[3]);
 
-		stdMsgUnion.l = SensorValue[rightQuad];
+		stdMsgUnion.l = nMotorEncoder[driveRFY];
 		sendChar(UART1, stdMsgUnion.b[0]);
 		sendChar(UART1, stdMsgUnion.b[1]);
 		sendChar(UART1, stdMsgUnion.b[2]);

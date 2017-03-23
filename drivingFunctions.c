@@ -8,7 +8,7 @@
 void driveStraight(const long distance)
 {
 	//Save left and right quad values instead of setting them to zero
-	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	const long encoderLeft = nMotorEncoder[driveLFY], encoderRight = nMotorEncoder[driveRFY];
 
 	//Total distance elapsed since start and total angle change since start
 	float distanceElapsed = 0, angleChange = 0;
@@ -63,8 +63,8 @@ void driveStraight(const long distance)
 	while (!atTarget)
 	{
 		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
+		currentLeft = nMotorEncoder[driveLFY] - encoderLeft;
+		currentRight = nMotorEncoder[driveRFY] - encoderRight;
 
 		//Overall displacement is the average of left and right displacements
 		distanceElapsed = (currentLeft + currentRight) / 2.0;
@@ -118,7 +118,7 @@ void driveStraight(const long distance)
 void driveStraight_Ballsy(const long distance)
 {
 	//Save left and right quad values instead of setting them to zero
-	const long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	const long encoderLeft = nMotorEncoder[driveLFY], encoderRight = nMotorEncoder[driveRFY];
 
 	//Total distance elapsed since start and total angle change since start
 	float distanceElapsed = 0, angleChange = 0;
@@ -173,8 +173,8 @@ void driveStraight_Ballsy(const long distance)
 	while (!atTarget)
 	{
 		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
+		currentLeft = nMotorEncoder[driveLFY] - encoderLeft;
+		currentRight = nMotorEncoder[driveRFY] - encoderRight;
 
 		//Overall displacement is the average of left and right displacements
 		distanceElapsed = (currentLeft + currentRight) / 2.0;

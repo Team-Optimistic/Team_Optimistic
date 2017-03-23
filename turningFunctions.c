@@ -8,7 +8,7 @@
 void turn(long angle)
 {
 	//Save left and right quad values instead of setting them to zero
-	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	const long encoderLeft = nMotorEncoder[driveLFY], encoderRight = nMotorEncoder[driveRFY];
 
 	//Total angle change since start
 	float angleChange = 0, lastAngle = 0;
@@ -60,8 +60,8 @@ void turn(long angle)
 	while (!atTarget)
 	{
 		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
+		currentLeft = nMotorEncoder[driveLFY] - encoderLeft;
+		currentRight = nMotorEncoder[driveRFY] - encoderRight;
 
 		angleChange = currentRight - currentLeft;
 
@@ -108,7 +108,7 @@ void turn(long angle)
 void turn_Ballsy(long angle)
 {
 	//Save left and right quad values instead of setting them to zero
-	long encoderLeft = SensorValue[leftQuad], encoderRight = SensorValue[rightQuad];
+	const long encoderLeft = nMotorEncoder[driveLFY], encoderRight = nMotorEncoder[driveRFY];
 
 	//Total angle change since start
 	float angleChange = 0, lastAngle = 0;
@@ -161,8 +161,8 @@ void turn_Ballsy(long angle)
 	while (!atTarget)
 	{
 		//Calculate distance displacement
-		currentLeft = SensorValue[leftQuad] - encoderLeft;
-		currentRight = SensorValue[rightQuad] - encoderRight;
+		currentLeft = nMotorEncoder[driveLFY] - encoderLeft;
+		currentRight = nMotorEncoder[driveRFY] - encoderRight;
 
 		angleChange = currentRight - currentLeft;
 

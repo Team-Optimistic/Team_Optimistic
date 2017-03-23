@@ -60,6 +60,27 @@ task monitorStop()
 	}
 }
 
+void testMotors(const tSensors btn, int power = 64)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		while (true)
+		{
+			motor[i] = power;
+			wait1Msec(250);
+			motor[i] = 0;
+
+			if (SensorValue[btn])
+			{
+				waitForZero(SensorValue[btn]);
+				break;
+			}
+
+			wait1Msec(15);
+		}
+	}
+}
+
 task main()
 {
 	startTask(monitorStop);
@@ -81,7 +102,6 @@ task main()
 	startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 	wait1Msec(250);
-
 
 	while(!vexRT[Btn8D]){wait1Msec(15);}
 	driveStraight(-550);

@@ -9,10 +9,10 @@
 #pragma config(Motor,  port1,           lidar,         tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           liftRO,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           liftLI,        tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port4,           driveLFY,      tmotorVex393_MC29, openLoop, encoderPort, dgtl6)
-#pragma config(Motor,  port5,           driveRB,       tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port6,           driveLB,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port7,           driveRFY,      tmotorVex393_MC29, openLoop, encoderPort, dgtl1)
+#pragma config(Motor,  port4,           driveRB,       tmotorVex393_MC29, openLoop, reversed, encoderPort, dgtl6)
+#pragma config(Motor,  port5,           driveRFY,      tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port6,           driveLFY,      tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port7,           driveLB,       tmotorVex393_MC29, openLoop, encoderPort, dgtl1)
 #pragma config(Motor,  port8,           intakeY,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           liftLO,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port10,          liftRI,        tmotorVex393_HBridge, openLoop, encoderPort, None)
@@ -60,19 +60,21 @@ task monitorStop()
 	}
 }
 
-void testMotors(const tSensors btn, int power = 64)
+void testMotors(const TVexJoysticks btn, int power = 64)
 {
 	for (int i = 0; i < 10; i++)
 	{
 		while (true)
 		{
 			motor[i] = power;
-			wait1Msec(250);
+			wait1Msec(500);
+			motor[i] = -(power/2);
+			wait1Msec(100);
 			motor[i] = 0;
 
-			if (SensorValue[btn])
+			if (vexRT[btn])
 			{
-				waitForZero(SensorValue[btn]);
+				waitForZero(vexRT[btn]);
 				break;
 			}
 
@@ -97,19 +99,39 @@ task main()
 
 	//startTask(testDrive);
 	//startTask(testLift);
-	intakeAndLiftTask_intakeState = INTAKE_REST;
-  intakeAndLiftTask_liftState = LIFT_REST;
-	startTask(intakeAndLiftTask);
-	startTask(readBuffer);
-	wait1Msec(250);
+	//intakeAndLiftTask_intakeState = INTAKE_REST;
+  //intakeAndLiftTask_liftState = LIFT_REST;
+	//startTask(intakeAndLiftTask);
+	//startTask(readBuffer);
+	//wait1Msec(250);
 
-	while(!vexRT[Btn8D]){wait1Msec(15);}
-	driveStraight(-550);
-	intakeAndLiftTask_intakeState = INTAKE_OPEN;
-	intakeAndLiftTask_liftState = LIFT_DOWN;
-	startTask(commandRobot);
+	//while(!vexRT[Btn8D]){wait1Msec(15);}
+	//driveStraight(-550);
+	//intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	//intakeAndLiftTask_liftState = LIFT_DOWN;
+	//startTask(commandRobot);
 
-	while (true) { wait1Msec(15); }
+	//while (true) { wait1Msec(15); }
+
+	//testMotors(JOY_BTN_RD);
+
+	int vert, hor;
+
+	while (true)
+	{
+		vert = vexRT[JOY_JOY_LV];
+		hor = vexRT[JOY_JOY_LH];
+
+		if (abs(vert) < JOY_THRESHOLD)
+			vert = 0;
+		if (abs(hor) < JOY_THRESHOLD)
+			hor = 0;
+
+		setLeftMotors(vert + hor);
+		setRightMotors(vert - hor);
+
+		wait1Msec(15);
+	}
 
 	// while (true)
 	// {

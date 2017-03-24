@@ -94,16 +94,52 @@ task main()
 	initUART();
 	initSensors();
 
-	//bool isUserControlled = false, isUserControlled_last = true;
-	//int leftVal, rightVal;
-
 	//startTask(testDrive);
 	//startTask(testLift);
-	//intakeAndLiftTask_intakeState = INTAKE_REST;
-  //intakeAndLiftTask_liftState = LIFT_REST;
-	//startTask(intakeAndLiftTask);
-	//startTask(readBuffer);
-	//wait1Msec(250);
+	intakeAndLiftTask_intakeState = INTAKE_REST;
+  intakeAndLiftTask_liftState = LIFT_REST;
+	startTask(intakeAndLiftTask);
+	startTask(readBuffer);
+	wait1Msec(250);
+
+	while(!vexRT[Btn8D]){wait1Msec(15);}
+
+	driveStraight(-600);
+
+	while (true)
+	{
+		moveToPoint(914 + TWO_TILE_MM, 304 + ONE_TILE_MM);
+		wait1Msec(1000);
+		moveToPoint(914, 304 + ONE_TILE_MM);
+		wait1Msec(1000);
+
+		if (vexRT[JOY_BTN_LD])
+		{
+			int vert, hor;
+			while (true)
+			{
+				vert = vexRT[JOY_JOY_LV];
+				hor = vexRT[JOY_JOY_LH];
+
+				if (abs(vert) < JOY_THRESHOLD)
+					vert = 0;
+				if (abs(hor) < JOY_THRESHOLD)
+					hor = 0;
+
+				setLeftMotors(vert + hor);
+				setRightMotors(vert - hor);
+
+				if (vexRT[JOY_BTN_LD])
+				{
+					setLeftMotors(0);
+					setRightMotors(0);
+					break;
+				}
+
+				wait1Msec(15);
+			}
+		}
+	}
 
 	//while(!vexRT[Btn8D]){wait1Msec(15);}
 	//driveStraight(-550);
@@ -113,96 +149,24 @@ task main()
 
 	//while (true) { wait1Msec(15); }
 
-	//testMotors(JOY_BTN_RD);
 
-	int vert, hor;
 
-	while (true)
-	{
-		vert = vexRT[JOY_JOY_LV];
-		hor = vexRT[JOY_JOY_LH];
 
-		if (abs(vert) < JOY_THRESHOLD)
-			vert = 0;
-		if (abs(hor) < JOY_THRESHOLD)
-			hor = 0;
+	//int vert, hor;
 
-		setLeftMotors(vert + hor);
-		setRightMotors(vert - hor);
+	//while (true)
+	//{
+	//	vert = vexRT[JOY_JOY_LV];
+	//	hor = vexRT[JOY_JOY_LH];
 
-		wait1Msec(15);
-	}
+	//	if (abs(vert) < JOY_THRESHOLD)
+	//		vert = 0;
+	//	if (abs(hor) < JOY_THRESHOLD)
+	//		hor = 0;
 
-	// while (true)
-	// {
-	// 	if (SensorValue[skillsBtn])
-	// 	{
-	// 		wait1Msec(400);
-	// 		runSkills();
-	//
-	// 		//moveToPoint(609, 304 + ONE_TILE_MM, true);
-	//
-	// 		//intakeAndLiftTask_intakeState = INTAKE_ACUBE;
-	// 		//intakeAndLiftTask_liftState = LIFT_DOWN;
-	// 		//startTask(intakeAndLiftTask);
-	// 		//waitForIntake(INTAKE_ACUBE);
-	// 		//driveStraight(ONE_TILE_MM);
-	// 		//intakeAndLiftTask_intakeState = INTAKE_CUBE;
-	// 		//wait1Msec(250);
-	// 		//intakeAndLiftTask_liftState = LIFT_UP;
-	// 		//while (true)
-	// 		//{
-	// 		//	EndTimeSlice();
-	// 		//}
-	//
-	// 		//turnToAbsAngle(0);
-	//
-	// 	  //turnToAbsAngle(190);
-	// 	  //turnToAbsAngle(270);
-	// 	}
-	//
-	// 	//Switch between driver control and autonomous
-	// 	if (vexRT[JOY_BTN_RL])
-	// 	{
-	// 		isUserControlled = !isUserControlled;
-	// 		waitForZero(vexRT[JOY_BTN_RL]);
-	// 	}
-	//
-	// 	if (isUserControlled)
-	// 	{
-	// 		leftVal = vexRT[JOY_JOY_LV];
-	// 		rightVal = vexRT[JOY_JOY_RV];
-	// 		leftVal = abs(leftVal) < JOY_THRESHOLD ? 0 : leftVal;
-	// 		rightVal = abs(rightVal) < JOY_THRESHOLD ? 0 : rightVal;
-	//
-	// 		setLeftMotors(leftVal);
-	// 		setRightMotors(rightVal);
-	//
-	// 		setIntakeMotors(127 * vexRT[JOY_TRIG_LU] + -127 * vexRT[JOY_TRIG_LD]);
-	// 		setLiftMotors(127 * vexRT[JOY_TRIG_RU] + -127 * vexRT[JOY_TRIG_RD]);
-	// 	}
-	// 	else
-	// 	{
-	// 		if (isUserControlled != isUserControlled_last)
-	// 		{
-	// 			startTask(commandRobot);
-	// 		}
-	// 	}
-	//
-	// 	isUserControlled_last = isUserControlled;
-	//
-	// 	if (vexRT[JOY_BTN_RU])
-	// 	{
-	// 		motor[lidar] += 1;
-	// 		waitForZero(vexRT[JOY_BTN_RU]);
-	// 	}
-	// 	else if (vexRT[JOY_BTN_RD])
-	// 	{
-	// 		motor[lidar] -= 1;
-	// 		waitForZero(vexRT[JOY_BTN_RD]);
-	// 	}
-	//
-	// 	//Task wait
-	// 	wait1Msec(15);
-	// }
+	//	setLeftMotors(vert + hor);
+	//	setRightMotors(vert - hor);
+
+	//	wait1Msec(15);
+	//}
 }

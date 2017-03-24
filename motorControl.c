@@ -56,6 +56,7 @@ void moveToPoint(const long x, const long y, bool backwards = false, long offset
 	#endif
 
 	turn(temp.theta);
+	wait1Msec(1000);
 
 	#ifdef MOVETOPOINT_DEBUG
 		writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);

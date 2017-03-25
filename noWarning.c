@@ -1,6 +1,5 @@
 void noWarning(){
 		uart_verifyMessageCount(5,5);
-		sendSPCMsg();
 		sendMPCMsg();
 		computeDistanceToPoint(5,5);
 		computeAngleToPoint(5,5);
@@ -12,12 +11,10 @@ void noWarning(){
 		doesindegreestakeCollide(5);
 		moveToPoint_Translate(5,5,true);
 		scoreFence(FENCE_LEFT);
-		pickUpStars(&fake,&fake);
+		pickUpStar(fake,fake);
 		pickUpCube(5,5);
-		cheeseThoseStars();
-
-
-
+		startTask(commandRobot);
+		runSkills();
 		if(false)
 			noWarning();
 }

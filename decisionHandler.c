@@ -1,93 +1,113 @@
 #ifndef DECISIONHANDLER_C_INCLUDED
 #define DECISIONHANDLER_C_INCLUDED
 
-
 //Drives the robot based on recieved commands
 task commandRobot()
 {
-  //long xDemand[3], yDemand[3], pickup[3];
+  long xDemand[MPC_MSG_OBJ_COUNT], yDemand[MPC_MSG_OBJ_COUNT], pickup[MPC_MSG_OBJ_COUNT];
+	sendMPCMsg();
+  while (true)
+  {
+    if (mpcMsgFlag)
+    {
+    	writeDebugStreamLine("MPC : Flag ");
+      BCI_lockSem(mpc_msgSem, "commandRobot")
+      {
+        int j;
+        for (int i = 0; i < MPC_MSG_OBJ_COUNT; i++)
+        {
+          j = i * 9;
+          xDemand[i] = mpc_msg[MPC_MSG_X_COORD + j];
+          yDemand[i] = mpc_msg[MPC_MSG_Y_COORD + j];
+          pickup[i] = mpc_msg[MPC_MSG_PICKUP + j];
+        }
 
-  //while (true)
-  //{
-  //	if (mpcMsgFlag)
-  //	{
-	 //   BCI_lockSem(mpc_msgSem, "commandRobot")
-	 //   {
-	 //     for (int i = 0; i < 3; i++)
-	 //     {
-	 //       xDemand[i] = mpc_msg[MPC_MSG_X_COORD + (i * 5)];
-	 //       yDemand[i] = mpc_msg[MPC_MSG_Y_COORD + (i * 5)];
-	 //       pickup[i] = mpc_msg[MPC_MSG_PICKUP];
-	 //     }
-	 //     BCI_unlockSem(mpc_msgSem, "commandRobot")
-	 //   }
+        BCI_unlockSem(mpc_msgSem, "commandRobot")
+      }
 
-  //    //First instruction determines type of following ones
-  //    //We can only follow multiple instructions if we are getting stars
-  //    switch (pickup[0])
-  //    {
-  //      case MPC_MSG_PICKUP_CLEAR:
-  //      	writeDebugStreamLine("moving to point (%d,%d)", xDemand[0], yDemand[0]);
+      //Go through each msg and perform the action
+      for (int i = 0; i < MPC_MSG_OBJ_COUNT; i++)
+      {
+        switch (pickup[i])
+        {
+          case MPC_MSG_PICKUP_CLEAR:
+            #ifdef MPC_DEBUG
+              writeDebugStreamLine("moving to point (%d,%d)", xDemand[i], yDemand[i]);
+            #endif
 
-  //        moveToPoint(xDemand[0], yDemand[0]);
+            moveToPoint(xDemand[i], yDemand[i]);
+            break;
 
-  //        sendMPCMsg();
-  //        break;
+          case MPC_MSG_PICKUP_STAR:
+            #ifdef MPC_DEBUG
+              writeDebugStreamLine("getting star at (%d,%d)", xDemand[i], yDemand[i]);
+            #endif
 
-  //      case MPC_MSG_PICKUP_STAR:
-		//			writeDebugStreamLine("getting star at (%d,%d)", xDemand[0], yDemand[0]);
+            pickUpStar(xDemand[i], yDemand[i]);
+            break;
 
-  //        pickUpStars(xDemand, yDemand);
+          case MPC_MSG_PICKUP_CUBE:
+            #ifdef MPC_DEBUG
+              writeDebugStreamLine("getting cube at (%d,%d)", xDemand[i], yDemand[i]);
+            #endif
 
-  //        sendMPCMsg();
-  //        break;
+            pickUpCube(xDemand[i], yDemand[i]);
+            i = MPC_MSG_OBJ_COUNT;//totally done
+            break;
 
-  //      case MPC_MSG_PICKUP_CUBE:
-		//			writeDebugStreamLine("getting cube at (%d,%d)", xDemand[0], yDemand[0]);
+          case MPC_MSG_PICKUP_BACK:
+            #ifdef MPC_DEBUG
+              writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[i], yDemand[i]);
+            #endif
 
-  //        pickUpCube(xDemand[0], yDemand[0]);
+            moveToPoint(xDemand[i], yDemand[i], true);
+            break;
 
-  //        sendMPCMsg();
-  //        break;
+          case MPC_MSG_PICKUP_WALL:
+            #ifdef MPC_DEBUG
+              writeDebugStreamLine("knocking stars off fence %d", xDemand[i]);
+            #endif
 
-		//		case MPC_MSG_PICKUP_BACK:
-		//			writeDebugStreamLine("moving to point (%d,%d) backwards", xDemand[0], yDemand[0]);
+            switch (xDemand[i])
+            {
+              case 1:
+              scoreFence(FENCE_LEFT);
+              break;
 
-		//			moveToPoint(xDemand[0], yDemand[0], true, 0);
+              case 2:
+              scoreFence(FENCE_MIDDLE);
+              break;
 
-		//			sendMPCMsg();
-		//			break;
+              case 3:
+              scoreFence(FENCE_RIGHT);
+              break;
 
-		//		case MPC_MSG_PICKUP_WALL:
-		//			writeDebugStreamLine("knocking stars off fence %d", xDemand[0]);
+              default:
+              break;
+            }
 
-		//			switch (xDemand[0])
-		//			{
-		//				case 1:
-		//					scoreFence(FENCE_LEFT);
-		//					break;
+            sendMPCMsg();
+            break;
 
-		//				case 2:
-		//					scoreFence(FENCE_MIDDLE);
-		//					break;
+          default:
+            break;
+        }
+      }
 
-		//				default:
-		//					scoreFence(FENCE_RIGHT);
-		//					break;
-		//			}
+      //Score whats in the intake
+      intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+      intakeAndLiftTask_liftState = LIFT_DOWN;
+      wait1Msec(500);
+      intakeAndLiftTask_liftState = LIFT_HALF;
+      wait1Msec(250);
+      dumpIntake();
 
-		//			sendMPCMsg();
-		//			break;
+      mpcMsgFlag = false;
+      sendMPCMsg();
+    }
 
-  //      default:
-  //        break;
-  //    }
-
-  //    mpcMsgFlag = false;
-	 // }
-
-  //  wait1Msec(5);
-  //}
+    wait1Msec(15);
+  }
 }
 
 #endif //DECISIONHANDLER_C_INCLUDED

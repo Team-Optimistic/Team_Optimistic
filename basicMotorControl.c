@@ -1,14 +1,18 @@
 #ifndef BASICMOTORCONTROL_C_INCLUDED
 #define BASICMOTORCONTROL_C_INCLUDED
-
-void setLeftMotors(const int powerValue)
+int max_pwr =50;
+void setLeftMotors(int powerValue)
 {
+	if(abs(powerValue)>max_pwr)
+		powerValue = max_pwr * sgn(powerValue);
 	motor[driveLFY] = powerValue;
 	motor[driveLB] = powerValue;
 }
 
-void setRightMotors(const int powerValue)
+void setRightMotors(int powerValue)
 {
+	if(abs(powerValue)>max_pwr)
+		powerValue = max_pwr * sgn(powerValue);
 	motor[driveRFY] = powerValue;
 	motor[driveRB] = powerValue;
 }

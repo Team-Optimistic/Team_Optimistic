@@ -14,13 +14,13 @@ void turn(long angle)
 	float angleChange = 0, lastAngle = 0;
 
 	//Conversion between encoder degrees and base_link degrees
-	const float conv = 12.75993;
+	const float conv = 12.88361;
 
 	//Fix angle
-	while(angle>180)
+	/*while(angle>180)
       angle-=360;
   while(angle<=-180)
-      angle+=360;
+      angle+=360;*/
 
 	int targetAngle = angle * conv;
 

@@ -26,41 +26,40 @@ int y_min = ft_to_mm;   //edge of robot is against wall
 int x_max = field_right_wall - ft_to_mm;
 int y_max = field_fence - ft_to_mm;
 int f_rad;
-bool testCornerCollision(){
+bool testCornerCollision(){ //return true if a corner of the chassis hits the wall
 	if((front_left.x_val | front_right.x_val | back_left.x_val | back_right.x_val) > x_max){
-		return false;
-	}
-	else if((front_left.x_val | front_right.x_val | back_left.x_val | back_right.x_val) < x_min){
-		return false;
-	}
-	else if((front_left.y_val | front_right.y_val | back_left.y_val | back_right.y_val) > y_max){
-		return false;
-	}
-	else if((front_left.y_val | front_right.y_val | back_left.y_val | back_right.y_val) < y_min){
-		return false;
-		}else{
 		return true;
 	}
-}
-
-//these functions either need arguments like sp or a global variable sp
-void setOpenIntakeVals(){
-	/*front_right.x_val = sp->x + (dist_cent_to_open_claw_x * cosdegrees(sp->theta)); //x and y distances from center of robot to claw extremity (need to recheck)
-	front_left.x_val = sp->x - (dist_cent_to_open_claw_x * cosdegrees(sp->theta));//just change theta to 90+theta?
-	front_right.y_val = sp->y + (dist_cent_to_open_claw_y * sindegrees(sp->theta));
-	front_left.y_val = sp->y - (dist_cent_to_open_claw_y * sindegrees(sp->theta));
-	f_rad = sqrt(dist_cent_to_open_claw_y * dist_cent_to_open_claw_y + dist_cent_to_open_claw_x * dist_cent_to_open_claw_x);*/
-}
-
-void setClosedIntakeVals(){
-	/*front_right.y_val = front_left.y_val  = sp->y + (dist_cent_to_closed_claw * sindegrees(sp->theta));//since extremity points are together
-	front_right.x_val = front_left.x_val = sp->x + (dist_cent_to_closed_claw * cosdegrees(sp->theta));
-	f_rad = dist_cent_to_closed_claw;*/
+	else if((front_left.x_val | front_right.x_val | back_left.x_val | back_right.x_val) < x_min){
+		return true;
+	}
+	else if((front_left.y_val | front_right.y_val | back_left.y_val | back_right.y_val) > y_max){
+		return true;
+	}
+	else if((front_left.y_val | front_right.y_val | back_left.y_val | back_right.y_val) < y_min){
+		return true;
+		}else{
+		return false;
+	}
 }
 
 
-long doesDriveCollideSP(const statePack *sp, const int mm)  //potential problem: return 0 if successful, what if the distance you can go is also 0?
-{
+void setOpenIntakeVals(statePack *sp){
+	front_right.x_val = sp->x + (dist_cent_to_open_claw_x * cosDegrees(sp->theta)); //x and y distances from center of robot to claw extremity (need to recheck)
+	front_left.x_val = sp->x - (dist_cent_to_open_claw_x * cosDegrees(sp->theta));//just change theta to 90+theta?
+	front_right.y_val = sp->y + (dist_cent_to_open_claw_y * sinDegrees(sp->theta));
+	front_left.y_val = sp->y - (dist_cent_to_open_claw_y * sinDegrees(sp->theta));
+	f_rad = sqrt(dist_cent_to_open_claw_y * dist_cent_to_open_claw_y + dist_cent_to_open_claw_x * dist_cent_to_open_claw_x);
+}
+
+void setClosedIntakeVals(statePack *sp){
+	front_right.y_val = front_left.y_val  = sp->y + (dist_cent_to_closed_claw * sinDegrees(sp->theta));//since extremity points are together
+	front_right.x_val = front_left.x_val = sp->x + (dist_cent_to_closed_claw * cosDegrees(sp->theta));
+	f_rad = dist_cent_to_closed_claw;
+}
+
+
+long doesDriveCollideSP(const statePack *sp, const int mm)  {
 	// Given our current state (x, y, theta, intake, lift),
 	// If we drive straight for the given millimeters,
 	// Do we hit the field wall?
@@ -70,33 +69,40 @@ long doesDriveCollideSP(const statePack *sp, const int mm)  //potential problem:
 	//int goal_x = sp->x + (mm * sinDegrees(sp->theta));
 	//int goal_y = sp->y + (mm * cosDegrees(sp->theta));
 	//commented out because never read
-	int x_dist = 0; //therefore return 0 if path was successful
+	int x_dist = 0;
 	int y_dist = 0;
 
 	switch (intakeAndLiftTask_intakeState)
 	{
 	case INTAKE_OPEN:
-		setOpenIntakeVals();
+		setOpenIntakeVals(sp);
+
 		break;
 	case INTAKE_CLOSED:
-		setClosedIntakeVals();
+		setClosedIntakeVals(sp);
+
 		break;
 		// case default :
 		////////////////something, for when state is wait or rest
 		// break;
 	}
-	if(front_left.x_val > x_max){
+	/*if(testCornerCollision()){/////////////////////WORKING ON GOOD CODE
+		if((front_left_goal_x_val < x_min) | (front_left_goal_x_val > x_max)){
+			bad_corner_x =
+		}
+	}
+/*	if(front_left_goal_x_val > x_max){
 		x_dist = front_left.x_val - x_max;
 	}
-	if(front_left.y_val > y_max){
+	if(front_left_goal_y_val > y_max){
 		y_dist = front_left.y_val - y_max;
 	}
-	if(front_right.x_val > x_max){
+	if(front_right_goal_x_val > x_max){
 		x_dist = front_right.x_val - x_max;
 	}
-	if(front_right.y_val > y_max){
+	if(front_right_goal_y_val > y_max){
 		y_dist = front_right.y_val - y_max;
-	}
+	}*/
 
 	s_dist = sqrt (x_dist * x_dist + y_dist * y_dist);
 	return s_dist;
@@ -132,14 +138,16 @@ long doesTurnCollideSP(const statePack *sp, const int deg)
 		break;
 	case LIFT_DOWN:
 		if(intakeAndLiftTask_intakeState == INTAKE_OPEN){
-			setOpenIntakeVals();
+			setOpenIntakeVals(sp);
 			}else if(intakeAndLiftTask_intakeState == INTAKE_CLOSED){
-			setClosedIntakeVals();
+			setClosedIntakeVals(sp);
+
+
 		}
 		break;
 	}
 	long turndeg = 0;
-	while(testCornerCollision() && (turndeg <= deg)){
+	while(!testCornerCollision() && (turndeg <= deg)){
 		front_left.x_val += f_rad * cos(turndeg + sp->theta);
 		front_right.x_val += f_rad * cos(turndeg + sp->theta);
 		front_left.y_val += f_rad * sin(turndeg + sp->theta);

@@ -103,9 +103,9 @@ task commandRobot()
       dumpIntake();
 
       mpcMsgFlag = false;
-      sendMPCMsg();
     }
 
+    sendMPCMsg();
     wait1Msec(15);
   }
 }

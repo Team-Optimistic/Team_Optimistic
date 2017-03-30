@@ -5,6 +5,7 @@
 task commandRobot()
 {
   long xDemand[MPC_MSG_OBJ_COUNT], yDemand[MPC_MSG_OBJ_COUNT], pickup[MPC_MSG_OBJ_COUNT];
+  bool badData = false;
 	sendMPCMsg();
   while (true)
   {
@@ -23,6 +24,25 @@ task commandRobot()
         }
 
         BCI_unlockSem(mpc_msgSem, "commandRobot")
+      }
+
+      //Check for bad data
+      for (int i = 0; i < MPC_MSG_OBJ_COUNT; i++)
+      {
+        if (xDemand[i] < 0 ||
+            xDemand[i] > 3658 ||
+            yDemand[i] < 0 ||
+            yDemand[i] > 1829)
+        {
+          badData = true;
+          break;
+        }
+      }
+
+      //Break out if we get bad data from pi
+      if (badData)
+      {
+        break;
       }
 
       //Go through each msg and perform the action

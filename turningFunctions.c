@@ -17,10 +17,10 @@ void turn(long angle)
 	const float conv = 12.88361;
 
 	//Fix angle
-	/*while(angle>180)
+	while(angle>180)
       angle-=360;
   while(angle<=-180)
-      angle+=360;*/
+      angle+=360;
 
 	int targetAngle = angle * conv;
 

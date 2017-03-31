@@ -1,8 +1,8 @@
 void noWarning(){
 		uart_verifyMessageCount(5,5);
 		sendMPCMsg();
-		computeDistanceToPoint(5,5);
-		computeAngleToPoint(5,5);
+		//computeDistanceToPoint(5,5);
+		//computeAngleToPoint(5,5);
 		int fake = dist_cent_to_closed_claw;
 		fake = dist_cent_to_open_claw_x;
 		fake = dist_cent_to_open_claw_y;

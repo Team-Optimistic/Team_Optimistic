@@ -60,29 +60,6 @@ task monitorStop()
 	}
 }
 
-void testMotors(const TVexJoysticks btn, int power = 64)
-{
-	for (int i = 0; i < 10; i++)
-	{
-		while (true)
-		{
-			motor[i] = power;
-			wait1Msec(500);
-			motor[i] = -(power/2);
-			wait1Msec(100);
-			motor[i] = 0;
-
-			if (vexRT[btn])
-			{
-				waitForZero(vexRT[btn]);
-				break;
-			}
-
-			wait1Msec(15);
-		}
-	}
-}
-
 task main()
 {
 	startTask(monitorStop);
@@ -97,11 +74,11 @@ task main()
 	//startTask(testDrive);
 	//startTask(testLift);
 	intakeAndLiftTask_intakeState = INTAKE_REST;
-  intakeAndLiftTask_liftState = LIFT_REST
-  ;
+  intakeAndLiftTask_liftState = LIFT_REST;
 	startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 	wait1Msec(250);
+
 /*
 	while(!vexRT[Btn8D]){wait1Msec(15);}
 
@@ -142,6 +119,7 @@ task main()
 		}
 	}
 */
+
 	while(!vexRT[Btn8D]){wait1Msec(15);}
 	driveStraight(-550);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;

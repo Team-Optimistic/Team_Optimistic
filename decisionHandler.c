@@ -127,7 +127,7 @@ task commandRobot()
     }
 
     sendMPCMsg();
-    wait1Msec(15);
+    wait1Msec(100);
   }
 }
 

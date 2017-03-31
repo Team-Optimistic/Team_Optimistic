@@ -1,7 +1,7 @@
 #ifndef BASICMOTORCONTROL_C_INCLUDED
 #define BASICMOTORCONTROL_C_INCLUDED
 
-const int max_pwr = 70;
+const int max_pwr = 127;
 void setLeftMotors(int powerValue)
 {
 	if(abs(powerValue)>max_pwr)

@@ -31,9 +31,7 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	wait1Msec(100);
 	if (!shouldNotPutLiftDown)
 		intakeAndLiftTask_liftState = LIFT_DOWN;
-	setAllDriveMotors(127);
-	wait1Msec(200);
-	setAllDriveMotors(0);
+	driveStraight_Ballsy(300);
 }
 
 /**

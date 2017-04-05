@@ -353,7 +353,7 @@ task readBuffer()
 						uart_readMsg(mpc_msg, MPC_MSG_LENGTH);
 
 						int j;
-						for (int i = 0; i < 4; i++)
+						for (int i = 0; i < 3; i++)
 						{
 							j = i * 9;
 							conv.b[0] = mpc_msg[MPC_MSG_X_COORD + j];

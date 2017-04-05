@@ -71,6 +71,16 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 
 	BCI_lockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	{
+		if (std_msg[STD_MSG_EST_X] > 3658 ||
+				std_msg[STD_MSG_EST_X] < 0 ||
+				std_msg[STD_MSG_EST_Y] > 1829 ||
+				std_msg[STD_MSG_EST_Y] < 0)
+		{
+			writeDebugStreamLine("BAD ROBOT POSITION");
+			BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
+			return;
+		}
+
 		//Compute difference in distance
 		#ifdef POINTMATH_DEBUG
 			writeDebugStreamLine("comp: x: %d, estx: %d, y: %d, esty: %d, estth: %d", x, std_msg[STD_MSG_EST_X], y, std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
@@ -108,7 +118,7 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 			//Compute difference in angle
 			out->theta = ((atan2(yDiff, xDiff) * (180 / PI))) - std_msg[STD_MSG_EST_THETA];
 		}
-		
+
 		BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 	}
 }

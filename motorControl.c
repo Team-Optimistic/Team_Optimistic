@@ -31,6 +31,7 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	wait1Msec(100);
 	if (!shouldNotPutLiftDown)
 		intakeAndLiftTask_liftState = LIFT_DOWN;
+	driveStraight_Ballsy(300);
 }
 
 /**
@@ -88,19 +89,19 @@ void moveToPoint_Ballsy(const long x, const long y, bool backwards = false, long
 	}
 
 	#ifdef MOVETOPOINT_DEBUG
-		writeDebugStreamLine("movetopoint: turning all the way: %1.2f", temp.theta);
+		writeDebugStreamLine("movetopoint_ballsy: turning all the way: %1.2f", temp.theta);
 	#endif
 
 	turn_Ballsy(temp.theta);
 
 	#ifdef MOVETOPOINT_DEBUG
-		writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);
+		writeDebugStreamLine("movetopoint_ballsy: driving all the way: %1.2f", temp.length - offset);
 	#endif
 
 	driveStraight_Ballsy(temp.length - offset);
 
 	#ifdef MOVETOPOINT_DEBUG
-		writeDebugStreamLine("movetopoint: done");
+		writeDebugStreamLine("movetopoint_ballsy: done");
 	#endif
 }
 
@@ -164,7 +165,7 @@ void pickUpStar(const long x, const long y)
 {
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint_Ballsy(x, y ,false ,315);
+	moveToPoint_Ballsy(x, y, false, 315);
 }
 
 /**

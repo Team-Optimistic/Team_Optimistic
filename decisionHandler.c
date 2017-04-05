@@ -5,12 +5,14 @@
 task commandRobot()
 {
   long xDemand[MPC_MSG_OBJ_COUNT], yDemand[MPC_MSG_OBJ_COUNT], pickup[MPC_MSG_OBJ_COUNT];
+  bool badData = false;
 	sendMPCMsg();
+	wait1Msec(100);
   while (true)
   {
     if (mpcMsgFlag)
     {
-    	writeDebugStreamLine("MPC : Flag ");
+    	writeDebugStreamLine("MPC : Flag");
       BCI_lockSem(mpc_msgSem, "commandRobot")
       {
         int j;
@@ -20,9 +22,30 @@ task commandRobot()
           xDemand[i] = mpc_msg[MPC_MSG_X_COORD + j];
           yDemand[i] = mpc_msg[MPC_MSG_Y_COORD + j];
           pickup[i] = mpc_msg[MPC_MSG_PICKUP + j];
+          writeDebugStreamLine("%d,%d,%d", xDemand[i], yDemand[i], pickup[i]);
         }
 
         BCI_unlockSem(mpc_msgSem, "commandRobot")
+      }
+
+      //Check for bad data
+      for (int i = 0; i < MPC_MSG_OBJ_COUNT; i++)
+      {
+        if (xDemand[i] < -1 ||
+            xDemand[i] > 3658 ||
+            yDemand[i] < -1 ||
+            yDemand[i] > 1829)
+        {
+          badData = true;
+          writeDebugStreamLine("MPC: BAD DATA");
+          break;
+        }
+      }
+
+      //Break out if we get bad data from pi
+      if (badData)
+      {
+        break;
       }
 
       //Go through each msg and perform the action
@@ -85,8 +108,6 @@ task commandRobot()
               default:
               break;
             }
-
-            sendMPCMsg();
             break;
 
           default:
@@ -103,10 +124,10 @@ task commandRobot()
       dumpIntake();
 
       mpcMsgFlag = false;
-      sendMPCMsg();
     }
 
-    wait1Msec(15);
+    sendMPCMsg();
+    wait1Msec(100);
   }
 }
 

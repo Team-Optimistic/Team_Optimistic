@@ -28,7 +28,7 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	setAllDriveMotors(0);
 	wait1Msec(100);
 	waitForLift(LIFT_UP);
-	wait1Msec(100);
+	wait1Msec(1000);
 	if (!shouldNotPutLiftDown)
 		intakeAndLiftTask_liftState = LIFT_DOWN;
 	driveStraight_Ballsy(300);
@@ -161,23 +161,27 @@ void scoreFence(const fenceTypes fence)
  * @param x X coordinates
  * @param y Y coordinates
  */
-void pickUpStar(const long x, const long y)
+ // true if against wall
+bool pickUp(const long x, const long y , bool isCube)
 {
-	intakeAndLiftTask_intakeState = INTAKE_OPEN;
-	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint_Ballsy(x, y, false, 315);
-}
 
-/**
- * Picks up a cube
- * @param x X coordinate
- * @param y Y coordinate
- */
-void pickUpCube(const long x, const long y)
-{
+	int half = 1790;//half field in mm
+	int quarter = 895;//quarter field
+	int fakeX = x - half;
+	int fakeY = y - quarter;// center point being center of our half the field
+	int safeDistance = 460;
+	bool fence = fakeY > quarter - safeDistance;
+	bool back = -1*fakeY > quarter - safeDistance;
+	bool right = fakeX > half - safeDistance;
+	bool left = -1 * fakeX > half - safeDistance;
+
+
+	//bool
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
+	moveToPoint_Ballsy(x + (left-right) * safeDistance, y + (back - fence) * safeDistance, false, 0);
 	moveToPoint_Ballsy(x, y, false, 315);
+	return fence || back || right || left; // if was near any wall
 }
 
 #endif //MOTORCONTROL_C_INCLUDED

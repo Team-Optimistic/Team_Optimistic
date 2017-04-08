@@ -10,7 +10,7 @@ task commandRobot()
 	wait1Msec(100);
   while (true)
   {
-    if (mpcMsgFlag)
+    if (mpcMsgFlag && !badData)
     {
     	writeDebugStreamLine("MPC : Flag");
       BCI_lockSem(mpc_msgSem, "commandRobot")
@@ -40,12 +40,15 @@ task commandRobot()
           writeDebugStreamLine("MPC: BAD DATA");
           break;
         }
+        else{
+        	badData=false;
+        }
       }
 
       //Break out if we get bad data from pi
       if (badData)
       {
-        break;
+        //break;
       }
 
       //Go through each msg and perform the action
@@ -66,7 +69,8 @@ task commandRobot()
               writeDebugStreamLine("getting star at (%d,%d)", xDemand[i], yDemand[i]);
             #endif
 
-            pickUpStar(xDemand[i], yDemand[i]);
+            if( pickUp(xDemand[i], yDemand[i] , false))
+            	i = MPC_MSG_OBJ_COUNT;//totally done
             break;
 
           case MPC_MSG_PICKUP_CUBE:
@@ -74,7 +78,7 @@ task commandRobot()
               writeDebugStreamLine("getting cube at (%d,%d)", xDemand[i], yDemand[i]);
             #endif
 
-            pickUpCube(xDemand[i], yDemand[i]);
+            pickUp(xDemand[i], yDemand[i], true);
             i = MPC_MSG_OBJ_COUNT;//totally done
             break;
 
@@ -127,7 +131,7 @@ task commandRobot()
     }
 
     sendMPCMsg();
-    wait1Msec(100);
+    wait1Msec(5000);
   }
 }
 

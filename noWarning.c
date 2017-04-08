@@ -11,8 +11,6 @@ void noWarning(){
 		doesindegreestakeCollide(5);
 		moveToPoint_Translate(5,5,true);
 		scoreFence(FENCE_LEFT);
-		pickUpStar(fake,fake);
-		pickUpCube(5,5);
 		startTask(commandRobot);
 		runSkills();
 		if(false)

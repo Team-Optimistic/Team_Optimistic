@@ -123,6 +123,7 @@ task commandRobot()
       intakeAndLiftTask_intakeState = INTAKE_CLOSED;
       intakeAndLiftTask_liftState = LIFT_DOWN;
       wait1Msec(500);
+      driveStraight_Ballsy(-400);
       intakeAndLiftTask_liftState = LIFT_HALF;
       wait1Msec(250);
       dumpIntake();

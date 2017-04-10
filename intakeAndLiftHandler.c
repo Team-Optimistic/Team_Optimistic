@@ -14,7 +14,7 @@
 
 #define INTAKE_BANDWITH    20
 #define LIFT_BANDWITH      30
-#define LIFT_PID_BIAS      -10
+#define LIFT_PID_BIAS      -18
 
 long waitStartTime = 0;
 #define waitForIntake(val) waitStartTime=nSysTime;while(intakeAndLiftTask_intakeStateRead != val){if(nSysTime-waitStartTime>1000){break;}wait1Msec(15);}
@@ -64,9 +64,16 @@ task intakeAndLiftTask()
 
 	pos_PID_InitController(&intakePID, intakePot, 0.3, 0.2, 0, 55);
 	pos_PID_InitController(&liftPID, &liftPosWithOffset, 0.1, 0.2, 0.04, LIFT_PID_BIAS);
-
+int oldLiftState =1;
 	while (true)
 	{
+	if((intakeAndLiftTask_liftState == LIFT_DOWN) && (intakeAndLiftTask_liftState != oldLiftState)){
+  	writeDebugStreamLine("intake state %d",intakeAndLiftTask_intakeState);
+	}
+
+		oldLiftState = intakeAndLiftTask_liftState;
+
+
 		switch (intakeAndLiftTask_intakeState)
 		{
 			case INTAKE_CUBE:
@@ -85,9 +92,9 @@ task intakeAndLiftTask()
 				break;
 
 			case INTAKE_CLOSED:
-				if (SensorValue[intakePot] <= 650)
+				if (SensorValue[intakePot] <= 680)
 				{
-					setIntakeMotors(0);
+					setIntakeMotors(-15);
 				}
 				else
 				{

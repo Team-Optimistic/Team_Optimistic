@@ -120,19 +120,22 @@ task commandRobot()
       }
 
       //Score whats in the intake
+      writeDebugStreamLine("closing claw");
       intakeAndLiftTask_intakeState = INTAKE_CLOSED;
       intakeAndLiftTask_liftState = LIFT_DOWN;
-      wait1Msec(500);
+      wait1Msec(600);
       driveStraight_Ballsy(-400);
       intakeAndLiftTask_liftState = LIFT_HALF;
       wait1Msec(250);
+      writeDebugStreamLine("about to dump");
       dumpIntake();
+      writeDebugStreamLine("dumped");
 
       mpcMsgFlag = false;
     }
 
     sendMPCMsg();
-    wait1Msec(5000);
+    wait1Msec(200);
   }
 }
 

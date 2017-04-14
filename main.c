@@ -124,9 +124,9 @@ task main()
 */
 
 	while(!vexRT[Btn8D]){wait1Msec(15);}
+	intakeAndLiftTask_liftState = LIFT_DOWN;
 	driveStraight(-550);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
-	//intakeAndLiftTask_liftState = LIFT_DOWN;
 	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }

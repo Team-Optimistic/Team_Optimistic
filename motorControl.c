@@ -31,8 +31,8 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	wait1Msec(1000);
 	if (!shouldNotPutLiftDown)
 		intakeAndLiftTask_liftState = LIFT_DOWN;
-	driveStraight_Ballsy(300);
-	driveStraight_Ballsy(-50);
+	driveStraight_Ballsy(350);
+	driveStraight_Ballsy(-100);
 
 }
 
@@ -188,7 +188,7 @@ bool pickUp(const long x, const long y , bool isCube)
 	}
 	//intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	moveToPoint_Ballsy(x, y, false, 420);
+	moveToPoint_Ballsy(x, y, false, 370);
 	return wall; // if was near any wall
 }
 

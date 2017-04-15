@@ -77,75 +77,26 @@ task main()
 	//startTask(testDrive);
 	//startTask(testLift);
 	intakeAndLiftTask_intakeState = INTAKE_REST;
-  intakeAndLiftTask_liftState = LIFT_REST;
+	intakeAndLiftTask_liftState = LIFT_REST;
 	startTask(intakeAndLiftTask);
 	startTask(readBuffer);
 	wait1Msec(250);
 
-/*
 	while(!vexRT[Btn8D]){wait1Msec(15);}
 
-	driveStraight(-600);
-
-	while (true)
-	{
-		moveToPoint(914 + TWO_TILE_MM, 304 + ONE_TILE_MM);
-		wait1Msec(1000);
-		moveToPoint(914, 304 + ONE_TILE_MM);
-		wait1Msec(1000);
-
-		if (vexRT[JOY_BTN_LD])
-		{
-			int vert, hor;
-			while (true)
-			{
-				vert = vexRT[JOY_JOY_LV];
-				hor = vexRT[JOY_JOY_LH];
-
-				if (abs(vert) < JOY_THRESHOLD)
-					vert = 0;
-				if (abs(hor) < JOY_THRESHOLD)
-					hor = 0;
-
-				setLeftMotors(vert + hor);
-				setRightMotors(vert - hor);
-
-				if (vexRT[JOY_BTN_LD])
-				{
-					setLeftMotors(0);
-					setRightMotors(0);
-					break;
-				}
-
-				wait1Msec(15);
-			}
-		}
-	}
-*/
-
-	while(!vexRT[Btn8D]){wait1Msec(15);}
+	driveStraight_Ballsy(-550);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
-	driveStraight(-550);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
+	pickUp(3250,350,true);
+
+
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	intakeAndLiftTask_liftState = LIFT_DOWN;
+	wait1Msec(650);
+	driveStraight_Ballsy(-400);
+	intakeAndLiftTask_liftState = LIFT_HALF;
+	dumpIntake();
 	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }
-
-	//int vert, hor;
-
-	//while (true)
-	//{
-	//	vert = vexRT[JOY_JOY_LV];
-	//	hor = vexRT[JOY_JOY_LH];
-
-	//	if (abs(vert) < JOY_THRESHOLD)
-	//		vert = 0;
-	//	if (abs(hor) < JOY_THRESHOLD)
-	//		hor = 0;
-
-	//	setLeftMotors(vert + hor);
-	//	setRightMotors(vert - hor);
-
-	//	wait1Msec(15);
-	//}
 }

@@ -105,6 +105,45 @@ void turn(long angle)
  * Turns clockwise for an angle in degrees
  * @param  angle Angle to turn for (deg)
  */
+void turn_SBallsy(long angle){
+		//Save left and right quad values instead of setting them to zero
+	const long encoderLeft = nMotorEncoder[driveLFY], encoderRight = nMotorEncoder[driveRFY];
+
+	//Total angle change since start
+	float angleChange = 0, lastAngle = 0;
+
+	//Conversion between encoder degrees and base_link degrees
+	const float conv = 12.88361;
+
+	//Fix angle
+	while(angle>180)
+      angle-=360;
+  while(angle<=-180)
+      angle+=360;
+
+	int targetAngle = angle * conv;
+		//If angle PID controller is at target
+	bool atTarget = false;
+long currentLeft, currentRight;
+	//Angle that is "close enough" to target
+	const int atTargetAngle = 10;
+	while(!atTarget){
+		//Calculate distance displacement
+		currentLeft = nMotorEncoder[driveLFY] - encoderLeft;
+		currentRight = nMotorEncoder[driveRFY] - encoderRight;
+
+		angleChange = currentRight - currentLeft;
+		setLeftMotors(-1 * sgn(targetAngle) * 127);
+		setRightMotors(sgn(targetAngle) * 127);
+		atTarget = angleChange > targetAngle - atTargetAngle && angleChange < targetAngle + atTargetAngle;
+}
+	setLeftMotors(sgn(targetAngle) * 127);
+	setRightMotors(-1 * sgn(targetAngle) * 127);
+	wait1Msec(20);
+	setAllDriveMotors(0);
+
+}
+
 void turn_Ballsy(long angle)
 {
 	//Save left and right quad values instead of setting them to zero
@@ -114,7 +153,7 @@ void turn_Ballsy(long angle)
 	float angleChange = 0, lastAngle = 0;
 
 	//Conversion between encoder degrees and base_link degrees
-	const float conv = 12.75993;
+	const float conv = 12.88361;
 
 	//Fix angle
 	while(angle>180)
@@ -217,7 +256,7 @@ void turnToAbsAngle(const long deg)
 		BCI_unlockSem(std_msgSem, "turnToAbsAngle")
 	}
 
-	turn(deg - theta);
+	turn_SBallsy(deg - theta);
 }
 
 #endif //TURNINGFUNCTIONS_C_INCLUDED

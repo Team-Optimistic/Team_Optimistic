@@ -123,7 +123,7 @@ task commandRobot()
       writeDebugStreamLine("closing claw");
       intakeAndLiftTask_intakeState = INTAKE_CLOSED;
       intakeAndLiftTask_liftState = LIFT_DOWN;
-      wait1Msec(600);
+      wait1Msec(650);
       driveStraight_Ballsy(-400);
       intakeAndLiftTask_liftState = LIFT_HALF;
       wait1Msec(250);

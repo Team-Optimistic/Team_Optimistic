@@ -183,7 +183,7 @@ bool pickUp(const long x, const long y , bool isCube)
 	if(wall){
 	//	intakeAndLiftTask_intakeState = INTAKE_POPEN;
 		//intakeAndLiftTask_liftState = LIFT_HALF;
-		moveToPoint_Ballsy(x + (left-right) *1.5 * safeDistance, y + (back - fence) * 1.5 * safeDistance, false, 0);
+		moveToPoint(x + (left-right) *1.5 * safeDistance, y + (back - fence) * 1.5 * safeDistance, false, 0);
 
 	}
 	//intakeAndLiftTask_intakeState = INTAKE_OPEN;

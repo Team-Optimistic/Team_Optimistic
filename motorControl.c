@@ -28,7 +28,7 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	setAllDriveMotors(0);
 	wait1Msec(100);
 	waitForLift(LIFT_UP);
-	wait1Msec(1000);
+	//wait1Msec(1000);
 	if (!shouldNotPutLiftDown)
 		intakeAndLiftTask_liftState = LIFT_DOWN;
 	driveStraight_Ballsy(350);
@@ -94,7 +94,7 @@ void moveToPoint_Ballsy(const long x, const long y, bool backwards = false, long
 	writeDebugStreamLine("movetopoint_ballsy: turning all the way: %1.2f", temp.theta);
 #endif
 
-	turn_Ballsy(temp.theta);
+	turn(temp.theta);
 
 #ifdef MOVETOPOINT_DEBUG
 	writeDebugStreamLine("movetopoint_ballsy: driving all the way: %1.2f", temp.length - offset);

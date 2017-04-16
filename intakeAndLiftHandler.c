@@ -2,12 +2,12 @@
 #define INTAKEANDLIFTHANDLER_C_INCLUDED
 
 #define INTAKE_CLOSED_VAL  680
-#define INTAKE_CUBE_VAL    800
+#define INTAKE_CUBE_VAL    1700
 #define INTAKE_OPEN_VAL    1400
 #define INTAKE_POPEN_VAL   3627
 
 #define LIFT_FENCE_VAL     1550
-#define LIFT_UP_VAL        3200
+#define LIFT_UP_VAL        3000
 #define LIFT_DUMP_VAL      2200
 #define LIFT_HALF_VAL      1350
 #define LIFT_DOWN_VAL      550
@@ -18,7 +18,7 @@
 
 long waitStartTime = 0;
 #define waitForIntake(val) waitStartTime=nSysTime;while(intakeAndLiftTask_intakeStateRead != val){if(nSysTime-waitStartTime>1000){break;}wait1Msec(15);}
-#define waitForLift(val) waitStartTime=nSysTime;while(intakeAndLiftTask_liftStateRead != val){if(nSysTime-waitStartTime>3500){break;}wait1Msec(15);}
+#define waitForLift(val) waitStartTime=nSysTime;while(intakeAndLiftTask_liftStateRead != val){if(nSysTime-waitStartTime>3000){break;}wait1Msec(15);}
 
 enum intakeState
 {
@@ -67,12 +67,12 @@ task intakeAndLiftTask()
 int oldLiftState =1;
 	while (true)
 	{
-	if((intakeAndLiftTask_liftState == LIFT_DOWN) && (intakeAndLiftTask_liftState != oldLiftState)){
-  	writeDebugStreamLine("intake state %d",intakeAndLiftTask_intakeState);
-	}
 
 		oldLiftState = intakeAndLiftTask_liftState;
-
+		if(vexrt[Btn8U]){
+			intakeAndLiftTask_intakeState = INTAKE_REST;
+			intakeAndLiftTask_liftState = LIFT_REST;
+	}
 
 		switch (intakeAndLiftTask_intakeState)
 		{

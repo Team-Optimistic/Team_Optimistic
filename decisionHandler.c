@@ -5,7 +5,6 @@
 task commandRobot()
 {
   long xDemand[MPC_MSG_OBJ_COUNT], yDemand[MPC_MSG_OBJ_COUNT], pickup[MPC_MSG_OBJ_COUNT];
-  bool badData = false;
 	sendMPCMsg();
 	wait1Msec(100);
   while (true)
@@ -135,7 +134,7 @@ task commandRobot()
     }
 
     sendMPCMsg();
-    wait1Msec(200);
+    wait1Msec(100);
   }
 }
 

@@ -77,6 +77,8 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 				std_msg[STD_MSG_EST_Y] < 0)
 		{
 			writeDebugStreamLine("BAD ROBOT POSITION");
+			badData = true;
+			stopAllTasks();
 			BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 			return;
 		}

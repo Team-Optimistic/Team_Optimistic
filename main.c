@@ -33,6 +33,7 @@
 //#define MOVETOPOINT_DEBUG
 //#define POINTMATH_DEBUG
 //#define MPC_DEBUG
+bool badData = false;
 
 #include "uartHandler.c"
 #include "pointMath.c"
@@ -83,11 +84,22 @@ task main()
 	wait1Msec(250);
 
 	while(!vexRT[Btn8D]){wait1Msec(15);}
-
 	driveStraight_Ballsy(-550);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
-	pickUp(3250,350,true);
+	pickUp(1500,750,true);
+
+
+	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
+	intakeAndLiftTask_liftState = LIFT_DOWN;
+	wait1Msec(450);
+	intakeAndLiftTask_liftState = LIFT_HALF;
+	wait1Msec(400);
+	dumpIntake();
+
+	intakeAndLiftTask_liftState = LIFT_DOWN;
+	intakeAndLiftTask_intakeState = INTAKE_CUBE;
+	pickUp(1500,350,true);
 
 
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;
@@ -96,6 +108,9 @@ task main()
 	driveStraight_Ballsy(-400);
 	intakeAndLiftTask_liftState = LIFT_HALF;
 	dumpIntake();
+
+
+
 	startTask(commandRobot);
 
 	while (true) { wait1Msec(15); }

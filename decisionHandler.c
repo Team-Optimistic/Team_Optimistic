@@ -36,6 +36,7 @@ task commandRobot()
             yDemand[i] > 1829)
         {
           badData = true;
+          SensorValue[LED] = 0;
           writeDebugStreamLine("MPC: BAD DATA");
           break;
         }

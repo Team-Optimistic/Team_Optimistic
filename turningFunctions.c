@@ -25,15 +25,7 @@ void turn(long angle)
 	int targetAngle = angle * conv;
 
 	pos_PID anglePID;
-	if (fabs(angle) <= 350)
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.7, 0.45, 0.11);
-		writeDebugStreamLine("test");
-	}
-	else
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.2);
-	}
+	pos_PID_InitController(&anglePID, &angleChange, 0.61, 0.12, 0.07); //Ku = 1.4, Tu = 0.45
 	pos_PID_SetTargetPosition(&anglePID, targetAngle);
 
 	//If angle PID controller is at target
@@ -165,14 +157,7 @@ void turn_Ballsy(long angle)
 	int targetAngle = angle * conv;
 
 	pos_PID anglePID;
-	if (fabs(angle) <= 350)
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.1 * (angle / 180.0));
-	}
-	else
-	{
-		pos_PID_InitController(&anglePID, &angleChange, 0.6, 0.45, 0.2 * (angle / 180.0));
-	}
+	pos_PID_InitController(&anglePID, &angleChange, 0.61, 0.12, 0.07); //Ku = 1.4, Tu = 0.45
 	pos_PID_SetTargetPosition(&anglePID, targetAngle);
 
 	//If angle PID controller is at target

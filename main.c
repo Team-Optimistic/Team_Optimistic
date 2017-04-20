@@ -84,6 +84,9 @@ task main()
 	wait1Msec(250);
 
 	while(!vexRT[Btn8D]){wait1Msec(15);}
+
+	//dumpIntake();
+
 	driveStraight_Ballsy(-550);
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
@@ -99,7 +102,7 @@ task main()
 
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 	intakeAndLiftTask_intakeState = INTAKE_CUBE;
-	pickUp(1500,350,true);
+	pickUp(1450,350,true);
 
 
 	intakeAndLiftTask_intakeState = INTAKE_CLOSED;

@@ -335,7 +335,7 @@ task readBuffer()
 						conv.b[3] = std_msg[STD_MSG_EST_THETA + 3];
 						std_msg[STD_MSG_EST_THETA] = conv.l;
 
-						#ifdef UARTHANDLER_DEBUG_READ
+						#if defined(UARTHANDLER_DEBUG_READ) || defined(UARTHANDLER_DEBUG_STD_MSG)
 							writeDebugStreamLine("decoded: %d, %d, %d", std_msg[STD_MSG_EST_X], std_msg[STD_MSG_EST_Y], std_msg[STD_MSG_EST_THETA]);
 						#endif
 

@@ -20,20 +20,28 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 	if (!shouldNotTurn)
 		turnToAbsAngle(-90);
 	intakeAndLiftTask_liftState = LIFT_UP;
+	waitForLift(LIFT_HALF);
 	waitForLift(LIFT_DUMP);
 	setAllDriveMotors(-127);
-	wait1Msec(200);
+	wait1Msec(300);
 	intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	wait1Msec(100);
 	setAllDriveMotors(0);
 	wait1Msec(100);
 	waitForLift(LIFT_UP);
 	//wait1Msec(1000);
-	if (!shouldNotPutLiftDown)
+	if (!shouldNotPutLiftDown){
+		intakeAndLiftTask_liftState = LIFT_WAIT;
+
+		setLiftMotors(0);
+		wait1Msec(200);
+		setLiftMotors(-40);
+		wait1Msec(100);
 		intakeAndLiftTask_liftState = LIFT_DOWN;
+
+	}
 	driveStraight_Ballsy(350);
 	driveStraight_Ballsy(-100);
-
 }
 
 /**
@@ -58,14 +66,15 @@ void moveToPoint(const long x, const long y, bool backwards = false, long offset
 	writeDebugStreamLine("movetopoint: turning all the way: %1.2f", temp.theta);
 #endif
 
-	turn(temp.theta);
-	wait1Msec(1000);
+	if(abs(temp.length - offset) >300){
+		turn(temp.theta);
 
 #ifdef MOVETOPOINT_DEBUG
-	writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);
+		writeDebugStreamLine("movetopoint: driving all the way: %1.2f", temp.length - offset);
 #endif
 
-	driveStraight(temp.length - offset);
+		driveStraight(temp.length - offset);
+	}
 
 #ifdef MOVETOPOINT_DEBUG
 	writeDebugStreamLine("movetopoint: done");
@@ -93,15 +102,15 @@ void moveToPoint_Ballsy(const long x, const long y, bool backwards = false, long
 #ifdef MOVETOPOINT_DEBUG
 	writeDebugStreamLine("movetopoint_ballsy: turning all the way: %1.2f", temp.theta);
 #endif
-
-	turn(temp.theta);
+	if(abs(temp.length - offset) >150){
+		turn_Ballsy(temp.theta);
 
 #ifdef MOVETOPOINT_DEBUG
-	writeDebugStreamLine("movetopoint_ballsy: driving all the way: %1.2f", temp.length - offset);
+		writeDebugStreamLine("movetopoint_ballsy: driving all the way: %1.2f", temp.length - offset);
 #endif
 
-	driveStraight_Ballsy(temp.length - offset);
-
+		driveStraight_Ballsy(temp.length - offset);
+	}
 #ifdef MOVETOPOINT_DEBUG
 	writeDebugStreamLine("movetopoint_ballsy: done");
 #endif
@@ -166,7 +175,7 @@ void scoreFence(const fenceTypes fence)
 // true if against wall
 bool pickUp(const long x, const long y , bool isCube)
 {
-
+	int full = 3580;
 	int half = 1790;//half field in mm
 	int quarter = 895;//quarter field
 	int fakeX = x - half;
@@ -178,12 +187,19 @@ bool pickUp(const long x, const long y , bool isCube)
 	bool left = -1 * fakeX > half - safeDistance;
 
 	bool wall = fence || back || right || left;
+
 	//bool
 
 	if(wall){
-	//	intakeAndLiftTask_intakeState = INTAKE_POPEN;
-		//intakeAndLiftTask_liftState = LIFT_HALF;
-		moveToPoint(x + (left-right) *1.5 * safeDistance, y + (back - fence) * 1.5 * safeDistance, false, 0);
+
+		int midPointX = left ? 0 : x;
+		midPointX = right ? full : x;
+
+		int midPointY = fence ? half : y;
+		midPointY = back ? 0 : y;
+		intakeAndLiftTask_intakeState = INTAKE_CUBE;
+		moveToPoint(midPointX + (left-right) *1.5 * safeDistance, midPointY + (back - fence) * 1.5 * safeDistance, false, 0);
+		intakeAndLiftTask_intakeState = INTAKE_OPEN;
 
 	}
 	//intakeAndLiftTask_intakeState = INTAKE_OPEN;

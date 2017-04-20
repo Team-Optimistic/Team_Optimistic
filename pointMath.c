@@ -78,7 +78,8 @@ void computeDistanceAndAngleToPoint(const long x, const long y, distanceAndAngle
 		{
 			writeDebugStreamLine("BAD ROBOT POSITION");
 			badData = true;
-			stopAllTasks();
+			SensorValue[LED] = 0;
+		//	stopAllTasks();
 			BCI_unlockSem(std_msgSem, "computeDistanceAndAngleToPoint")
 			return;
 		}

@@ -41,7 +41,7 @@ void dumpIntake(bool shouldNotTurn = false, bool shouldNotPutLiftDown = false)
 
 	}
 	driveStraight_Ballsy(350);
-	driveStraight_Ballsy(-100);
+	driveStraight_Ballsy(-150);
 }
 
 /**
@@ -197,11 +197,9 @@ bool pickUp(const long x, const long y , bool isCube)
 
 		int midPointY = fence ? half : y;
 		midPointY = back ? 0 : y;
-		intakeAndLiftTask_intakeState = INTAKE_CUBE;
-		moveToPoint(midPointX + (left-right) *1.5 * safeDistance, midPointY + (back - fence) * 1.5 * safeDistance, false, 0);
 		intakeAndLiftTask_intakeState = INTAKE_OPEN;
-
-	}
+		moveToPoint(midPointX + (left-right) *1.5 * safeDistance, midPointY + (back - fence) * 1.5 * safeDistance, false, 0);
+}
 	//intakeAndLiftTask_intakeState = INTAKE_OPEN;
 	intakeAndLiftTask_liftState = LIFT_DOWN;
 	moveToPoint_Ballsy(x, y, false, 370);

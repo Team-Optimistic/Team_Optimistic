@@ -7,10 +7,10 @@
 #define INTAKE_POPEN_VAL   3627
 
 //#define LIFT_FENCE_VAL     1550
-#define LIFT_UP_VAL        2800
-#define LIFT_DUMP_VAL      1900
-#define LIFT_HALF_VAL      1010
-#define LIFT_DOWN_VAL      270
+#define LIFT_UP_VAL        2660
+#define LIFT_DUMP_VAL      1760
+#define LIFT_HALF_VAL      870
+#define LIFT_DOWN_VAL      136
 
 #define INTAKE_BANDWITH    20
 #define LIFT_BANDWITH      300

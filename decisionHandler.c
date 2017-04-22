@@ -9,7 +9,7 @@ task commandRobot()
 	wait1Msec(100);
   while (true)
   {
-    if (mpcMsgFlag && !badData)
+    if (mpcMsgFlag && !badData && ((nPgmTime - autoStartTime) < 35000))
     {
     	writeDebugStreamLine("MPC : Flag");
       BCI_lockSem(mpc_msgSem, "commandRobot")
